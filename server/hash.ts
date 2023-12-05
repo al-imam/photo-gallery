@@ -10,13 +10,15 @@ export async function generateOTP(length: number) {
     result += characters[randomIndex]
   }
 
-  return [result, await bcrypt.hash(result, 'secret')]
+  return [result, await bcrypt.hash(result, 2)]
 }
 
 export async function encrypt(plain: string) {
-  return bcrypt.hash(plain, 'secret')
+  if (!plain) throw new Error('Password is required')
+  return bcrypt.hash(plain, 2)
 }
 
 export async function compare(plain: string, hash: string) {
+  if (!plain) throw new Error('Password is required')
   return bcrypt.compare(plain, hash)
 }
