@@ -1,7 +1,7 @@
 import { NotFound } from "$components/not-found/not-found";
 
 export const metadata = {
-  title: "not-found",
+  title: "Not Found",
   description: "You're lost in the web",
 };
 
