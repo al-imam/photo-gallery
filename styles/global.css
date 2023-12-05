@@ -1,0 +1,151 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: theme(__colors.zinc-50);
+    --foreground: theme(__colors.zinc-950);
+
+    --card: theme(__colors.zinc-50);
+    --card-foreground: theme(__colors.zinc-950);
+
+    --popover: theme(__colors.zinc-50);
+    --popover-foreground: theme(__colors.zinc-950);
+
+    --primary: theme(__colors.zinc-900);
+    --primary-foreground: theme(__colors.zinc-100);
+
+    --secondary: theme(__colors.zinc-100);
+    --secondary-foreground: theme(__colors.zinc-900);
+
+    --muted: theme(__colors.zinc-200); /* fix - 100 */
+    --muted-foreground: theme(__colors.zinc-500);
+
+    --accent: theme(__colors.zinc-100);
+    --accent-foreground: theme(__colors.zinc-900);
+
+    --destructive: theme(__colors.red-500);
+    --destructive-foreground: theme(__colors.zinc-50);
+
+    --border: theme(__colors.zinc-200);
+    --input: theme(__colors.zinc-200);
+    --ring: theme(__colors.zinc-950);
+
+    --shade-p-500: theme(__colors.zinc-50);
+    --shade-p-400: theme(__colors.zinc-100);
+    --shade-p-300: theme(__colors.zinc-200);
+    --shade-p-200: theme(__colors.zinc-300);
+    --shade-p-100: theme(__colors.zinc-400);
+    --shade-0: theme(__colors.zinc-500);
+    --shade-n-100: theme(__colors.zinc-600);
+    --shade-n-200: theme(__colors.zinc-700);
+    --shade-n-300: theme(__colors.zinc-800);
+    --shade-n-400: theme(__colors.zinc-900);
+    --shade-n-500: theme(__colors.zinc-950);
+
+    --link: theme(__colors.blue-700);
+    --link-muted: theme(__colors.blue-500);
+
+    --success: theme(__colors.green-400);
+    --failure: theme(__colors.red-500);
+
+    --radius: 0.5rem;
+  }
+
+
+  .dark {
+    --background: theme(__colors.zinc-950);
+    --foreground: theme(__colors.zinc-50);
+
+    --card: theme(__colors.zinc-950);
+    --card-foreground: theme(__colors.zinc-50);
+
+    --popover: theme(__colors.zinc-950);
+    --popover-foreground: theme(__colors.zinc-50);
+
+    --primary: theme(__colors.zinc-50);
+    --primary-foreground: theme(__colors.zinc-900);
+
+    --secondary: theme(__colors.zinc-800);
+    --secondary-foreground: theme(__colors.zinc-50);
+
+    --muted: theme(__colors.zinc-800);
+    --muted-foreground: theme(__colors.zinc-400);
+
+    --accent: theme(__colors.zinc-800);
+    --accent-foreground: theme(__colors.zinc-50);
+
+    --destructive: theme(__colors.red-800);
+    --destructive-foreground: theme(__colors.zinc-50);
+
+    --border: theme(__colors.zinc-800);
+    --input: theme(__colors.zinc-800);
+    --ring: theme(__colors.zinc-300);
+
+    --shade-p-500: theme(__colors.zinc-900);
+    --shade-p-400: theme(__colors.zinc-800);
+    --shade-p-300: theme(__colors.zinc-700);
+    --shade-p-200: theme(__colors.zinc-600);
+    --shade-p-100: theme(__colors.zinc-500);
+    --shade-0: theme(__colors.zinc-400);
+    --shade-n-100: theme(__colors.zinc-300);
+    --shade-n-200: theme(__colors.zinc-200);
+    --shade-n-300: theme(__colors.zinc-100);
+    --shade-n-400: theme(__colors.zinc-50);
+    --shade-n-500: theme(__colors.white);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .stack-content {
+    display: grid;
+    grid-template: "container";
+  }
+
+  .stack-content > * {
+    grid-area: container;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .debug-outline * {
+    @apply bg-red-500/5 outline outline-1 outline-red-500/20;
+  }
+
+  .stop-dragging {
+    -webkit-user-drag: none;
+    user-drag: none;
+  }
+
+  .writing-vertical {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    transition:
+      background-color 50000s ease-in-out 0s,
+      color 5000s ease-in-out 0s;
+  }
+}
