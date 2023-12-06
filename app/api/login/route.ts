@@ -7,4 +7,4 @@ export const POST = router(async (req, ctx, next) => {
   const result = await server.auth.login(body.email, body.password)
   ctx.user = result
   return next()
-}, sendUserAndToken)
+}, sendUserAndToken )
