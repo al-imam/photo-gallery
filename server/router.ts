@@ -22,15 +22,17 @@ export const authRouter = Router.create({
     },
   ],
 })
+
 export const authVerifiedRouter = Router.create({
   middleware: [
-    (req: NextRequest, ctx: any, next: Function) => {
+    async (req: NextRequest, ctx: any, next: Function) => {
       ctx.test = 'test'
       console.log('::::: authVerifiedRouter Init :::::')
       return next()
     },
   ],
 })
+
 export const authNonVerifiedRouter = Router.create({
   middleware: [
     (req: NextRequest, param: any, next: Function) => {
