@@ -7,14 +7,14 @@
   },
 
   "[typescriptreact][typescript][javascript][javascriptreact]": {
-    "editor.formatOnSave": false
+    "editor.formatOnSave": false,
+    "files.trimFinalNewlines": true
   },
 
   "editor.defaultFormatter": "esbenp.prettier-vscode",
 
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true,
-    "source.sortImports": true
+    "source.fixAll.eslint": true
   },
 
   "typescript.tsdk": "node_modules/typescript/lib"
