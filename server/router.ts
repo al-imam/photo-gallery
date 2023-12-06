@@ -1,9 +1,12 @@
+import { User } from '@prisma/client'
 import { NextRequest, NextResponse } from 'next/server'
-import Router from 'router13'
+import Router, { NextFunction } from 'router13'
+import * as service from './index'
+import { NextHandler, NextUserHandler } from './types'
 
-const router = Router.create({
+const router = Router.create<NextHandler>({
   middleware: [
-    (req: NextRequest, param: any, next: Function) => {
+    (req, param, next) => {
       console.log('::::: Init :::::')
       return next()
     },
@@ -14,27 +17,30 @@ const router = Router.create({
   },
 })
 
-export const authRouter = Router.create({
+export const authRouter = router.create<NextUserHandler>({
   middleware: [
-    (req: NextRequest, param: any, next: Function) => {
-      console.log('::::: Auth Init :::::')
+    async (req, ctx, next) => {
+      const token = (req.headers as any).authorization
+      const user = await service.auth.checkAuth(token, 'auth')
+      ctx.user = user
       return next()
     },
   ],
 })
-export const authVerifiedRouter = Router.create({
+
+export const authVerifiedRouter = authRouter.create({
   middleware: [
-    (req: NextRequest, ctx: any, next: Function) => {
-      ctx.test = 'test'
-      console.log('::::: authVerifiedRouter Init :::::')
+    async (req, ctx, next) => {
+      if (!ctx.user.isAccountVerified) throw new Error('User is not verified')
       return next()
     },
   ],
 })
-export const authNonVerifiedRouter = Router.create({
+
+export const authNotVerifiedRouter = authRouter.create({
   middleware: [
-    (req: NextRequest, param: any, next: Function) => {
-      console.log('::::: authNonVerifiedRouter Init :::::')
+    async (req, ctx, next) => {
+      if (ctx.user.isAccountVerified) throw new Error('User is verified')
       return next()
     },
   ],
