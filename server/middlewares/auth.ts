@@ -2,7 +2,7 @@ import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import * as hash from '../hash'
 import { NextUserHandler } from '../types'
- 
+
 export const sendUserAndToken: NextUserHandler = async (req, ctx) => {
   const cookieToken = await hash.sign(ctx.user.id, 'cookie')
   const authToken = await hash.sign(ctx.user.id, 'auth')
@@ -18,7 +18,7 @@ export const sendUserAndToken: NextUserHandler = async (req, ctx) => {
   return NextResponse.json({
     data: {
       user: ctx.user,
-      token: authToken,
+      jwt_token: authToken,
     },
   })
 }

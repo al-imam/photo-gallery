@@ -1,10 +1,9 @@
-import { User } from '@prisma/client'
-import { NextRequest, NextResponse } from 'next/server'
-import Router, { NextFunction } from 'router13'
+import { NextResponse } from 'next/server'
+import Router from 'router13'
 import * as service from './index'
 import { NextHandler, NextUserHandler } from './types'
 
-const router = Router.create<NextHandler>({
+export const router = Router.create<NextHandler>({
   middleware: [
     (req, param, next) => {
       console.log('::::: Init :::::')
@@ -20,7 +19,7 @@ const router = Router.create<NextHandler>({
 export const authRouter = router.create<NextUserHandler>({
   middleware: [
     async (req, ctx, next) => {
-      const token = (req.headers as any).authorization
+      const token = req.headers.get('authorization')?.replace(/^Bearer /, '')
       const user = await service.auth.checkAuth(token, 'auth')
       ctx.user = user
       return next()
@@ -45,5 +44,3 @@ export const authNotVerifiedRouter = authRouter.create({
     },
   ],
 })
-
-export default router

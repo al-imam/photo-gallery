@@ -1,14 +1,12 @@
 import * as server from '$/server'
-import router, { authRouter } from '$/server/router'
-import { NextResponse } from 'next/server'
+import { sendUserAndToken } from '$/server/middlewares/auth'
+import { router, authRouter } from '$/server/router'
 
-export const POST = router(async (req) => {
+export const POST = router(async (req, ctx, next) => {
   const body = await req.json()
   const result = await server.user.create(body)
-  return NextResponse.json({ data: result })
-})
+  ctx.user = result
+  return next()
+}, sendUserAndToken)
 
-export const GET = authRouter(async (req) => {
-  const result = await server.user.find()
-  return NextResponse.json({ data: result })
-})
+export const GET = authRouter(sendUserAndToken)
