@@ -4,7 +4,9 @@ import * as jose from 'jose'
 const characters = '0123456789'
 const charactersLength = characters.length
 
-const secret = new TextEncoder().encode('cc7e0d44fd473002f1c42167459001140ec6389b7353f8088f4d9a95f2f596f2')
+const secret = new TextEncoder().encode(
+  'cc7e0d44fd473002f1c42167459001140ec6389b7353f8088f4d9a95f2f596f2'
+)
 const alg = 'HS256'
 
 export async function generateOTP(length: number) {
@@ -18,12 +20,12 @@ export async function generateOTP(length: number) {
 }
 
 export async function encrypt(plain: string) {
-  if (!plain) throw new Error('Password is required')
+  if (!plain) throw new Error('Text is required')
   return bcrypt.hash(plain, 2)
 }
 
 export async function compare(plain: string, hash: string) {
-  if (!plain) throw new Error('Password is required')
+  if (!plain) throw new Error('Text is required')
   return bcrypt.compare(plain, hash)
 }
 

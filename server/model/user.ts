@@ -1,3 +1,4 @@
+import { writeFileSync } from 'fs'
 import db, { User } from '../db'
 import * as hash from '../hash'
 import { PrettifyPick } from '../utils'
@@ -12,10 +13,15 @@ async function checkIfEmailAvailability(email: string) {
 }
 
 async function sendOTPToEmail(email: string, code: string) {
-  console.log('OTP <' + email + '>:', code)
+  const text = 'OTP <' + email + '>: ' + code
+  console.log(text)
+  writeFileSync('./email.log', text)
 }
 
-export async function get<T extends UserOrId, U = T extends string ? true : boolean>(userOrId: T, forceUpdate?: U) {
+export async function get<
+  T extends UserOrId,
+  U = T extends string ? true : boolean,
+>(userOrId: T, forceUpdate?: U) {
   let user: User | null = null
 
   if (typeof userOrId === 'string' || forceUpdate) {
@@ -27,7 +33,9 @@ export async function get<T extends UserOrId, U = T extends string ? true : bool
   return user
 }
 
-export async function create(data: PrettifyPick<User, 'name' | 'email' | 'password', 'avatar'>) {
+export async function create(
+  data: PrettifyPick<User, 'name' | 'email' | 'password', 'avatar'>
+) {
   const count = await checkIfEmailAvailability(data.email)
   if (!count) throw new Error('Email already exists')
 
@@ -47,7 +55,10 @@ export async function create(data: PrettifyPick<User, 'name' | 'email' | 'passwo
   return user
 }
 
-export async function update(userOrId: UserOrId, data: PrettifyPick<User, never, 'avatar' | 'name'>) {
+export async function update(
+  userOrId: UserOrId,
+  data: PrettifyPick<User, never, 'avatar' | 'name'>
+) {
   const user = await get(userOrId)
   return db.user.update({
     where: { id: user.id },
@@ -67,7 +78,8 @@ export async function verifyAccount(userOrId: UserOrId, code: string) {
     throw new Error('No verification process is pending')
   }
 
-  if (user.email_verificationCode !== code) {
+  console.log(await hash.compare(code, user.email_verificationCode))
+  if (!(await hash.compare(code, user.email_verificationCode))) {
     throw new Error('Invalid verification code')
   }
 
