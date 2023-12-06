@@ -9,4 +9,4 @@ export const POST = router(async (req, ctx, next) => {
   return next()
 }, sendUserAndToken)
 
-export const GET = authRouter(sendUserAndToken)
+export const GET = authRouter(sendUserAndToken )
