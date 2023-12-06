@@ -1,13 +1,13 @@
-import style from "$components/not-found/not-found.module.css";
-import { cn } from "$shadcn/utils";
-import Link from "next/link";
+import { cn } from '$shadcn/utils'
+import Link from 'next/link'
+import style from '/components/not-found/not-found.module.css'
 
-export function NotFound({ home = "/" }) {
+export function NotFound({ home = '/' }) {
   return (
     <div
       className={cn(
-        style["not-found"],
-        "stop-dragging [--last-color:rgb(var(--foreground))]]  select-none bg-background font-display text-foreground [--svg-background-color:rgb(var(--background))] [--svg-background-opacity:var(--background)]"
+        style['not-found'],
+        'stop-dragging [--last-color:rgb(var(--foreground))]]  select-none bg-background font-display text-foreground [--svg-background-color:rgb(var(--background))] [--svg-background-opacity:var(--background)]'
       )}
     >
       <main className="relative -top-16">
@@ -38,5 +38,5 @@ export function NotFound({ home = "/" }) {
         </div>
       </main>
     </div>
-  );
+  )
 }

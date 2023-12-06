@@ -1,2 +1,2 @@
-export * from "./mouse";
-export * from "./theme";
+export * from './mouse'
+export * from './theme'

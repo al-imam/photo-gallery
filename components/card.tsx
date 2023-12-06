@@ -1,28 +1,28 @@
-"use client";
+'use client'
 
-import { motion, useMotionTemplate, useSpring } from "framer-motion";
-import { useLayoutEffect, useRef } from "react";
+import { motion, useMotionTemplate, useSpring } from 'framer-motion'
+import { useLayoutEffect, useRef } from 'react'
 
 export const Card: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const mouseX = useSpring(0, { stiffness: 500, damping: 100 });
-  const mouseY = useSpring(0, { stiffness: 500, damping: 100 });
+  const cardRef = useRef<HTMLDivElement>(null)
+  const mouseX = useSpring(0, { stiffness: 500, damping: 100 })
+  const mouseY = useSpring(0, { stiffness: 500, damping: 100 })
 
   function onMouseMove({ currentTarget, clientX, clientY }: any) {
-    const { left, top } = currentTarget.getBoundingClientRect();
-    mouseX.set(clientX - left);
-    mouseY.set(clientY - top);
+    const { left, top } = currentTarget.getBoundingClientRect()
+    mouseX.set(clientX - left)
+    mouseY.set(clientY - top)
   }
 
   useLayoutEffect(() => {
     if (cardRef.current) {
-      const { width, height } = cardRef.current.getBoundingClientRect();
-      mouseX.set(Math.floor(width / Math.floor(Math.random() * 2 + 1)));
-      mouseY.set(Math.floor(height / Math.floor(Math.random() * 2 + 1)));
+      const { width, height } = cardRef.current.getBoundingClientRect()
+      mouseX.set(Math.floor(width / Math.floor(Math.random() * 2 + 1)))
+      mouseY.set(Math.floor(height / Math.floor(Math.random() * 2 + 1)))
     }
-  }, [cardRef]);
+  }, [cardRef])
 
-  const maskImage = useMotionTemplate`radial-gradient(240px at ${mouseX}px ${mouseY}px, white, transparent)`;
+  const maskImage = useMotionTemplate`radial-gradient(240px at ${mouseX}px ${mouseY}px, white, transparent)`
 
   return (
     <div
@@ -44,5 +44,5 @@ export const Card: React.FC<React.PropsWithChildren> = ({ children }) => {
 
       {children}
     </div>
-  );
-};
+  )
+}

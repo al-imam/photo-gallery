@@ -1,10 +1,15 @@
 {
-  "extends": ["next/core-web-vitals", "airbnb-base", "plugin:prettier/recommended"],
+  "extends": [
+    "next/core-web-vitals",
+    "airbnb-base",
+    "plugin:prettier/recommended"
+  ],
   "plugins": ["prettier"],
 
   "rules": {
+    "import/no-absolute-path": 0,
     "no-unused-vars": 2,
-    "prettier/prettier": 2,
+    "prettier/prettier": 1,
     "arrow-body-style": 0,
     "prefer-arrow-callback": 0,
     "import/prefer-default-export": 0,
