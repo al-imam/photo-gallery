@@ -1,6 +1,6 @@
-import * as server from '$/server'
-import { sendUserAndToken } from '$/server/middlewares/auth'
-import { router } from '$/server/router'
+import * as server from '@/server'
+import { sendUserAndToken } from '@/server/middlewares/auth'
+import { router } from '@/server/router'
 
 export const POST = router(async (req, ctx, next) => {
   const body = await req.json()
