@@ -17,21 +17,7 @@
     "plugins": [{ "name": "next" }],
     "baseUrl": ".",
     "paths": {
-      "$components/*": ["components/*"],
-      "$components": ["components"],
-      "$shadcn/*": ["shadcn/components/*", "shadcn/lib/*"],
-      "$util": ["util"],
-      "$styles/*": ["styles/*"],
-      "$context": ["context"],
-      "$iconify": ["icons/iconify-react"],
-      "$icons": ["icons"],
-      "$icons/*": ["icons/*"],
-      "$data/*": ["data/*"],
-      "$lib": ["lib"],
-      "$lib/*": ["lib/*"],
-      "$hooks/*": ["hooks/*"],
-      "$hooks": ["hooks"],
-      "$/*": ["*"]
+      "@/*": ["*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
