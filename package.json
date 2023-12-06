@@ -61,7 +61,7 @@
     "react-day-picker": "^8.9.1",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.48.2",
-    "router13": "^0.0.4",
+    "router13": "^0.0.7",
     "rype": "^2.0.3",
     "sharp": "^0.33.0",
     "tailwind-merge": "^2.1.0"

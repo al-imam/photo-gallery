@@ -1,7 +1,6 @@
 import { User } from '@prisma/client'
 import { NextRequest } from 'next/server'
+import { NextFunction } from 'router13'
 
-export type UserHandler<T = {}> = (req: NextRequest, ctx: { user: User } & T, next: Function) => any
-export function asUserHandler<T>(fn: UserHandler<T>) {
-  return fn
-}
+export type NextHandler = (req: NextRequest, ctx: Record<string, any>, next: NextFunction) => void
+export type NextUserHandler = (req: NextRequest, ctx: Record<string, any> & { user: User }, next: NextFunction) => void

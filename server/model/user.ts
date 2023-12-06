@@ -1,5 +1,5 @@
-import * as hash from '../hash'
 import db, { User } from '../db'
+import * as hash from '../hash'
 import { PrettifyPick } from '../utils'
 export type UserOrId = User | string
 
@@ -15,10 +15,7 @@ async function sendOTPToEmail(email: string, code: string) {
   console.log('OTP <' + email + '>:', code)
 }
 
-export async function get<
-  T extends UserOrId,
-  U = T extends string ? true : boolean
->(userOrId: T, forceUpdate?: U) {
+export async function get<T extends UserOrId, U = T extends string ? true : boolean>(userOrId: T, forceUpdate?: U) {
   let user: User | null = null
 
   if (typeof userOrId === 'string' || forceUpdate) {
@@ -30,9 +27,7 @@ export async function get<
   return user
 }
 
-export async function create(
-  data: PrettifyPick<User, 'name' | 'email' | 'password', 'avatar'>
-) {
+export async function create(data: PrettifyPick<User, 'name' | 'email' | 'password', 'avatar'>) {
   const count = await checkIfEmailAvailability(data.email)
   if (!count) throw new Error('Email already exists')
 
@@ -52,10 +47,7 @@ export async function create(
   return user
 }
 
-export async function update(
-  userOrId: UserOrId,
-  data: PrettifyPick<User, never, 'avatar' | 'name'>
-) {
+export async function update(userOrId: UserOrId, data: PrettifyPick<User, never, 'avatar' | 'name'>) {
   const user = await get(userOrId)
   return db.user.update({
     where: { id: user.id },
@@ -66,15 +58,6 @@ export async function update(
 export async function remove(userOrId: UserOrId) {
   const user = await get(userOrId)
   return db.user.delete({ where: { id: user.id } })
-}
-
-export async function login(email: string, password: string) {
-  const user = await db.user.findUnique({ where: { email } })
-  if (!user || !(await hash.compare(password, user.password))) {
-    throw new Error('Invalid email or password')
-  }
-
-  return user
 }
 
 export async function verifyAccount(userOrId: UserOrId, code: string) {
