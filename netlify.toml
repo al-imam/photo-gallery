@@ -1,4 +1,4 @@
 [[redirects]]
 from = "/media-storage-index/*"
-to = "https://cdn.discordapp.com/attachments/$DISCORD_CHANNEL/:splat"
+to = "./redirects.js"
 status = 200
