@@ -1,14 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { media } from '/server'
+import { authVerifiedRouter } from '/server/router'
 
-export async function POST(req: NextRequest) {
+export const POST = authVerifiedRouter(async (req: NextRequest, ctx) => {
   const body = await req.formData()
   const file = body.get('file') as File
+  if (!file) throw new Error('No file provided')
   const buffer = Buffer.from(await file.arrayBuffer())
-
-  const response = await media.create(buffer, {
-    authorId: '657073843ff831a4dd15d97a',
+  const data: Record<string, any> = {}
+  body.forEach((value, key) => {
+    if (key === 'file') return
+    data[key] = value
   })
 
-  return NextResponse.json(response)
-}
+  const response = await media.create(buffer, {
+    ...data,
+    authorId: ctx.user.id,
+  })
+
+  return NextResponse.json({ data: response })
+})
