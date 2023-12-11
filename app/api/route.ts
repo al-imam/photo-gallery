@@ -1,3 +1,3 @@
 export function GET() {
-  return Response.redirect('https://google.com', 200)
+  return Response.redirect('https://google.com', 301)
 }
