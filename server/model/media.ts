@@ -6,7 +6,7 @@ const mediaStatus = ['PENDING', 'APPROVED', 'REJECTED', 'PASSED_TO_ADMIN'] as [
   'PENDING',
   'APPROVED',
   'REJECTED',
-  'PASSED_TO_ADMIN'
+  'PASSED_TO_ADMIN',
 ]
 mediaStatus satisfies MediaStatus[]
 
@@ -28,8 +28,8 @@ export async function create(
   const newMedia = await db.media.create({
     data: {
       ...body,
-      discord_message: result.id,
-      discord_channel: result.channel_id,
+      messageId: result.id,
+      size: result.media.size,
       url_media: result.media.url,
       url_thumbnail: result.thumbnail.url,
     },

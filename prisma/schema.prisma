@@ -46,15 +46,14 @@ model User {
 
 model Media {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  messageId String
   createdAt DateTime @default(now())
 
   title       String   @default("")
   description String   @default("")
   tags        String[]
 
-  discord_channel String
-  discord_message String
-
+  size          Int
   url_media     String
   url_thumbnail String
 
