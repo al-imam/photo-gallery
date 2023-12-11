@@ -18,28 +18,27 @@ export function PhotoCard({ photoURL }: PhotoCardProps) {
           className="min-w-full"
         />
       </Link>
-      <div className="hidden group-hover:flex flex-col justify-between p-4 pointer-events-none">
-        <div className="flex gap-1 justify-end">
-          <Button size="icon" className="pointer-events-auto">
-            <Bookmark />
-          </Button>
-          <Button size="icon" className="pointer-events-auto">
-            <Heart />
-          </Button>
-        </div>
+      <div className="flex opacity-0 mt-auto group-hover:opacity-100 transition-opacity duration-300 flex-col justify-between p-4 pointer-events-none">
+        <div className="flex gap-1 justify-end"></div>
         <div className="flex gap-1 justify-between">
           <Link
             href="#"
-            className="font-sm font-semibold text-foreground pointer-events-auto"
+            className="font-sm font-semibold text-foreground group-hover:pointer-events-auto"
           >
             <Avatar className="h-10 w-10 rounded-sm">
               <AvatarImage src="https://github.com/shadcn.png" />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
           </Link>
-          <div>
-            <Button size="icon" className="pointer-events-auto">
+          <div className="flex flex-row-reverse gap-2">
+            <Button size="icon" className="group-hover:pointer-events-auto">
               <Download />
+            </Button>
+            <Button size="icon" className="group-hover:pointer-events-auto">
+              <Bookmark />
+            </Button>
+            <Button size="icon" className="group-hover:pointer-events-auto">
+              <Heart />
             </Button>
           </div>
         </div>
