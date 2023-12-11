@@ -6,7 +6,7 @@
     "editorRuler.foreground": "#ffffff18"
   },
 
-  "[typescriptreact][typescript][javascript][javascriptreact]": {
+  "[tsx][ts][js][jsx]": {
     "editor.formatOnSave": false,
     "files.trimFinalNewlines": true
   },
@@ -14,8 +14,15 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
 
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
+    "source.fixAll.eslint": "always"
   },
+
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
 
   "typescript.tsdk": "node_modules/typescript/lib"
 }

@@ -21,7 +21,7 @@ import { useEffect, useRef, useState } from 'react'
 const ghostFocus =
   'focus-visible:bg-accent focus-visible:text-accent-foreground focus-visible:ring-0 focus-visible:ring-offset-0'
 
-export function NavBar() {
+export function NavBar({ takeHeight = true }) {
   const ref = useRef<HTMLElement>(null)
   const [isIntersecting, setIntersecting] = useState(true)
   const { setTheme } = useTheme()
@@ -38,7 +38,10 @@ export function NavBar() {
   }, [])
 
   return (
-    <nav ref={ref} className="w-full mb-[var(--nav-size)]">
+    <nav
+      ref={ref}
+      className={cn('w-full', { 'mb-[var(--nav-size)]': takeHeight })}
+    >
       <div
         className={cn(
           'content fixed inset-x-0 top-0 z-50 border-b duration-200',
