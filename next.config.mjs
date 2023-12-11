@@ -1,3 +1,9 @@
+import { writeFileSync } from 'fs'
+
+const source = '/media-storage-index'
+const destination = `https://cdn.discordapp.com/attachments/${process.env.DISCORD_CHANNEL}`
+writeFileSync('./_redirects', `${source}/* ${destination}/:splat 200`)
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: { remotePatterns: [{ protocol: 'https', hostname: '**' }] },
@@ -5,8 +11,8 @@ const nextConfig = {
   rewrites() {
     return [
       {
-        source: '/media-storage-index/:path*',
-        destination: `https://cdn.discordapp.com/attachments/${process.env.DISCORD_CHANNEL}/:path*`,
+        source: source + '/:path*',
+        destination: destination + '/:path*',
       },
     ]
   },
