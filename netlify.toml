@@ -1,4 +1,0 @@
-[[redirects]]
-from = "/media-storage-index/*"
-to = "/.netlify/functions/redirects"
-status = 200
