@@ -1,4 +1,4 @@
 [[redirects]]
-  from = "/old-path"
-  to = "/${redirect_target}"
-  status = 200
+from = "/media-storage-index/*"
+to = "https://cdn.discordapp.com/attachments/${DISCORD_CHANNEL}/:splat"
+status = 200
