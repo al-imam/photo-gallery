@@ -1,6 +1,6 @@
 import axios from 'axios'
-import sharp from 'sharp'
 import FormData from 'form-data'
+import sharp from 'sharp'
 // @ts-ignore
 import * as magic from 'detect-file-type'
 
@@ -92,10 +92,15 @@ async function upload(image: Buffer) {
   const [media, thumbnail] = data.attachments.map((attachment) => ({
     size: attachment.size,
     contentType: attachment.content_type,
-    url: attachment.url.replace(/(\?\w+\=).*/, ''),
+    url: `${attachment.id}/${attachment.filename}`,
   }))
 
-  return { id: data.id, channel_id: data.channel_id, media, thumbnail }
+  return {
+    media,
+    thumbnail,
+    id: data.id,
+    channel_id: data.channel_id,
+  }
 }
 
 async function remove() {}
