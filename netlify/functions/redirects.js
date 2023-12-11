@@ -1,8 +1,8 @@
 // netlify/functions/redirects.js
 
 exports.handler = async (event, context) => {
-  const { splat } = event.params
-  const discordChannel = process.env.DISCORD_CHANNEL
+  console.log(event)
+  console.log(context)
 
   if (!discordChannel) {
     return {
@@ -13,7 +13,7 @@ exports.handler = async (event, context) => {
     }
   }
 
-  const redirectTo = `https://cdn.discordapp.com/attachments/${discordChannel}/${splat}`
+  const redirectTo = `https://cdn.discordapp.com/attachments/${process.env.DISCORD_CHANNEL}/:splat`
 
   return {
     statusCode: 200,
