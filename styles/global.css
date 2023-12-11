@@ -51,8 +51,9 @@
     --failure: theme(__colors.red-500);
 
     --radius: 0.5rem;
-  }
 
+    --nav-size: 4rem;
+  }
 
   .dark {
     --background: theme(__colors.zinc-950);
@@ -110,7 +111,7 @@
 @layer components {
   .stack-content {
     display: grid;
-    grid-template: "container";
+    grid-template: 'container';
   }
 
   .stack-content > * {
