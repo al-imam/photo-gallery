@@ -3,6 +3,7 @@ import FormData from 'form-data'
 import sharp from 'sharp'
 // @ts-ignore
 import * as magic from 'detect-file-type'
+import env from './env'
 
 type Attachment = {
   id: string
@@ -62,14 +63,11 @@ async function generateFormData(image: Buffer): Promise<FormData> {
 }
 
 async function uploadFormData(formData: FormData): Promise<Data> {
-  const channel = process.env.DISCORD_CHANNEL
-  const token = process.env.DISCORD_TOKEN
-
   try {
     const response = await axios.post<Data>(
-      `https://discord.com/api/v10/channels/${channel}/messages`,
+      `https://discord.com/api/v10/channels/${env.DISCORD_CHANNEL}/messages`,
       formData,
-      { headers: { Authorization: `Bot ${token}` } }
+      { headers: { Authorization: `Bot ${env.DISCORD_TOKEN}` } }
     )
 
     return response.data

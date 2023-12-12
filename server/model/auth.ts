@@ -12,9 +12,14 @@ export async function login(email: string, password: string) {
   return user
 }
 
-export async function checkAuth(token: string | undefined, tokenMode: 'cookie' | 'auth') {
+export async function checkAuth(
+  token: string | undefined | null,
+  tokenMode: 'cookie' | 'auth'
+) {
   if (!token) throw new Error('Token is required')
-  const { payload, iat, mode } = await hash.verify(token)
+  const { payload, iat, mode } = await hash.verify(
+    token.replace(/^Bearer /, '')
+  )
 
   if (mode !== tokenMode) throw new Error('Token is invalid')
   const user = await userService.get(payload)
