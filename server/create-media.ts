@@ -1,6 +1,6 @@
 import r from 'rype'
-import db, { MediaStatus } from '../db'
-import discord from '../discord'
+import db, { MediaStatus } from './db'
+import discord from './discord'
 
 const mediaStatus = ['PENDING', 'APPROVED', 'REJECTED', 'PASSED_TO_ADMIN'] as [
   'PENDING',
@@ -19,7 +19,7 @@ const mediaInput = r.object({
   status_moderatedById: r.string().optional(),
 })
 
-export async function create(
+export default async function (
   image: Buffer,
   data: r.inferInput<typeof mediaInput>
 ) {

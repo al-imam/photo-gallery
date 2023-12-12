@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
-import { media } from '../index'
-import { checkAuth } from '../model/auth'
+ import { checkAuth } from '../model/auth'
+import createMedia from '../create-media'
 type UserRequest = Request & { user?: any }
 
 export function catchAsync(fn: any) {
@@ -28,7 +28,7 @@ export async function checkAuthMiddleware(
 export async function postMedia(req: UserRequest, res: Response) {
   if (!req.file) throw new Error('No file provided')
   const buffer = req.file.buffer
-  const response = await media.create(buffer, {
+  const response = await createMedia(buffer, {
     ...req.body,
     authorId: req.user.id,
   })
