@@ -27,5 +27,8 @@ export async function checkAuth(
 
   const passChangedAtInSec = Math.floor(user.passwordChangedAt.getTime() / 1000)
   if (iat <= passChangedAtInSec) throw new Error('Token is invalid')
+
+  if (user.hasBeenBanned) throw new Error('User has been banned')
+
   return user
 }

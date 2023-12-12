@@ -24,7 +24,6 @@ export const authRouter = router.create<NextUserHandler>({
     async (req, ctx, next) => {
       const token = req.headers.get('authorization')
       const user = await service.auth.checkAuth(token, 'auth')
-      if (user.hasBeenBanned) throw new Error('User has been banned')
       ctx.user = user
       return next()
     },

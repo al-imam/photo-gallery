@@ -21,7 +21,6 @@ export async function checkAuthMiddleware(
 ) {
   const user = await checkAuth(req.headers.authorization, 'auth')
   if (!user.isAccountVerified) throw new Error('User is not verified')
-  if (user.hasBeenBanned) throw new Error('User has been banned')
   req.user = user
   next()
 }
