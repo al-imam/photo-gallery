@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate ;next build",
+    "build": "prisma generate ; next build",
     "start": "next start",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
@@ -13,7 +13,7 @@
     "prisma": "prisma generate",
     "express:serve": "node ./dist/express.js",
     "express:dev": "nodemon ./dist/express.js",
-    "express:build": "tsc ./server/express.ts --outDir dist --noEmit false --esModuleInterop",
+    "express:build": "prisma generate ; tsc ./server/express.ts --outDir dist --noEmit false --esModuleInterop",
     "express:watch": "tsc ./server/express.ts --outDir dist --noEmit false --esModuleInterop -w"
   },
   "dependencies": {
