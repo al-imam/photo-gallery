@@ -12,7 +12,8 @@ type Attachment = {
   url: string
   proxy_url: string
   content_type: string
-  content_scan_version: number
+  width: number
+  height: number
 }
 
 type Data = {
@@ -89,9 +90,13 @@ async function upload(image: Buffer) {
   const data = await uploadFormData(formData)
   const [media, thumbnail] = data.attachments.map((attachment) => ({
     size: attachment.size,
+    width: attachment.width,
+    height: attachment.height,
     contentType: attachment.content_type,
     url: `${attachment.id}/${attachment.filename}`,
   }))
+
+  console.log(media)
 
   return {
     media,
