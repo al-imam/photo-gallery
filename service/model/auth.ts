@@ -32,3 +32,21 @@ export async function checkAuth(
 
   return user
 }
+
+export async function checkAuthVerified(
+  token: string | undefined | null,
+  tokenMode: 'cookie' | 'auth'
+) {
+  const user = await checkAuth(token, tokenMode)
+  if (!user.isAccountVerified) throw new Error('User is not verified')
+  return user
+}
+
+export async function checkAuthNotVerified(
+  token: string | undefined | null,
+  tokenMode: 'cookie' | 'auth'
+) {
+  const user = await checkAuth(token, tokenMode)
+  if (user.isAccountVerified) throw new Error('User is verified')
+  return user
+}

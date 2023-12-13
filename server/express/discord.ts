@@ -3,7 +3,7 @@ import FormData from 'form-data'
 import sharp from 'sharp'
 // @ts-ignore
 import * as magic from 'detect-file-type'
-import env from './env'
+import env from '../../service/env'
 
 type Attachment = {
   id: string

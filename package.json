@@ -11,10 +11,10 @@
     "format": "prettier --write .",
     "type-check": "tsc --noEmit",
     "prisma": "prisma generate",
-    "express:serve": "node ./dist/express.js",
-    "express:dev": "nodemon ./dist/express.js",
-    "express:build": "prisma generate ; tsc ./server/express.ts --outDir dist --noEmit false --esModuleInterop",
-    "express:watch": "tsc ./server/express.ts --outDir dist --noEmit false --esModuleInterop -w"
+    "express:serve": "node ./dist/server/express",
+    "express:dev": "nodemon ./dist/server/express",
+    "express:build": "prisma generate & tsc ./server/express/index.ts --outDir dist --noEmit false --esModuleInterop",
+    "express:watch": "tsc ./server/express/index.ts --outDir dist --noEmit false --esModuleInterop -w"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",

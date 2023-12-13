@@ -1,5 +1,5 @@
 import r from 'rype'
-import db, { MediaStatus } from './db'
+import db, { MediaStatus } from '../../service/db'
 import discord from './discord'
 
 const mediaStatus = ['PENDING', 'APPROVED', 'REJECTED', 'PASSED_TO_ADMIN'] as [
@@ -12,6 +12,8 @@ mediaStatus satisfies MediaStatus[]
 
 const mediaInput = r.object({
   authorId: r.string(),
+  categoryId: r.string(),
+
   title: r.string().optional(),
   description: r.string().optional(),
   tags: r.array(r.string()).optional(),
