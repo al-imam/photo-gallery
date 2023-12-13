@@ -59,9 +59,10 @@ model Media {
   categoryId  String?        @db.ObjectId
   category    MediaCategory? @relation("MediaCategory", fields: [categoryId], references: [id])
 
-  media_size   Int
-  media_width  Int
-  media_height Int
+  media_size              Int
+  media_width             Int
+  media_height            Int
+  media_hasGraphicContent Boolean @default(false)
 
   url_media     String
   url_thumbnail String
@@ -88,8 +89,6 @@ model MediaReaction {
 
   userId String @db.ObjectId
   user   User   @relation("MediaReaction", fields: [userId], references: [id])
-
-  @@unique([mediaId, userId])
 }
 
 model MediaCategory {

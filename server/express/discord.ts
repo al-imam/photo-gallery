@@ -77,7 +77,7 @@ async function uploadFormData(formData: FormData): Promise<Data> {
 
     const statusCode = error.response?.statusCode
     if (!statusCode || statusCode < 400 || statusCode >= 500) {
-      console.log(error.response?.data)
+      console.log(error.response)
       throw new Error("Something's wrong with the request!")
     }
 
