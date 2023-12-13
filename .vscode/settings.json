@@ -1,28 +1,26 @@
 {
   "css.validate": false,
-
   "files.eol": "\n",
   "workbench.colorCustomizations": {
     "editorRuler.foreground": "#ffffff18"
   },
-
   "[tsx][ts][js][jsx]": {
     "editor.formatOnSave": false,
     "files.trimFinalNewlines": true
   },
-
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "always"
   },
-
+  "cSpell.words": [
+    "rype"
+  ]
   "eslint.validate": [
     "javascript",
     "javascriptreact",
     "typescript",
     "typescriptreact"
   ],
-
   "typescript.tsdk": "node_modules/typescript/lib"
+
 }
