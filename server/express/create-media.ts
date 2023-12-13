@@ -1,35 +1,30 @@
-import r from 'rype'
-import db, { MediaStatus } from '../../service/db'
+import { Response } from 'express'
+import db from '../../service/db'
+import { mediaInputSchema } from './config'
 import discord from './discord'
+import { UserRequest } from './middleware'
 
-const mediaStatus = ['PENDING', 'APPROVED', 'REJECTED', 'PASSED_TO_ADMIN'] as [
-  'PENDING',
-  'APPROVED',
-  'REJECTED',
-  'PASSED_TO_ADMIN',
-]
-mediaStatus satisfies MediaStatus[]
+export default async function (req: UserRequest, res: Response) {
+  const buffer = req.file?.buffer
+  if (!buffer) throw new Error('No file provided')
+  const body = mediaInputSchema.parse(req.body)
 
-const mediaInput = r.object({
-  authorId: r.string(),
-  categoryId: r.string(),
+  const category = await db.mediaCategory.findUnique({
+    where: { id: body.categoryId },
+  })
+  if (!category) throw new Error('Invalid category')
 
-  title: r.string().optional(),
-  description: r.string().optional(),
-  tags: r.array(r.string()).optional(),
-  status: r.string(...mediaStatus).optional(),
-  status_moderatedById: r.string().optional(),
-})
+  if (req.user.role === 'ADMIN' || req.user.role === 'MODERATOR') {
+    body.status = 'APPROVED'
+    body.status_moderatedById = req.user.id
+  }
 
-export default async function (
-  image: Buffer,
-  data: r.inferInput<typeof mediaInput>
-) {
-  const body = mediaInput.parse(data)
-  const result = await discord.upload(image)
-  const newMedia = await db.media.create({
+  const result = await discord.upload(buffer)
+  const media = await db.media.create({
     data: {
       ...body,
+      authorId: req.user.id,
+      categoryId: category.id,
       messageId: result.id,
       size: result.media.size,
       url_media: result.media.url,
@@ -37,5 +32,5 @@ export default async function (
     },
   })
 
-  return newMedia
+  res.json({ data: media })
 }
