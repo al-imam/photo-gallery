@@ -51,8 +51,9 @@
     --failure: theme(__colors.red-500);
 
     --radius: 0.5rem;
-  }
 
+    --nav-size: 4rem;
+  }
 
   .dark {
     --background: theme(__colors.zinc-950);
@@ -110,7 +111,7 @@
 @layer components {
   .stack-content {
     display: grid;
-    grid-template: "container";
+    grid-template: 'container';
   }
 
   .stack-content > * {
@@ -147,5 +148,26 @@
     transition:
       background-color 50000s ease-in-out 0s,
       color 5000s ease-in-out 0s;
+  }
+
+  .overlay::before,
+  .overlay::after {
+    --gradient-width: 10%;
+    --g-start: rgb(var(--background));
+    --g-end: rgb(var(--background) / 0);
+
+    background: linear-gradient(to right, var(--g-start), var(--g-end));
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: var(--gradient-width);
+    z-index: 10;
+  }
+
+  .overlay::after {
+    --g-end: rgb(var(--background));
+    --g-start: rgb(var(--background) / 0);
+
+    inset: 0 0 0 auto;
   }
 }
