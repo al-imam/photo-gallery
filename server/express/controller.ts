@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from 'express'
- import { checkAuth } from '../model/auth'
-import createMedia from '../create-media'
+import service from '../../service'
+import createMedia from './create-media'
 type UserRequest = Request & { user?: any }
 
-export function catchAsync(fn: any) {
+export function catchError(fn: any) {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const rv = fn(req, res, next)
@@ -19,15 +19,16 @@ export async function checkAuthMiddleware(
   res: Response,
   next: NextFunction
 ) {
-  const user = await checkAuth(req.headers.authorization, 'auth')
-  if (!user.isAccountVerified) throw new Error('User is not verified')
-  req.user = user
+  req.user = await service.auth.checkAuthVerified(
+    req.headers.authorization,
+    'auth'
+  )
   next()
 }
 
 export async function postMedia(req: UserRequest, res: Response) {
-  if (!req.file) throw new Error('No file provided')
-  const buffer = req.file.buffer
+  const buffer = req.file?.buffer
+  if (!buffer) throw new Error('No file provided')
   const response = await createMedia(buffer, {
     ...req.body,
     authorId: req.user.id,

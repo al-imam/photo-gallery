@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import Router from 'router13'
-import * as service from './index'
-import { NextHandler, NextUserHandler } from './types'
+import service from '/service'
+import { NextHandler, NextUserHandler } from '/service/types'
 
 export const router = Router.create<NextHandler>({
   middleware: [
@@ -30,19 +30,23 @@ export const authRouter = router.create<NextUserHandler>({
   ],
 })
 
-export const authVerifiedRouter = authRouter.create({
+export const authVerifiedRouter = router.create({
   middleware: [
     async (req, ctx, next) => {
-      if (!ctx.user.isAccountVerified) throw new Error('User is not verified')
+      const token = req.headers.get('authorization')
+      const user = await service.auth.checkAuthVerified(token, 'auth')
+      ctx.user = user
       return next()
     },
   ],
 })
 
-export const authNotVerifiedRouter = authRouter.create({
+export const authNotVerifiedRouter = router.create({
   middleware: [
     async (req, ctx, next) => {
-      if (ctx.user.isAccountVerified) throw new Error('User is verified')
+      const token = req.headers.get('authorization')
+      const user = await service.auth.checkAuthNotVerified(token, 'auth')
+      ctx.user = user
       return next()
     },
   ],

@@ -6,7 +6,7 @@ import rateLimit from 'express-rate-limit'
 import helmet from 'helmet'
 // @ts-ignore
 import xss from 'xss-clean'
-import router from './express/router'
+import router from './router'
 console.clear()
 configDotenv()
 const app = express()

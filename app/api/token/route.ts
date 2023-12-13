@@ -1,6 +1,6 @@
-import * as service from '/server'
-import { sendUserAndToken } from '/server/middlewares/auth'
-import { router } from '/server/router'
+import { sendUserAndToken } from '/server/next/middlewares/auth'
+import { router } from '/server/next/router'
+import service from '/service'
 
 export const GET = router(async (req, ctx, next) => {
   const token = req.cookies.get('authorization')?.value

@@ -49,9 +49,11 @@ model Media {
   messageId String
   createdAt DateTime @default(now())
 
-  title       String   @default("")
-  description String   @default("")
+  title       String         @default("")
+  description String         @default("")
   tags        String[]
+  categoryId  String?        @db.ObjectId
+  category    MediaCategory? @relation("MediaCategory", fields: [categoryId], references: [id])
 
   size          Int
   url_media     String
@@ -65,7 +67,14 @@ model Media {
   status_moderatedBy   User?       @relation("ModeratedByUser", fields: [status_moderatedById], references: [id])
   status_approvedAt    DateTime?
 
-  BookMark BookMark[] @relation("BookmarkMedia")
+  NONE_BOOKMARK BookMark[] @relation("BookmarkMedia")
+}
+
+model MediaCategory {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  name      String
+  media     Media[]  @relation("MediaCategory")
 }
 
 model BookMark {

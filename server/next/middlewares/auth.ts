@@ -1,9 +1,9 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { USER_SAFE_FIELDS } from '../config'
-import * as hash from '../hash'
-import { NextUserHandler } from '../types'
-import { pick } from '../utils'
+import { USER_SAFE_FIELDS } from '/service/config'
+import * as hash from '/service/hash'
+import { NextUserHandler } from '/service/types'
+import { pick } from '/service/utils'
 
 export const sendUserAndToken: NextUserHandler = async (req, ctx) => {
   const cookieToken = await hash.sign(ctx.user.id, 'cookie')
