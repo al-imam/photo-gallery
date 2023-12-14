@@ -29,6 +29,13 @@ app.use(express.json({ limit: '8kb' }))
 app.use(mongoSanitize())
 app.use(xss())
 app.use(router)
+app.use((_, res) => {
+  res
+    .status(404)
+    .json({
+      error: "Not Found\nCurrently just 'POST /upload' route is in service",
+    })
+})
 
 const port = process.env.PORT ?? 8000
 app.listen(port, () => {
