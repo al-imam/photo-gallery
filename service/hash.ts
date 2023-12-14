@@ -18,7 +18,7 @@ export async function generateOTP(length: number) {
 
 export async function encrypt(plain: string) {
   if (!plain) throw new Error('Text is required')
-  return bcrypt.hash(plain, 2)
+  return bcrypt.hash(plain, env.BCRYPT_SALT_ROUNDS)
 }
 
 export async function compare(plain: string, hash: string) {
