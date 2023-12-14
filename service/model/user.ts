@@ -12,9 +12,16 @@ async function checkIfEmailAvailability(email: string) {
   return count === 0
 }
 
-async function sendOTPToEmail(email: string, code: string) {
+function sendOTPToEmail(email: string, code: string) {
   const text = 'OTP <' + email + '>: ' + code
+
   mail(email, 'OTP', text)
+    .catch(() => {
+      console.error('Error sending OTP to email:', email)
+    })
+    .then(() => {
+      console.log('OTP sent to email:', email)
+    })
 }
 
 export async function get<
@@ -50,7 +57,7 @@ export async function create(
     },
   })
 
-  await sendOTPToEmail(user.email, code)
+  sendOTPToEmail(user.email, code)
   return user
 }
 
