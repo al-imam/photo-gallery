@@ -13,7 +13,7 @@ export async function generateOTP(length: number) {
     result += characters[randomIndex]
   }
 
-  return [result, await bcrypt.hash(result, 2)]
+  return [result, await bcrypt.hash(result, 4)]
 }
 
 export async function encrypt(plain: string) {

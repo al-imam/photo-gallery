@@ -23,16 +23,6 @@ export async function addLovesToMedia(
 ) {
   const result: MediaWithLoves[] = []
 
-  console.log(
-    'Created:',
-    await db.mediaReaction.create({
-      data: {
-        mediaId: '6579cdac90c86821408ef6ac',
-        userId: '6579cd8c24947f383244330d',
-      },
-    })
-  )
-
   const reactions = groupBy(
     await db.mediaReaction.findMany({
       where: { mediaId: { in: mediaList.map((m) => m.id) } },

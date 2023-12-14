@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
 }
 
 enum UserRole {
@@ -22,7 +21,7 @@ enum MediaStatus {
 }
 
 model User {
-  id        String   @id @default(uuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   createdAt DateTime @default(now())
 
   name   String
@@ -47,7 +46,7 @@ model User {
 }
 
 model Media {
-  id        String   @id @default(uuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   createdAt DateTime @default(now())
   messageId String
 
@@ -57,7 +56,7 @@ model Media {
   note        String?
 
   newCategory String?
-  categoryId  String?
+  categoryId  String?        @db.ObjectId
   category    MediaCategory? @relation("MediaCategory", fields: [categoryId], references: [id])
 
   media_size              Int
@@ -68,11 +67,11 @@ model Media {
   url_media     String
   url_thumbnail String
 
-  authorId String
+  authorId String @db.ObjectId
   author   User   @relation("User", fields: [authorId], references: [id])
 
   status               MediaStatus @default(PENDING)
-  status_moderatedById String?
+  status_moderatedById String?     @db.ObjectId
   status_moderatedBy   User?       @relation("Media", fields: [status_moderatedById], references: [id])
   status_moderatedAt   DateTime?
   status_approvedAt    DateTime?
@@ -82,39 +81,39 @@ model Media {
 }
 
 model MediaReaction {
-  id        String   @id @default(uuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   createdAt DateTime @default(now())
 
-  mediaId String
+  mediaId String @db.ObjectId
   media   Media  @relation("MediaReaction", fields: [mediaId], references: [id])
 
-  userId String
+  userId String @db.ObjectId
   user   User   @relation("MediaReaction", fields: [userId], references: [id])
 
   @@unique([mediaId, userId])
 }
 
 model MediaCategory {
-  id        String   @id @default(uuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   name      String   @unique
   createdAt DateTime @default(now())
   media     Media[]  @relation("MediaCategory")
 }
 
 model BookMark {
-  id      String @id @default(uuid())
-  mediaId String
-  userId  String
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  mediaId String @db.ObjectId
+  userId  String @db.ObjectId
 
   NONE_MEDIA Media @relation("Bookmark", fields: [mediaId], references: [id])
   NONE_USER  User  @relation("Bookmark", fields: [userId], references: [id])
 }
 
 model Notification {
-  id        String   @id @default(uuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   createdAt DateTime @default(now())
 
-  userId String
+  userId String @db.ObjectId
   user   User   @relation("Notification", fields: [userId], references: [id])
 
   message String

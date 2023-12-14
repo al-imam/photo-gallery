@@ -1,10 +1,10 @@
 import { Response } from 'express'
 import db from '../../service/db'
 import { mediaInputSchema } from './config'
-import discord from './discord'
 import { UserRequest } from './middleware'
 import { USER_PUBLIC_FIELDS_QUERY } from '../../service/config'
 import { MediaWithLoves } from '../../service/types'
+import discord from './discord'
 
 export default async function (req: UserRequest, res: Response) {
   const buffer = req.file?.buffer

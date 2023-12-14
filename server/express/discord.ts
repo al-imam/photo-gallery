@@ -1,111 +1,58 @@
-import axios from 'axios'
-import FormData from 'form-data'
-import sharp from 'sharp'
-// @ts-ignore
-import * as magic from 'detect-file-type'
+import Discord, { TextChannel } from 'discord.js'
 import env from '../../service/env'
+import makeImage, { generateThumbnail } from './image'
+export default { upload, remove }
 
-type Attachment = {
-  id: string
-  filename: string
-  size: number
-  url: string
-  proxy_url: string
-  content_type: string
-  width: number
-  height: number
-}
+const client = new Discord.Client({ intents: [] })
+client.login(env.DISCORD_TOKEN)
 
-type Data = {
-  id: string
-  channel_id: string
-  attachments: Attachment[]
-}
-
-async function getExtension(imageBuffer: Buffer): Promise<string> {
-  return new Promise((resolve, reject) => {
-    magic.default.fromBuffer(imageBuffer, (err: any, result: any) => {
-      if (err) reject(err.message)
-      else resolve(result.ext)
-    })
+function getDiscordClient(): Promise<Discord.Client<true>> {
+  return new Promise((resolve) => {
+    if (client.isReady()) return resolve(client)
+    client.once('ready', resolve)
   })
 }
 
-async function generateThumbnail(imageBuffer: Buffer): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
-    sharp(imageBuffer)
-      .resize({
-        withoutEnlargement: true,
-        fit: 'inside',
-        width: 768,
-        height: 768,
-      })
-      .webp({ quality: 75 })
-      .toBuffer((err, buffer) => {
-        if (err) reject(err.message)
-        else resolve(buffer)
-      })
-  })
-}
+async function getDiscordChannel() {
+  const client = await getDiscordClient()
+  const channel =
+    client.channels.cache.get(env.DISCORD_CHANNEL) ??
+    (await client.channels.fetch(env.DISCORD_CHANNEL))
 
-async function generateFormData(image: Buffer): Promise<FormData> {
-  const formData = new FormData()
-  const thumbnail = await generateThumbnail(image)
-
-  formData.append('media-image', image, {
-    filename: 'file.' + (await getExtension(image)),
-  })
-
-  formData.append('media-thumbnail', thumbnail, {
-    filename: 'file.thumbnail.' + (await getExtension(thumbnail)),
-  })
-
-  return formData
-}
-
-async function uploadFormData(formData: FormData): Promise<Data> {
-  try {
-    const response = await axios.post<Data>(
-      `https://discord.com/api/v10/channels/${env.DISCORD_CHANNEL}/messages`,
-      formData,
-      { headers: { Authorization: `Bot ${env.DISCORD_TOKEN}` } }
-    )
-
-    return response.data
-  } catch (error: any) {
-    if (typeof error === 'string') throw new Error(error)
-
-    const statusCode = error.response?.statusCode
-    if (!statusCode || statusCode < 400 || statusCode >= 500) {
-      console.log(error.response)
-      throw new Error("Something's wrong with the request!")
-    }
-
-    throw new Error(error?.response?.data?.message ?? error.message)
+  if (!(channel instanceof TextChannel)) {
+    throw new Error('Channel not found.')
   }
+
+  return channel
 }
 
-async function upload(image: Buffer) {
-  const formData = await generateFormData(image)
-  const data = await uploadFormData(formData)
+async function sendFiles(...args: { name: string; attachment: Buffer }[]) {
+  const channel = await getDiscordChannel()
+  return channel.send({ files: args })
+}
+
+async function upload(buffer: Buffer) {
+  const mediaFile = await makeImage(buffer, 'media')
+  const thumbnailBuffer = await generateThumbnail(buffer)
+  const thumbnailFile = await makeImage(thumbnailBuffer, 'thumbnail')
+
+  const data = await sendFiles(mediaFile, thumbnailFile)
   const [media, thumbnail] = data.attachments.map((attachment) => ({
     size: attachment.size,
-    width: attachment.width,
-    height: attachment.height,
-    contentType: attachment.content_type,
-    url: `${attachment.id}/${attachment.filename}`,
+    width: attachment.width!,
+    height: attachment.height!,
+    url: `${attachment.id}/${attachment.name}`,
   }))
-
-  console.log(media)
 
   return {
     media,
     thumbnail,
     id: data.id,
-    channel_id: data.channel_id,
   }
 }
 
-async function remove() {}
-
-export default { upload, remove }
+async function remove(id: string) {
+  const channel = await getDiscordChannel()
+  const message = await channel.messages.fetch(id)
+  return message.delete()
+}
