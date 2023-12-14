@@ -7,8 +7,10 @@ import helmet from 'helmet'
 // @ts-ignore
 import xss from 'xss-clean'
 import router from './router'
-console.clear()
+
 configDotenv()
+configDotenv({ path: '/etc/secrets/.env' })
+console.clear()
 const app = express()
 
 app.use(cors({ origin: /.*/ }))
@@ -18,8 +20,7 @@ app.use(
     max: 1000,
     windowMs: 60 * 60 * 1000 /* 1 Hour */,
     message: {
-      status: 'fail',
-      message: 'Too many requests, please try again later',
+      error: 'Too many requests, please try again later',
     },
   })
 )

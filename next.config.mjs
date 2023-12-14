@@ -1,4 +1,4 @@
-const source = '/media-storage-index'
+const source = '/yandex-disk'
 const destination = `https://cdn.discordapp.com/attachments/${process.env.DISCORD_CHANNEL}`
 
 /** @type {import('next').NextConfig} */

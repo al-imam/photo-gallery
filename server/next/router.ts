@@ -8,12 +8,7 @@ import service from '/service'
 import { NextResponse } from 'next/server'
 
 export const router = Router.create<NextHandler>({
-  middleware: [
-    (req, param, next) => {
-      console.log('::::: Init :::::')
-      return next()
-    },
-  ],
+  middleware: [],
 
   errorHandler: async (err: any) => {
     return NextResponse.json(

@@ -1,4 +1,4 @@
-import { User } from '@prisma/client'
+import { Media, User } from '@prisma/client'
 import { NextRequest } from 'next/server'
 import { NextFunction } from 'router13'
 
@@ -19,3 +19,5 @@ export type NextOptUserHandler = (
   ctx: Record<string, any> & { user?: User },
   next: NextFunction
 ) => void
+
+export type MediaWithLoves = Media & { isLoved: boolean; loves: number }

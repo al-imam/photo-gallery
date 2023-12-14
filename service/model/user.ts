@@ -1,6 +1,6 @@
-import { writeFileSync } from 'fs'
-import db, { User } from '../db'
+import mail from '../mail'
 import * as hash from '../hash'
+import db, { User } from '../db'
 import { PrettifyPick } from '../utils'
 export type UserOrId = User | string
 
@@ -14,8 +14,7 @@ async function checkIfEmailAvailability(email: string) {
 
 async function sendOTPToEmail(email: string, code: string) {
   const text = 'OTP <' + email + '>: ' + code
-  console.log(text)
-  writeFileSync('./email.log', text)
+  mail(email, 'OTP', text)
 }
 
 export async function get<
@@ -78,7 +77,6 @@ export async function verifyAccount(userOrId: UserOrId, code: string) {
     throw new Error('No verification process is pending')
   }
 
-  console.log(await hash.compare(code, user.email_verificationCode))
   if (!(await hash.compare(code, user.email_verificationCode))) {
     throw new Error('Invalid verification code')
   }

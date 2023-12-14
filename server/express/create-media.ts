@@ -1,8 +1,10 @@
 import { Response } from 'express'
 import db from '../../service/db'
 import { mediaInputSchema } from './config'
-import discord from './discord'
 import { UserRequest } from './middleware'
+import { USER_PUBLIC_FIELDS_QUERY } from '../../service/config'
+import { MediaWithLoves } from '../../service/types'
+import discord from './discord'
 
 export default async function (req: UserRequest, res: Response) {
   const buffer = req.file?.buffer
@@ -52,10 +54,11 @@ export default async function (req: UserRequest, res: Response) {
       url_thumbnail: result.thumbnail.url,
     },
     include: {
-      author: true,
+      author: { select: USER_PUBLIC_FIELDS_QUERY },
       category: true,
     },
   })
 
-  res.json({ data: { media, isLoved: false } })
+  const data: MediaWithLoves = { ...media, isLoved: false, loves: 0 }
+  res.json({ data })
 }
