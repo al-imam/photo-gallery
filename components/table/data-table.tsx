@@ -22,8 +22,8 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import * as React from 'react'
-import { DataTableViewOptions } from './data-table-view-options'
 import { DataTablePagination } from '/components/table/data-table-pagination'
+import { DataTableViewOptions } from '/components/table/data-table-view-options'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -35,6 +35,7 @@ export function DataTable<TData, TValue>({
   data,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
+  const [globalFilter, setGlobalFilter] = React.useState('')
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
@@ -53,20 +54,35 @@ export function DataTable<TData, TValue>({
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onRowSelectionChange: setRowSelection,
-    state: { sorting, columnFilters, columnVisibility, rowSelection },
+    enableColumnFilters: true,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+      globalFilter,
+    },
   })
+
+  const canFilterColumns = React.useMemo(
+    () =>
+      table
+        .getAllColumns()
+        .filter((c) => c.getCanGlobalFilter())
+        .map((c) => c.id),
+    []
+  )
 
   return (
     <div>
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
-          onChange={(event) =>
-            table.getColumn('email')?.setFilterValue(event.target.value)
-          }
+          placeholder={`Search by ${canFilterColumns.join(', ')}`}
+          value={globalFilter}
+          onChange={(event) => setGlobalFilter(event.target.value)}
           className="max-w-sm"
         />
+
         <DataTableViewOptions table={table} />
       </div>
       <div className="rounded-md border">

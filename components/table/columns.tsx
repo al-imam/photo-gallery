@@ -47,6 +47,7 @@ export const columns: ColumnDef<Payment>[] = [
   {
     accessorKey: 'status',
     header: 'Status',
+    enableGlobalFilter: false,
   },
   {
     accessorKey: 'email',
