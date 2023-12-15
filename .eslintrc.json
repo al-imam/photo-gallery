@@ -8,7 +8,7 @@
 
   "rules": {
     "import/no-absolute-path": 0,
-    "no-unused-vars": 2,
+    "no-unused-vars": 1,
     "prettier/prettier": 1,
     "arrow-body-style": 0,
     "prefer-arrow-callback": 0,

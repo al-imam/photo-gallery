@@ -1,7 +1,9 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import * as hash from '../hash'
-import { NextUserHandler } from '../types'
+import { USER_SAFE_FIELDS } from '/service/config'
+import * as hash from '/service/hash'
+import { NextUserHandler } from '/service/types'
+import { pick } from '/service/utils'
 
 export const sendUserAndToken: NextUserHandler = async (req, ctx) => {
   const cookieToken = await hash.sign(ctx.user.id, 'cookie')
@@ -16,9 +18,7 @@ export const sendUserAndToken: NextUserHandler = async (req, ctx) => {
   })
 
   return NextResponse.json({
-    data: {
-      user: ctx.user,
-      jwt_token: authToken,
-    },
+    user: pick(ctx.user, ...USER_SAFE_FIELDS),
+    jwt_token: authToken,
   })
 }

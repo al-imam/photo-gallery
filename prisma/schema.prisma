@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum UserRole {
@@ -21,7 +22,7 @@ enum MediaStatus {
 }
 
 model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String   @id @default(uuid())
   createdAt DateTime @default(now())
 
   name   String
@@ -31,58 +32,94 @@ model User {
   password          String
   isAccountVerified Boolean @default(false)
 
-  email                  String  @unique
-  email_verificationCode String?
-  email_pending          String?
+  email         String  @unique
+  email_pending String?
 
-  media          Media[]        @relation("User")
-  approved_media Media[]        @relation("ModeratedByUser")
-  bookmarks      BookMark[]     @relation("BookmarkUser")
-  notifications  Notification[] @relation("NotificationUser")
+  opt_passwordResetCode        String?
+  opt_passwordResetCodeExp     DateTime?
+  opt_emailVerificationCode    String?
+  opt_emailVerificationCodeExp DateTime?
 
   hasBeenBanned     Boolean  @default(false)
   passwordChangedAt DateTime @default(now())
+
+  media          Media[]         @relation("User")
+  approved_media Media[]         @relation("Media")
+  bookmarks      BookMark[]      @relation("Bookmark")
+  notifications  Notification[]  @relation("Notification")
+  NONE_REACTIONS MediaReaction[] @relation("MediaReaction")
 }
 
 model Media {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String   @id @default(uuid())
   createdAt DateTime @default(now())
+  messageId String
 
   title       String   @default("")
   description String   @default("")
   tags        String[]
+  note        String?
 
-  discord_channel String
-  discord_message String
+  newCategory String?
+  categoryId  String?
+  category    MediaCategory? @relation("MediaCategory", fields: [categoryId], references: [id])
+
+  media_size              Int
+  media_width             Int
+  media_height            Int
+  media_hasGraphicContent Boolean @default(false)
 
   url_media     String
   url_thumbnail String
 
-  authorId String @db.ObjectId
+  authorId String
   author   User   @relation("User", fields: [authorId], references: [id])
 
   status               MediaStatus @default(PENDING)
-  status_moderatedById String?     @db.ObjectId
-  status_moderatedBy   User?       @relation("ModeratedByUser", fields: [status_moderatedById], references: [id])
+  status_moderatedById String?
+  status_moderatedBy   User?       @relation("Media", fields: [status_moderatedById], references: [id])
+  status_moderatedAt   DateTime?
   status_approvedAt    DateTime?
 
-  BookMark BookMark[] @relation("BookmarkMedia")
+  NONE_BOOKMARK  BookMark[]      @relation("Bookmark")
+  NONE_REACTIONS MediaReaction[] @relation("MediaReaction")
+}
+
+model MediaReaction {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  mediaId String
+  media   Media  @relation("MediaReaction", fields: [mediaId], references: [id])
+
+  userId String
+  user   User   @relation("MediaReaction", fields: [userId], references: [id])
+
+  @@unique([mediaId, userId])
+}
+
+model MediaCategory {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  media     Media[]  @relation("MediaCategory")
 }
 
 model BookMark {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
-  mediaId String @db.ObjectId
-  media   Media  @relation("BookmarkMedia", fields: [mediaId], references: [id])
-  userId  String @db.ObjectId
-  user    User   @relation("BookmarkUser", fields: [userId], references: [id])
+  id      String @id @default(uuid())
+  mediaId String
+  userId  String
+
+  NONE_MEDIA Media @relation("Bookmark", fields: [mediaId], references: [id])
+  NONE_USER  User  @relation("Bookmark", fields: [userId], references: [id])
 }
 
 model Notification {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String   @id @default(uuid())
   createdAt DateTime @default(now())
 
-  userId String @db.ObjectId
-  user   User   @relation("NotificationUser", fields: [userId], references: [id])
+  userId String
+  user   User   @relation("Notification", fields: [userId], references: [id])
 
   message String
   read    Boolean @default(false)

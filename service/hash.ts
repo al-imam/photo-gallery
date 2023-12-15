@@ -1,11 +1,10 @@
 import * as bcrypt from 'bcryptjs'
 import * as jose from 'jose'
+import env from './env'
 
 const characters = '0123456789'
 const charactersLength = characters.length
-
-const secret = new TextEncoder().encode('cc7e0d44fd473002f1c42167459001140ec6389b7353f8088f4d9a95f2f596f2')
-const alg = 'HS256'
+const JWT_SECRET = new TextEncoder().encode(env.JWT_SECRET)
 
 export async function generateOTP(length: number) {
   let result = ''
@@ -14,29 +13,31 @@ export async function generateOTP(length: number) {
     result += characters[randomIndex]
   }
 
-  return [result, await bcrypt.hash(result, 2)]
+  return [result, await bcrypt.hash(result, 4)]
 }
 
 export async function encrypt(plain: string) {
-  if (!plain) throw new Error('Password is required')
-  return bcrypt.hash(plain, 2)
+  if (!plain) throw new Error('Text is required')
+  return bcrypt.hash(plain, env.BCRYPT_SALT_ROUNDS)
 }
 
 export async function compare(plain: string, hash: string) {
-  if (!plain) throw new Error('Password is required')
+  if (!plain) throw new Error('Text is required')
   return bcrypt.compare(plain, hash)
 }
 
 export async function sign(payload: string, mode: 'cookie' | 'auth') {
   return new jose.SignJWT({ payload, mode })
-    .setProtectedHeader({ alg })
+    .setProtectedHeader({ alg: 'HS256' })
     .setExpirationTime('30d')
     .setIssuedAt()
-    .sign(secret)
+    .sign(JWT_SECRET)
 }
 
 export async function verify(token: string) {
-  const { payload } = await jose.jwtVerify(token, secret, { algorithms: [alg] })
+  const { payload } = await jose.jwtVerify(token, JWT_SECRET, {
+    algorithms: ['HS256'],
+  })
   return payload as {
     payload: string
     mode: 'cookie' | 'auth'
