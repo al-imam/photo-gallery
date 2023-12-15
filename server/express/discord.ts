@@ -1,7 +1,7 @@
 import Discord, { TextChannel } from 'discord.js'
 import env from '../../service/env'
 import makeImage, { generateThumbnail } from './image'
-import ReqErr from '/service/ReqError'
+import ReqErr from '../../service/ReqError'
 
 export default { upload, remove }
 
