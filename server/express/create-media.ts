@@ -5,7 +5,7 @@ import { UserRequest } from './middleware'
 import { USER_PUBLIC_FIELDS_QUERY } from '../../service/config'
 import { MediaWithLoves } from '../../service/types'
 import discord from './discord'
-import ReqErr from '/service/ReqError'
+import ReqErr from '../../service/ReqError'
 
 export default async function (req: UserRequest, res: Response) {
   const buffer = req.file?.buffer
