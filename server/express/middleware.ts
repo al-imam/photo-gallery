@@ -1,6 +1,7 @@
 import { User } from '@prisma/client'
 import { NextFunction, Request, Response } from 'express'
 import service from '../../service'
+
 export type UserRequest = Request & { user: User }
 
 export function catchError(fn: any) {

@@ -32,7 +32,7 @@ export async function addLovesToMediaList(
     'mediaId'
   )
 
-  for (let media of mediaList) {
+  for (const media of mediaList) {
     result.push({
       ...media,
       isLoved: Boolean(userId && reactions[media.id]?.has(userId)),

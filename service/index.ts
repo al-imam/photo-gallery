@@ -6,10 +6,10 @@ const service = { auth, user, media }
 export default service
 
 const _sdk: any = {}
-for (let key in service) {
+for (const key in service) {
   _sdk[key] = {}
 
-  for (let method in (service as any)[key]) {
+  for (const method in (service as any)[key]) {
     _sdk[key][method] = (...args: any[]) => {
       try {
         const rv = (service as any)[key][method](...args)
@@ -47,5 +47,3 @@ interface SDKMethod<Fn extends (...args: any) => any> {
     ? Promise<[Awaited<ReturnType<Fn>> | null, string | null]>
     : [ReturnType<Fn> | null, string | null]
 }
-
-

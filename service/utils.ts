@@ -14,7 +14,10 @@ export type PrettifyOmit<
   L extends keyof T = never,
 > = Prettify<Omit<T, K> & Partial<Omit<T, L>>>
 
-export function pick<T extends object, K extends keyof T>(obj: T, ...keys: K[]) {
+export function pick<T extends object, K extends keyof T>(
+  obj: T,
+  ...keys: K[]
+) {
   const newObj: any = {}
   keys.forEach((key) => {
     newObj[key] = obj[key]

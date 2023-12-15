@@ -31,6 +31,6 @@ export async function generateThumbnail(imageBuffer: Buffer): Promise<Buffer> {
 export default async function makeImage(attachment: Buffer, name: string) {
   return {
     attachment,
-    name: name + '.' + (await getExtension(attachment)),
+    name: `${name}.${await getExtension(attachment)}`,
   }
 }

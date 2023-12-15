@@ -1,6 +1,7 @@
 import db, { User } from '../db'
 import * as hash from '../hash'
 import * as userService from './user'
+
 export type UserOrId = User | string
 
 export async function login(email: string, password: string) {

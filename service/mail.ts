@@ -1,9 +1,10 @@
 import { appendFileSync } from 'fs'
 import nodemailer from 'nodemailer'
-const email = 'dont.stop.talking.about.palestine@gmail.com'
+
+const emailAddress = 'dont.stop.talking.about.palestine@gmail.com'
 
 const transporter = nodemailer.createTransport({
-  auth: { user: email, pass: process.env.GOOGLE_PASSWORD },
+  auth: { user: emailAddress, pass: process.env.GOOGLE_PASSWORD },
   service: 'gmail',
 })
 
@@ -11,14 +12,14 @@ export default function mail(to: string, subject: string, body: string) {
   return transporter.sendMail({
     to,
     subject,
-    from: `Verification Bot <${email}>`,
+    from: `Verification Bot <${emailAddress}>`,
     html: body,
   })
 }
 
 export function sendOTPToEmail(email: string, code: string) {
-  const text = 'OTP <' + email + '>: ' + code
-  appendFileSync('./email.log', text + '\n')
+  const text = `OTP <${email}>: ${code}`
+  appendFileSync('./email.log', `${text}\n`)
 
   mail(email, 'OTP', text)
     .catch(() => {

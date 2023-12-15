@@ -1,6 +1,7 @@
 import Discord, { TextChannel } from 'discord.js'
 import env from '../../service/env'
 import makeImage, { generateThumbnail } from './image'
+
 export default { upload, remove }
 
 const client = new Discord.Client({ intents: [] })
