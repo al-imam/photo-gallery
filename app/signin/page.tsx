@@ -1,10 +1,9 @@
+import { buttonVariants } from '$shadcn/ui/button'
+import { cn } from '$shadcn/utils'
 import { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-
-import { buttonVariants } from '$shadcn/ui/button'
-import { cn } from '$shadcn/utils'
-import { UserSignupForm } from '/components/user-signup-form'
+import { UserSigninForm } from '/components/user-signin-form'
 
 export const metadata: Metadata = {
   title: 'signup',
@@ -25,25 +24,42 @@ export default function Signin() {
         </div>
         <div className="min-h-full p-4">
           <Link
-            href="/signin"
+            href="/signup"
             className={cn(
               buttonVariants({ variant: 'ghost' }),
               'absolute right-4 top-4 md:right-8 md:top-8'
             )}
           >
-            Signin
+            Singup
           </Link>
           <div className="flex items-center justify-center max-w-lg mx-auto h-full">
             <div className="flex w-full flex-col justify-center space-y-6 ">
               <div className="flex flex-col space-y-2 text-center">
                 <h1 className="text-2xl font-semibold tracking-tight">
-                  Create an account
+                  Welcome back
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  Enter your email below to create your account
+                  Enter your email and password below to signin to your account
                 </p>
               </div>
-              <UserSignupForm />
+              <UserSigninForm />
+              <p className="text-center text-sm text-muted-foreground">
+                By clicking continue, you agree to our{' '}
+                <Link
+                  href="/terms"
+                  className="underline underline-offset-4 hover:text-primary"
+                >
+                  Terms of Service
+                </Link>{' '}
+                and{' '}
+                <Link
+                  href="/privacy"
+                  className="underline underline-offset-4 hover:text-primary"
+                >
+                  Privacy Policy
+                </Link>
+                .
+              </p>
             </div>
           </div>
         </div>
