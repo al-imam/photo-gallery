@@ -1,3 +1,4 @@
+import ReqErr from '../ReqError'
 import db from '../db'
 import * as hash from '../hash'
 import mail from '../mail'
@@ -7,15 +8,15 @@ export async function checkAuth(
   token: string | undefined | null,
   tokenMode: 'cookie' | 'auth'
 ) {
-  if (!token) throw new Error('Token is required')
+  if (!token) throw new ReqErr('Token is required')
   const { payload, iatVerify } = await hash.jwt.verify(
     tokenMode,
     token.replace(/^Bearer /, '')
   )
 
   const user = await userService.fetch(payload)
-  if (!user) throw new Error('User not found')
-  if (user.hasBeenBanned) throw new Error('User has been banned')
+  if (!user) throw new ReqErr('User not found')
+  if (user.hasBeenBanned) throw new ReqErr('User has been banned')
   iatVerify(user.authModifiedAt)
 
   return user
@@ -23,16 +24,16 @@ export async function checkAuth(
 
 export async function signup(email: string) {
   const isAlreadyExist = await db.user.findUnique({ where: { email } })
-  if (isAlreadyExist) throw new Error('Already exist')
+  if (isAlreadyExist) throw new ReqErr('Already exist')
 
   const token = await hash.jwt.sign('signup-email', email)
-  mail(email, 'Create your account', token)
+  mail.sendSignupToken(email, token)
 }
 
 export async function login(email: string, password: string) {
   const user = await db.user.findUnique({ where: { email } })
   if (!user || !(await hash.bcrypt.compare(password, user.password))) {
-    throw new Error('Invalid email or password')
+    throw new ReqErr('Invalid email or password')
   }
 
   return user

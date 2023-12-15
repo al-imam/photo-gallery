@@ -2,16 +2,17 @@ import env from './env'
 import * as jose from 'jose'
 import * as bcryptjs from 'bcryptjs'
 import { JWTPayload } from './types'
+import ReqErr from './ReqError'
 const JWT_SECRET = new TextEncoder().encode(env.JWT_SECRET)
 
 export const bcrypt = {
   async encrypt(plain: string) {
-    if (!plain) throw new Error('Text is required')
+    if (!plain) throw new ReqErr('Text is required')
     return bcryptjs.hash(plain, env.BCRYPT_SALT_ROUNDS)
   },
 
   async compare(plain: string, hash: string) {
-    if (!plain) throw new Error('Text is required')
+    if (!plain) throw new ReqErr('Text is required')
     return bcryptjs.compare(plain, hash)
   },
 }
@@ -36,14 +37,14 @@ export const jwt = {
     const { payload } = await jose.jwtVerify<Payload>(token, JWT_SECRET, {
       algorithms: ['HS256'],
     })
-    if (payload.mode !== mode) throw new Error('Invalid token')
+    if (payload.mode !== mode) throw new ReqErr('Invalid token')
 
     return {
       ...(payload as Payload),
       iatVerify(authModifiedAt: Date) {
         const authModifiedAtInSec = Math.floor(authModifiedAt.getTime() / 1000)
         if (payload.iat < authModifiedAtInSec) {
-          throw new Error('Token is expired due to email or password change')
+          throw new ReqErr('Token is expired due to email or password change')
         }
       },
     }

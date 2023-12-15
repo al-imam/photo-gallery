@@ -2,6 +2,7 @@ import * as hash from '../hash'
 import db, { User } from '../db'
 import { PrettifyPick } from '../utils'
 import mail from '../mail'
+import ReqErr from '../ReqError'
 
 export function fetch(id: string) {
   return db.user.findUnique({ where: { id } })
@@ -42,7 +43,7 @@ export async function requestEmailChange(
   newEmail: string
 ) {
   const count = await db.user.count({ where: { email: newEmail } })
-  if (count) throw new Error('Email already exists')
+  if (count) throw new ReqErr('Email already exists')
 
   const token = await hash.jwt.sign('change-email', {
     id: user.id,
@@ -50,13 +51,13 @@ export async function requestEmailChange(
     newEmail,
   })
 
-  mail(newEmail, 'Change your email', token)
+  mail.sendChangeEmailToken(newEmail, token)
 }
 
 export async function confirmEmailChange(token: string) {
   const { payload, iatVerify } = await hash.jwt.verify('change-email', token)
   const user = await db.user.findUnique({ where: { id: payload.id } })
-  if (!user) throw new Error('User not found')
+  if (!user) throw new ReqErr('User not found')
   iatVerify(user.authModifiedAt)
 
   return db.user.update({
@@ -67,13 +68,13 @@ export async function confirmEmailChange(token: string) {
 
 export async function requestPasswordReset(email: string) {
   const user = await db.user.findUnique({ where: { email } })
-  if (!user) throw new Error('User not found')
+  if (!user) throw new ReqErr('User not found')
   const token = await hash.jwt.sign('reset-password', {
     id: user.id,
     email: user.email,
   })
 
-  mail(email, 'Reset your password', token)
+  mail.sendResetToken(email, token)
 }
 
 export async function confirmPasswordReset(token: string, newPassword: string) {
@@ -103,10 +104,10 @@ export async function changePassword(userId: string, newPassword: string) {
 }
 
 export async function changeUsername(userId: string, newUsername: string) {
-  if (newUsername.length < 3) throw new Error('Username is too short')
-  if (newUsername.length > 32) throw new Error('Username is too long')
+  if (newUsername.length < 3) throw new ReqErr('Username is too short')
+  if (newUsername.length > 32) throw new ReqErr('Username is too long')
   if (!/^[a-z0-9\_\-]+$/i.test(newUsername)) {
-    throw new Error(
+    throw new ReqErr(
       'Invalid username, only alphanumeric, underscore and hyphen are allowed'
     )
   }

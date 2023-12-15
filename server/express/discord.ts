@@ -1,6 +1,7 @@
 import Discord, { TextChannel } from 'discord.js'
 import env from '../../service/env'
 import makeImage, { generateThumbnail } from './image'
+import ReqErr from '/service/ReqError'
 
 export default { upload, remove }
 
@@ -21,7 +22,7 @@ async function getDiscordChannel() {
     (await client.channels.fetch(env.DISCORD_CHANNEL))
 
   if (!(channel instanceof TextChannel)) {
-    throw new Error('Channel not found.')
+    throw new ReqErr('Channel not found.')
   }
 
   return channel
