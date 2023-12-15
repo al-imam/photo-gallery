@@ -32,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={[inter.variable, mark.variable].join(' ')}>
       <body
-        className={`bg-black ${
+        className={`bg-background ${
           process.env.NODE_ENV === 'development' ? 'debug-screens' : undefined
         }`}
       >
