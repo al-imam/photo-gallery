@@ -1,8 +1,7 @@
-import mail from '../mail'
 import * as hash from '../hash'
 import db, { User } from '../db'
 import { PrettifyPick } from '../utils'
-export type UserOrId = User | string
+import { sendOTPToEmail } from '../mail'
 
 async function checkIfEmailAvailability(email: string) {
   const count = await db.user.count({
@@ -12,31 +11,8 @@ async function checkIfEmailAvailability(email: string) {
   return count === 0
 }
 
-function sendOTPToEmail(email: string, code: string) {
-  const text = 'OTP <' + email + '>: ' + code
-
-  mail(email, 'OTP', text)
-    .catch(() => {
-      console.error('Error sending OTP to email:', email)
-    })
-    .then(() => {
-      console.log('OTP sent to email:', email)
-    })
-}
-
-export async function get<
-  T extends UserOrId,
-  U = T extends string ? true : boolean,
->(userOrId: T, forceUpdate?: U) {
-  let user: User | null = null
-
-  if (typeof userOrId === 'string' || forceUpdate) {
-    const id = typeof userOrId === 'string' ? userOrId : userOrId.id
-    user = await db.user.findUnique({ where: { id } })
-  }
-
-  if (!user) throw new Error('User not found')
-  return user
+export function fetch(id: string) {
+  return db.user.findUnique({ where: { id } })
 }
 
 export async function create(
@@ -61,25 +37,27 @@ export async function create(
   return user
 }
 
-export async function update(
-  userOrId: UserOrId,
+export function update(
+  userId: string,
   data: PrettifyPick<User, never, 'avatar' | 'name'>
 ) {
-  const user = await get(userOrId)
   return db.user.update({
-    where: { id: user.id },
+    where: { id: userId },
     data,
   })
 }
 
-export async function remove(userOrId: UserOrId) {
-  const user = await get(userOrId)
-  return db.user.delete({ where: { id: user.id } })
+export function remove(userId: string) {
+  return db.user.delete({ where: { id: userId } })
 }
 
-export async function verifyAccount(userOrId: UserOrId, code: string) {
-  const user = await get(userOrId)
-
+export async function verifyAccount(
+  user: PrettifyPick<
+    User,
+    'id' | 'isAccountVerified' | 'email_pending' | 'email_verificationCode'
+  >,
+  code: string
+) {
   if (!user.email_verificationCode) {
     throw new Error('No verification process is pending')
   }
@@ -109,33 +87,31 @@ export async function verifyAccount(userOrId: UserOrId, code: string) {
   throw new Error('Something went wrong!!')
 }
 
-export async function resendVerificationCode(userOrId: UserOrId) {
-  const user = await get(userOrId)
-
+export async function resendEmailVerificationCode(
+  user: PrettifyPick<User, 'id' | 'email_verificationCode'>
+) {
   if (!user) throw new Error('User not found')
-  if (!user.email_pending && user.isAccountVerified) {
+  if (!user.email_verificationCode) {
     throw new Error('No verification process is pending')
   }
 
-  if (user.email_pending) {
+  if (user.email_verificationCode) {
     const [code, hashedCode] = await hash.generateOTP(6)
     const newUser = await db.user.update({
       where: { id: user.id },
       data: { email_verificationCode: hashedCode },
     })
 
-    await sendOTPToEmail(newUser.email, code)
+    sendOTPToEmail(newUser.email, code)
     return newUser
   }
 
   throw new Error('Something went wrong!!')
 }
 
-export async function changePassword(userOrId: UserOrId, password: string) {
-  const user = await get(userOrId)
-
+export async function changePassword(userId: string, password: string) {
   return db.user.update({
-    where: { id: user.id },
+    where: { id: userId },
     data: {
       password: await hash.encrypt(password),
       passwordChangedAt: new Date(),
@@ -143,17 +119,15 @@ export async function changePassword(userOrId: UserOrId, password: string) {
   })
 }
 
-export async function changeEmail(userOrId: UserOrId, email: string) {
-  const user = await get(userOrId)
-
-  const count = await checkIfEmailAvailability(email)
+export async function changeEmail(userId: string, newEmail: string) {
+  const count = await checkIfEmailAvailability(newEmail)
   if (!count) throw new Error('Email already exists')
 
   const newUser = await db.user.update({
-    where: { id: user.id },
-    data: { email_pending: email },
+    where: { id: userId },
+    data: { email_pending: newEmail },
   })
 
-  await resendVerificationCode(newUser)
+  await resendEmailVerificationCode(newUser)
   return newUser
 }

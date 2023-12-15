@@ -1,3 +1,4 @@
+import { USER_PUBLIC_FIELDS_QUERY } from '../config'
 import db, { Media, MediaReaction } from '../db'
 import { MediaWithLoves } from '../types'
 import { Prettify } from '../utils'
@@ -17,7 +18,7 @@ function groupBy<T extends Pick<MediaReaction, 'mediaId' | 'userId'>[]>(
   return result
 }
 
-export async function addLovesToMedia(
+export async function addLovesToMediaList(
   userId?: null | string,
   ...mediaList: Media[]
 ) {
@@ -40,4 +41,35 @@ export async function addLovesToMedia(
   }
 
   return result
+}
+
+export type MediaOptions = {
+  limit?: number
+  skip?: number
+  category?: string
+  authorId?: string
+}
+
+export async function getFeaturedMedia(
+  userId?: null | string,
+  options: MediaOptions = {}
+) {
+  const media = await db.media.findMany({
+    where: {
+      status: 'APPROVED',
+      categoryId: options.category,
+      authorId: options.authorId,
+    },
+    orderBy: {
+      id: 'desc',
+    },
+    take: options.limit,
+    skip: options.skip,
+    include: {
+      author: { select: USER_PUBLIC_FIELDS_QUERY },
+      category: true,
+    },
+  })
+
+  return addLovesToMediaList(userId, ...media)
 }

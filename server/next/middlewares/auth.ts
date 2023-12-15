@@ -18,9 +18,7 @@ export const sendUserAndToken: NextUserHandler = async (req, ctx) => {
   })
 
   return NextResponse.json({
-    data: {
-      user: pick(ctx.user, ...USER_SAFE_FIELDS),
-      jwt_token: authToken,
-    },
+    user: pick(ctx.user, ...USER_SAFE_FIELDS),
+    jwt_token: authToken,
   })
 }

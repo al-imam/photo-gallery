@@ -40,7 +40,7 @@ export const authVerifiedRouter = router.create<NextUserHandler>({
   ],
 })
 
-export const optAuthVerifiedRouter = router.create<NextOptUserHandler>({
+export const authOptVerifiedRouter = router.create<NextOptUserHandler>({
   middleware: [
     async (req, ctx, next) => {
       try {
