@@ -22,7 +22,7 @@ export async function checkAuth(
   )
 
   if (mode !== tokenMode) throw new Error('Token is invalid')
-  const user = await userService.get(payload)
+  const user = await userService.fetch(payload)
   if (!user) throw new Error('User not found')
 
   const passChangedAtInSec = Math.floor(user.passwordChangedAt.getTime() / 1000)

@@ -1,22 +1,17 @@
 import { NextResponse } from 'next/server'
-import { optAuthVerifiedRouter } from '/server/next/router'
-import db from '/service/db'
-import { USER_PUBLIC_FIELDS_QUERY } from '/service/config'
-import { addLovesToMedia } from '/service/model/media'
+import { authOptVerifiedRouter } from '/server/next/router'
+import { queryToNumber } from '/server/next/utils'
+import service from '/service'
 
-export const GET = optAuthVerifiedRouter(async (_, ctx) => {
-  const media = await db.media.findMany({
-    where: { status: 'APPROVED' },
-    orderBy: {
-      id: 'desc',
-    },
-    include: {
-      author: { select: USER_PUBLIC_FIELDS_QUERY },
-      category: true,
-    },
-  })
+export const GET = authOptVerifiedRouter(async (req, ctx) => {
+  const query = Object.fromEntries(req.nextUrl.searchParams.entries())
 
   return NextResponse.json({
-    data: await addLovesToMedia(ctx.user?.id, ...media),
+    media: await service.media.getFeaturedMedia(ctx.user?.id, {
+      limit: queryToNumber(query.limit),
+      skip: queryToNumber(query.skip),
+      category: query.category,
+      authorId: query.authorId,
+    }),
   })
 })
