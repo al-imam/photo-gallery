@@ -21,3 +21,18 @@ export type NextOptUserHandler = (
 ) => void
 
 export type MediaWithLoves = Media & { isLoved: boolean; loves: number }
+
+export type JWTPayload = {
+  auth: string
+  cookie: string
+  'signup-email': string
+  'change-email': {
+    id: string
+    email: string
+    newEmail: string
+  }
+  'reset-password': {
+    id: string
+    email: string
+  }
+}
