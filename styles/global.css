@@ -159,6 +159,7 @@
     background: linear-gradient(to right, var(--g-start), var(--g-end));
     content: '';
     position: absolute;
+    pointer-events: none;
     inset: 0 auto 0 0;
     width: var(--gradient-width);
     z-index: 10;

@@ -1,18 +1,20 @@
 import * as React from "react"
-
 import { cn } from "shadcn/lib/utils"
+import { ScrollArea, ScrollBar } from "./scroll-area"
 
 const Table = React.forwardRef<
   HTMLTableElement,
   React.HTMLAttributes<HTMLTableElement>
 >(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-auto">
+  <ScrollArea className="relative">
     <table
       ref={ref}
       className={cn("w-full caption-bottom text-sm", className)}
       {...props}
     />
-  </div>
+
+    <ScrollBar orientation="horizontal" className="brightness-50 dark:brightness-150" />
+  </ScrollArea>
 ))
 Table.displayName = "Table"
 
@@ -106,12 +108,7 @@ const TableCaption = React.forwardRef<
 TableCaption.displayName = "TableCaption"
 
 export {
-  Table,
-  TableHeader,
-  TableBody,
-  TableFooter,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableCaption,
+  Table, TableBody, TableCaption, TableCell, TableFooter,
+  TableHead, TableHeader, TableRow
 }
+
