@@ -31,25 +31,25 @@ export default function Home() {
         </div>
       </div>
 
-      <main className="pb-6">
-        <div className="relative isolate overlay py-14">
-          <Marquee className="gap-2" pauseOnHover>
-            <div className="flex gap-2 items-center">
-              {Array(15)
-                .fill(null)
-                .map((_, i) => (
-                  <Link
-                    href="#"
-                    key={i}
-                    className={buttonVariants({ variant: 'secondary' })}
-                  >
-                    Nature {i}
-                  </Link>
-                ))}
-            </div>
-          </Marquee>
-        </div>
+      <div className="relative isolate overlay py-14 content-expand">
+        <Marquee className="gap-2" pauseOnHover>
+          <div className="flex gap-2 items-center">
+            {Array(20)
+              .fill(null)
+              .map((_, i) => (
+                <Link
+                  href="#"
+                  key={i}
+                  className={buttonVariants({ variant: 'secondary' })}
+                >
+                  Nature {i}
+                </Link>
+              ))}
+          </div>
+        </Marquee>
+      </div>
 
+      <main className="pb-6">
         <div className="md:columns-2 xl:columns-3 space-y-4">
           {Array(20)
             .fill(null)
