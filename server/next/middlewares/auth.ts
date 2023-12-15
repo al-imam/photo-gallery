@@ -4,6 +4,7 @@ import { USER_SAFE_FIELDS } from '/service/config'
 import * as hash from '/service/hash'
 import { NextUserHandler } from '/service/types'
 import { pick } from '/service/utils'
+import ReqErr from '/service/ReqError'
 
 export const sendUserAndToken: NextUserHandler = async (_, ctx) => {
   const cookieToken = await hash.jwt.sign('cookie', ctx.user.id)
@@ -29,12 +30,12 @@ export const checkPassword: NextUserHandler = async (req, ctx, next) => {
   ctx.data = body
 
   if (!body.password) {
-    throw new Error('Password is required')
+    throw new ReqErr('Password is required')
   }
 
   if (await hash.bcrypt.compare(body.password, ctx.user.password)) {
     return next()
   }
 
-  throw new Error('Password is incorrect')
+  throw new ReqErr('Password is incorrect')
 }

@@ -6,15 +6,22 @@ import {
 import Router from 'router13'
 import service from '/service'
 import { NextResponse } from 'next/server'
+import ReqErr from '/service/ReqError'
 
 export const router = Router.create<NextHandler>({
   middleware: [],
-
   errorHandler: async (err: any) => {
-    return NextResponse.json(
-      { error: err.message, rawError: err },
-      { status: 400 }
-    )
+    let error = "Something's went wrong!"
+    let status = 500
+
+    if (err instanceof ReqErr) {
+      error = err.message
+      status = err.statusCode
+    } else {
+      console.error(err)
+    }
+
+    return NextResponse.json({ error }, { status })
   },
 })
 
@@ -22,8 +29,7 @@ export const authRouter = router.create<NextUserHandler>({
   middleware: [
     async (req, ctx, next) => {
       const token = req.headers.get('authorization')
-      const user = await service.auth.checkAuth(token, 'auth')
-      ctx.user = user
+      ctx.user = await service.auth.checkAuth(token, 'auth')
       return next()
     },
   ],

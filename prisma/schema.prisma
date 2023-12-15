@@ -35,11 +35,12 @@ model User {
   password       String
   authModifiedAt DateTime @default(now())
 
-  media          Media[]         @relation("User")
-  approved_media Media[]         @relation("Media")
-  bookmarks      BookMark[]      @relation("Bookmark")
-  notifications  Notification[]  @relation("Notification")
-  NONE_REACTIONS MediaReaction[] @relation("MediaReaction")
+  media         Media[]        @relation("User")
+  bookmarks     BookMark[]     @relation("Bookmark")
+  notifications Notification[] @relation("Notification")
+
+  NONE_APPROVED_MEDIA Media[]         @relation("Media")
+  NONE_REACTIONS      MediaReaction[] @relation("MediaReaction")
 }
 
 model Media {

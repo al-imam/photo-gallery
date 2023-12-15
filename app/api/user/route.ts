@@ -1,4 +1,5 @@
-import { sendUserAndToken } from '/server/next/middlewares/auth'
+import { NextResponse } from 'next/server'
+import { checkPassword, sendUserAndToken } from '/server/next/middlewares/auth'
 import { authRouter, router } from '/server/next/router'
 import service from '/service'
 
@@ -12,3 +13,10 @@ export const POST = router(async (req, ctx, next) => {
   })
   return next()
 }, sendUserAndToken)
+
+export const DELETE = authRouter(checkPassword, async (_, ctx) => {
+  ctx.user = await service.user.remove(ctx.user.id)
+  return NextResponse.json({
+    message: 'User deleted',
+  })
+})

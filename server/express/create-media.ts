@@ -5,13 +5,14 @@ import { UserRequest } from './middleware'
 import { USER_PUBLIC_FIELDS_QUERY } from '../../service/config'
 import { MediaWithLoves } from '../../service/types'
 import discord from './discord'
+import ReqErr from '/service/ReqError'
 
 export default async function (req: UserRequest, res: Response) {
   const buffer = req.file?.buffer
-  if (!buffer) throw new Error('No file provided')
+  if (!buffer) throw new ReqErr('No file provided')
   const body = mediaInputSchema.parse(req.body)
   if (body.newCategory && body.categoryId) {
-    throw new Error('Cannot provide both newCategory and categoryId')
+    throw new ReqErr('Cannot provide both newCategory and categoryId')
   }
 
   if (body.categoryId) {
