@@ -1,10 +1,9 @@
-import { sendUserAndToken } from '/server/next/middlewares/auth'
+import { NextResponse } from 'next/server'
 import { router } from '/server/next/router'
 import service from '/service'
 
 export const POST = router(async (req, ctx, next) => {
-  const body = await req.json()
-  const result = await service.user.create(body)
-  ctx.user = result
-  return next()
-}, sendUserAndToken)
+  const { email } = await req.json()
+  await service.auth.signup(email)
+  return NextResponse.json({ message: 'Check your email' })
+})

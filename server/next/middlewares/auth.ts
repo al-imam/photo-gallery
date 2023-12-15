@@ -5,9 +5,9 @@ import * as hash from '/service/hash'
 import { NextUserHandler } from '/service/types'
 import { pick } from '/service/utils'
 
-export const sendUserAndToken: NextUserHandler = async (req, ctx) => {
-  const cookieToken = await hash.sign(ctx.user.id, 'cookie')
-  const authToken = await hash.sign(ctx.user.id, 'auth')
+export const sendUserAndToken: NextUserHandler = async (_, ctx) => {
+  const cookieToken = await hash.jwt.sign('cookie', ctx.user.id)
+  const authToken = await hash.jwt.sign('auth', ctx.user.id)
 
   cookies().set({
     name: 'authorization',
@@ -18,7 +18,23 @@ export const sendUserAndToken: NextUserHandler = async (req, ctx) => {
   })
 
   return NextResponse.json({
+    ...ctx.response,
     user: pick(ctx.user, ...USER_SAFE_FIELDS),
     jwt_token: authToken,
   })
+}
+
+export const checkPassword: NextUserHandler = async (req, ctx, next) => {
+  const body = await req.json()
+  ctx.data = body
+
+  if (!body.password) {
+    throw new Error('Password is required')
+  }
+
+  if (await hash.bcrypt.compare(body.password, ctx.user.password)) {
+    return next()
+  }
+
+  throw new Error('Password is incorrect')
 }

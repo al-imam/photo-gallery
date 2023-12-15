@@ -1,42 +1,26 @@
 import * as hash from '../hash'
 import db, { User } from '../db'
 import { PrettifyPick } from '../utils'
-import { sendOTPToEmail } from '../mail'
-
-async function checkIfEmailAvailability(email: string) {
-  const count = await db.user.count({
-    where: { OR: [{ email }, { email_pending: email }] },
-  })
-
-  return count === 0
-}
+import mail from '../mail'
 
 export function fetch(id: string) {
   return db.user.findUnique({ where: { id } })
 }
 
 export async function create(
-  data: PrettifyPick<User, 'name' | 'email' | 'password', 'avatar'>
+  token: string,
+  data: PrettifyPick<User, 'name' | 'password', 'avatar'>
 ) {
-  const count = await checkIfEmailAvailability(data.email)
-  if (!count) throw new Error('Email already exists')
+  const { payload: email } = await hash.jwt.verify('signup-email', token)
 
-  const [code, hashedCode] = await hash.generateOTP(6)
-  const user = await db.user.create({
+  return db.user.create({
     data: {
+      email: email,
       name: data.name,
-      email: data.email,
       avatar: data.avatar,
-      password: await hash.encrypt(data.password),
-      opt_emailVerificationCode: hashedCode,
-      opt_emailVerificationCodeExp: new Date(
-        Date.now() + 1000 * 60 * 10 /* 10 minutes */
-      ),
+      password: await hash.bcrypt.encrypt(data.password),
     },
   })
-
-  sendOTPToEmail(user.email, code)
-  return user
 }
 
 export function update(
@@ -53,97 +37,82 @@ export function remove(userId: string) {
   return db.user.delete({ where: { id: userId } })
 }
 
-export async function verifyAccount(
-  user: PrettifyPick<
-    User,
-    | 'id'
-    | 'isAccountVerified'
-    | 'email_pending'
-    | 'opt_emailVerificationCode'
-    | 'opt_emailVerificationCodeExp'
-  >,
-  code: string
+export async function requestEmailChange(
+  user: PrettifyPick<User, 'id' | 'email'>,
+  newEmail: string
 ) {
-  if (!user.opt_emailVerificationCode) {
-    throw new Error('No verification process is pending')
-  }
+  const count = await db.user.count({ where: { email: newEmail } })
+  if (count) throw new Error('Email already exists')
 
-  if (
-    !(
-      (await hash.compare(code, user.opt_emailVerificationCode)) &&
-      user.opt_emailVerificationCodeExp! > new Date()
-    )
-  ) {
-    throw new Error('Invalid verification code')
-  }
+  const token = await hash.jwt.sign('change-email', {
+    id: user.id,
+    email: user.email,
+    newEmail,
+  })
 
-  if (!user.isAccountVerified) {
-    return db.user.update({
-      where: { id: user.id },
-      data: { isAccountVerified: true, opt_emailVerificationCode: null },
-    })
-  }
-
-  if (user.email_pending) {
-    return db.user.update({
-      where: { id: user.id },
-      data: {
-        email: user.email_pending!,
-        email_pending: null,
-        opt_emailVerificationCode: null,
-      },
-    })
-  }
-
-  throw new Error('Something went wrong!!')
+  mail(newEmail, 'Change your email', token)
 }
 
-export async function resendEmailVerificationCode(
-  user: PrettifyPick<User, 'id' | 'opt_emailVerificationCode'>
-) {
+export async function confirmEmailChange(token: string) {
+  const { payload, iatVerify } = await hash.jwt.verify('change-email', token)
+  const user = await db.user.findUnique({ where: { id: payload.id } })
   if (!user) throw new Error('User not found')
-  if (!user.opt_emailVerificationCode) {
-    throw new Error('No verification process is pending')
-  }
+  iatVerify(user.authModifiedAt)
 
-  if (user.opt_emailVerificationCode) {
-    const [code, hashedCode] = await hash.generateOTP(6)
-    const newUser = await db.user.update({
-      where: { id: user.id },
-      data: {
-        opt_emailVerificationCode: hashedCode,
-        opt_emailVerificationCodeExp: new Date(
-          Date.now() + 1000 * 60 * 10 /* 10 minutes */
-        ),
-      },
-    })
-
-    sendOTPToEmail(newUser.email, code)
-    return newUser
-  }
-
-  throw new Error('Something went wrong!!')
+  return db.user.update({
+    where: { id: payload.id, email: payload.email },
+    data: { email: payload.newEmail, authModifiedAt: new Date() },
+  })
 }
 
-export async function changePassword(userId: string, password: string) {
+export async function requestPasswordReset(email: string) {
+  const user = await db.user.findUnique({ where: { email } })
+  if (!user) throw new Error('User not found')
+  const token = await hash.jwt.sign('reset-password', {
+    id: user.id,
+    email: user.email,
+  })
+
+  mail(email, 'Reset your password', token)
+}
+
+export async function confirmPasswordReset(token: string, newPassword: string) {
+  const { payload, iatVerify } = await hash.jwt.verify('reset-password', token)
+  const user = await db.user.findUniqueOrThrow({
+    where: { id: payload.id, email: payload.email },
+  })
+  iatVerify(user.authModifiedAt)
+
   return db.user.update({
-    where: { id: userId },
+    where: { id: payload.id },
     data: {
-      password: await hash.encrypt(password),
-      passwordChangedAt: new Date(),
+      password: await hash.bcrypt.encrypt(newPassword),
+      authModifiedAt: new Date(),
     },
   })
 }
 
-export async function changeEmail(userId: string, newEmail: string) {
-  const count = await checkIfEmailAvailability(newEmail)
-  if (!count) throw new Error('Email already exists')
-
-  const newUser = await db.user.update({
+export async function changePassword(userId: string, newPassword: string) {
+  return db.user.update({
     where: { id: userId },
-    data: { email_pending: newEmail },
+    data: {
+      password: await hash.bcrypt.encrypt(newPassword),
+      authModifiedAt: new Date(),
+    },
   })
+}
 
-  await resendEmailVerificationCode(newUser)
-  return newUser
+export async function changeUsername(userId: string, newUsername: string) {
+  if (newUsername.length < 3) throw new Error('Username is too short')
+  if (newUsername.length > 32) throw new Error('Username is too long')
+  if (!/^[a-z0-9\_\-]+$/i.test(newUsername)) {
+    throw new Error(
+      'Invalid username, only alphanumeric, underscore and hyphen are allowed'
+    )
+  }
+
+  return db.user.update({
+    where: { id: userId },
+    data: { username: newUsername },
+  })
 }

@@ -21,6 +21,7 @@ export function sendOTPToEmail(email: string, code: string) {
   const text = `OTP <${email}>: ${code}`
   appendFileSync('./email.log', `${text}\n`)
 
+  return
   mail(email, 'OTP', text)
     .catch(() => {
       console.error('Error sending OTP to email:', email)

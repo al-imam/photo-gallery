@@ -1,47 +1,51 @@
-import * as bcrypt from 'bcryptjs'
-import * as jose from 'jose'
 import env from './env'
-
-const characters = '0123456789'
-const charactersLength = characters.length
+import * as jose from 'jose'
+import * as bcryptjs from 'bcryptjs'
+import { JWTPayload } from './types'
 const JWT_SECRET = new TextEncoder().encode(env.JWT_SECRET)
 
-export async function generateOTP(length: number) {
-  let result = ''
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * charactersLength)
-    result += characters[randomIndex]
-  }
+export const bcrypt = {
+  async encrypt(plain: string) {
+    if (!plain) throw new Error('Text is required')
+    return bcryptjs.hash(plain, env.BCRYPT_SALT_ROUNDS)
+  },
 
-  return [result, await bcrypt.hash(result, 4)]
+  async compare(plain: string, hash: string) {
+    if (!plain) throw new Error('Text is required')
+    return bcryptjs.compare(plain, hash)
+  },
 }
 
-export async function encrypt(plain: string) {
-  if (!plain) throw new Error('Text is required')
-  return bcrypt.hash(plain, env.BCRYPT_SALT_ROUNDS)
-}
+export const jwt = {
+  sign<T extends keyof JWTPayload>(mode: T, payload: JWTPayload[T]) {
+    return new jose.SignJWT({ payload, mode })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setExpirationTime('30d')
+      .setIssuedAt()
+      .sign(JWT_SECRET)
+  },
 
-export async function compare(plain: string, hash: string) {
-  if (!plain) throw new Error('Text is required')
-  return bcrypt.compare(plain, hash)
-}
+  async verify<T extends keyof JWTPayload>(mode: T, token: string) {
+    type Payload = {
+      payload: JWTPayload[T]
+      mode: T
+      iat: number
+      exp: number
+    }
 
-export async function sign(payload: string, mode: 'cookie' | 'auth') {
-  return new jose.SignJWT({ payload, mode })
-    .setProtectedHeader({ alg: 'HS256' })
-    .setExpirationTime('30d')
-    .setIssuedAt()
-    .sign(JWT_SECRET)
-}
+    const { payload } = await jose.jwtVerify<Payload>(token, JWT_SECRET, {
+      algorithms: ['HS256'],
+    })
+    if (payload.mode !== mode) throw new Error('Invalid token')
 
-export async function verify(token: string) {
-  const { payload } = await jose.jwtVerify(token, JWT_SECRET, {
-    algorithms: ['HS256'],
-  })
-  return payload as {
-    payload: string
-    mode: 'cookie' | 'auth'
-    iat: number
-    exp: number
-  }
+    return {
+      ...(payload as Payload),
+      iatVerify(authModifiedAt: Date) {
+        const authModifiedAtInSec = Math.floor(authModifiedAt.getTime() / 1000)
+        if (payload.iat < authModifiedAtInSec) {
+          throw new Error('Token is expired due to email or password change')
+        }
+      },
+    }
+  },
 }

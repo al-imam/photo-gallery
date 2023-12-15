@@ -29,37 +29,13 @@ export const authRouter = router.create<NextUserHandler>({
   ],
 })
 
-export const authVerifiedRouter = router.create<NextUserHandler>({
-  middleware: [
-    async (req, ctx, next) => {
-      const token = req.headers.get('authorization')
-      const user = await service.auth.checkAuthVerified(token, 'auth')
-      ctx.user = user
-      return next()
-    },
-  ],
-})
-
-export const authOptVerifiedRouter = router.create<NextOptUserHandler>({
+export const optionalAuthRouter = router.create<NextOptUserHandler>({
   middleware: [
     async (req, ctx, next) => {
       try {
         const token = req.headers.get('authorization')
-        const user = await service.auth.checkAuthVerified(token, 'auth')
-        ctx.user = user
+        ctx.user = await service.auth.checkAuth(token, 'auth')
       } catch {}
-
-      return next()
-    },
-  ],
-})
-
-export const authNotVerifiedRouter = router.create<NextUserHandler>({
-  middleware: [
-    async (req, ctx, next) => {
-      const token = req.headers.get('authorization')
-      const user = await service.auth.checkAuthNotVerified(token, 'auth')
-      ctx.user = user
       return next()
     },
   ],

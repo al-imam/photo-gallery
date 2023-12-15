@@ -20,7 +20,7 @@ export async function checkAuthMiddleware(
   res: Response,
   next: NextFunction
 ) {
-  req.user = await service.auth.checkAuthVerified(
+  req.user = await service.auth.checkAuth(
     req.headers.authorization,
     'auth'
   )
