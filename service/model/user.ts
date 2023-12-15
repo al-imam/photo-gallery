@@ -22,14 +22,16 @@ export async function create(
   if (!count) throw new Error('Email already exists')
 
   const [code, hashedCode] = await hash.generateOTP(6)
-
   const user = await db.user.create({
     data: {
       name: data.name,
       email: data.email,
       avatar: data.avatar,
       password: await hash.encrypt(data.password),
-      email_verificationCode: hashedCode,
+      opt_emailVerificationCode: hashedCode,
+      opt_emailVerificationCodeExp: new Date(
+        Date.now() + 1000 * 60 * 10 /* 10 minutes */
+      ),
     },
   })
 
@@ -54,22 +56,31 @@ export function remove(userId: string) {
 export async function verifyAccount(
   user: PrettifyPick<
     User,
-    'id' | 'isAccountVerified' | 'email_pending' | 'email_verificationCode'
+    | 'id'
+    | 'isAccountVerified'
+    | 'email_pending'
+    | 'opt_emailVerificationCode'
+    | 'opt_emailVerificationCodeExp'
   >,
   code: string
 ) {
-  if (!user.email_verificationCode) {
+  if (!user.opt_emailVerificationCode) {
     throw new Error('No verification process is pending')
   }
 
-  if (!(await hash.compare(code, user.email_verificationCode))) {
+  if (
+    !(
+      (await hash.compare(code, user.opt_emailVerificationCode)) &&
+      user.opt_emailVerificationCodeExp! > new Date()
+    )
+  ) {
     throw new Error('Invalid verification code')
   }
 
   if (!user.isAccountVerified) {
     return db.user.update({
       where: { id: user.id },
-      data: { isAccountVerified: true, email_verificationCode: null },
+      data: { isAccountVerified: true, opt_emailVerificationCode: null },
     })
   }
 
@@ -79,7 +90,7 @@ export async function verifyAccount(
       data: {
         email: user.email_pending!,
         email_pending: null,
-        email_verificationCode: null,
+        opt_emailVerificationCode: null,
       },
     })
   }
@@ -88,18 +99,23 @@ export async function verifyAccount(
 }
 
 export async function resendEmailVerificationCode(
-  user: PrettifyPick<User, 'id' | 'email_verificationCode'>
+  user: PrettifyPick<User, 'id' | 'opt_emailVerificationCode'>
 ) {
   if (!user) throw new Error('User not found')
-  if (!user.email_verificationCode) {
+  if (!user.opt_emailVerificationCode) {
     throw new Error('No verification process is pending')
   }
 
-  if (user.email_verificationCode) {
+  if (user.opt_emailVerificationCode) {
     const [code, hashedCode] = await hash.generateOTP(6)
     const newUser = await db.user.update({
       where: { id: user.id },
-      data: { email_verificationCode: hashedCode },
+      data: {
+        opt_emailVerificationCode: hashedCode,
+        opt_emailVerificationCodeExp: new Date(
+          Date.now() + 1000 * 60 * 10 /* 10 minutes */
+        ),
+      },
     })
 
     sendOTPToEmail(newUser.email, code)

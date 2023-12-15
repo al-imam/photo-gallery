@@ -32,9 +32,13 @@ model User {
   password          String
   isAccountVerified Boolean @default(false)
 
-  email                  String  @unique
-  email_verificationCode String?
-  email_pending          String?
+  email         String  @unique
+  email_pending String?
+
+  opt_passwordResetCode        String?
+  opt_passwordResetCodeExp     DateTime?
+  opt_emailVerificationCode    String?
+  opt_emailVerificationCodeExp DateTime?
 
   hasBeenBanned     Boolean  @default(false)
   passwordChangedAt DateTime @default(now())

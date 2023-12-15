@@ -1,5 +1,5 @@
-import db, { User } from '../db'
 import * as hash from '../hash'
+import db, { User } from '../db'
 import * as userService from './user'
 
 export type UserOrId = User | string
