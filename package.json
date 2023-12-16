@@ -14,7 +14,7 @@
     "express:serve": "node ./dist/server/express",
     "express:dev": "nodemon ./dist/server/express",
     "express:build": "prisma generate & tsc ./server/express/index.ts --outDir dist --noEmit false --esModuleInterop --skipLibCheck",
-    "express:watch": "tsc ./server/express/index.ts --outDir dist --noEmit false --esModuleInterop -w",
+    "express:watch": "tsc ./server/express/index.ts --outDir dist --noEmit false --esModuleInterop --skipLibCheck -w",
     "render:build": "npm install;npm install --force @img/sharp-linux-x64;npm run express:build"
   },
   "dependencies": {

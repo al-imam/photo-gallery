@@ -26,10 +26,14 @@ model User {
   createdAt DateTime @default(now())
 
   name          String
-  avatar        String?
   role          UserRole @default(USER)
   username      String   @unique @default(cuid())
   hasBeenBanned Boolean  @default(false)
+
+  avatar_sm String?
+  avatar_md String?
+  avatar_lg String?
+  avatarId  String?
 
   email          String   @unique
   password       String

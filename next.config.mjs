@@ -1,4 +1,4 @@
-const source = '/yandex-disk'
+const source = '/api/yandex-disk'
 const destination = `https://cdn.discordapp.com/attachments/${process.env.DISCORD_CHANNEL}`
 
 /** @type {import('next').NextConfig} */
