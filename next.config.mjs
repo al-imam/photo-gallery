@@ -1,5 +1,5 @@
-const source = '/api/yandex-disk'
-const destination = `https://cdn.discordapp.com/attachments/${process.env.DISCORD_CHANNEL}`
+const baseSource = '/api/yandex-disk'
+const baseDestination = `https://cdn.discordapp.com/attachments`
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -8,8 +8,12 @@ const nextConfig = {
   rewrites() {
     return [
       {
-        source: source + '/:path*',
-        destination: destination + '/:path*',
+        source: `${baseSource}/media/:path*`,
+        destination: `${baseDestination}/${process.env.DISCORD_CHANNEL_MEDIA}/:path*`,
+      },
+      {
+        source: `${baseSource}/avatar/:path*`,
+        destination: `${baseDestination}/${process.env.DISCORD_CHANNEL_AVATAR}/:path*`,
       },
     ]
   },
