@@ -1,14 +1,18 @@
+import env from './env'
 import nodemailer from 'nodemailer'
-const emailAddress = 'dont.stop.talking.about.palestine@gmail.com'
+const emailAddress = 'no-reply@palestinian.top'
 const transporter = nodemailer.createTransport({
-  auth: { user: emailAddress, pass: process.env.GOOGLE_PASSWORD },
-  service: 'gmail',
+  auth: { user: env.GOOGLE_EMAIL, pass: env.GOOGLE_PASSWORD },
+  host: 'smtp.gmail.com',
+  secure: true,
+  port: 465,
 })
 
 function mail(to: string, subject: string, body: string) {
   return transporter
     .sendMail({
-      from: `Verification Bot <${emailAddress}>`,
+      from: emailAddress,
+      priority: 'high',
       html: body,
       subject,
       to,
