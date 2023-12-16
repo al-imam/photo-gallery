@@ -77,7 +77,9 @@ export function DataTable<TData, TValue>({
     <div>
       <div className="flex items-center py-4">
         <Input
-          placeholder={`Search by ${canFilterColumns.join(', ')}`}
+          placeholder={`Search by ${new Intl.ListFormat().format(
+            canFilterColumns
+          )}`}
           value={globalFilter}
           onChange={(event) => setGlobalFilter(event.target.value)}
           className="max-w-sm"
