@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
 function mail(to: string, subject: string, body: string) {
   return transporter
     .sendMail({
-      from: { name: 'Palestinian', address: emailAddress },
+      from: emailAddress,
       priority: 'high',
       html: body,
       subject,
