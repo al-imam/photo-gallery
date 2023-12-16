@@ -7,8 +7,8 @@ import { Provider } from '/context'
 
 export const metadata: Metadata = {
   title: {
-    default: 'Photo Gallery',
-    template: '%s | Photo Gallery',
+    default: 'Palestine',
+    template: '%s | palestine',
   },
 }
 
