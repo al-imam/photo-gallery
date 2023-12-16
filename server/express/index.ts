@@ -13,6 +13,14 @@ configDotenv({ path: '/etc/secrets/.env' })
 console.clear()
 const app = express()
 
+app.use((req, res, next) => {
+  if (req.hostname === 'ps-gallery.onrender.com') {
+    return res.redirect('https://api.palestinian.top')
+  }
+
+  next()
+})
+
 app.use(cors({ origin: /.*/ }))
 app.use(helmet())
 app.use(
@@ -31,7 +39,7 @@ app.use(xss())
 app.use(router)
 app.use((_, res) => {
   res.status(404).json({
-    error: "Not Found\nCurrently just 'POST /upload' route is in service",
+    error: "Currently just 'POST /upload' route is in service",
   })
 })
 
