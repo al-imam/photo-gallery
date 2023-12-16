@@ -64,7 +64,7 @@ export default {
     const media = await generateMedia(buffer)
     const thumbnail = await generateThumbnail(buffer)
     const { attachments, ...data } = await sendAttachments(
-      env.DISCORD_CHANNEL,
+      env.DISCORD_CHANNEL_MEDIA,
       media,
       thumbnail
     )
@@ -78,7 +78,7 @@ export default {
 
   async uploadAvatar(buffer: Buffer) {
     const { attachments, ...data } = await sendAttachments(
-      env.DISCORD_CHANNEL,
+      env.DISCORD_CHANNEL_AVATAR,
       await generateAvatar(buffer, 256),
       await generateAvatar(buffer, 512),
       await generateAvatar(buffer, 1024)
@@ -93,10 +93,10 @@ export default {
   },
 
   deleteMedia(id: string) {
-    return removeMessage(env.DISCORD_CHANNEL, id)
+    return removeMessage(env.DISCORD_CHANNEL_MEDIA, id)
   },
 
   deleteAvatar(id: string) {
-    return removeMessage(env.DISCORD_CHANNEL, id)
+    return removeMessage(env.DISCORD_CHANNEL_AVATAR, id)
   },
 }

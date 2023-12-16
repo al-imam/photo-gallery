@@ -44,7 +44,7 @@ export async function generateAvatar(
       .webp({ quality: 75 })
       .toBuffer((err, buffer) => {
         if (err) reject(err.message)
-        else makeImageBody(buffer, 'avatar-' + size).then(resolve)
+        else makeImageBody(buffer, 'avatar').then(resolve)
       })
   })
 }
