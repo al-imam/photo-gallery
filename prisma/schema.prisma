@@ -25,29 +25,26 @@ model User {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
 
-  name   String
-  avatar String?
-  role   UserRole @default(USER)
+  name          String
+  role          UserRole @default(USER)
+  username      String   @unique @default(cuid())
+  hasBeenBanned Boolean  @default(false)
 
-  password          String
-  isAccountVerified Boolean @default(false)
+  avatar_sm String?
+  avatar_md String?
+  avatar_lg String?
+  avatarId  String?
 
-  email         String  @unique
-  email_pending String?
+  email          String   @unique
+  password       String
+  authModifiedAt DateTime @default(now())
 
-  opt_passwordResetCode        String?
-  opt_passwordResetCodeExp     DateTime?
-  opt_emailVerificationCode    String?
-  opt_emailVerificationCodeExp DateTime?
+  media         Media[]        @relation("User")
+  bookmarks     BookMark[]     @relation("Bookmark")
+  notifications Notification[] @relation("Notification")
 
-  hasBeenBanned     Boolean  @default(false)
-  passwordChangedAt DateTime @default(now())
-
-  media          Media[]         @relation("User")
-  approved_media Media[]         @relation("Media")
-  bookmarks      BookMark[]      @relation("Bookmark")
-  notifications  Notification[]  @relation("Notification")
-  NONE_REACTIONS MediaReaction[] @relation("MediaReaction")
+  NONE_APPROVED_MEDIA Media[]         @relation("Media")
+  NONE_REACTIONS      MediaReaction[] @relation("MediaReaction")
 }
 
 model Media {
