@@ -19,17 +19,6 @@
     "no-underscore-dangle": 0,
     "import/no-unresolved": 0,
     "@next/next/no-img-element": 0,
-    "no-restricted-imports": [
-      2,
-      {
-        "patterns": [
-          {
-            "group": ["./*/", "**../"],
-            "message": "Relative imports are not allowed."
-          }
-        ]
-      }
-    ],
     "no-plusplus": [2, { "allowForLoopAfterthoughts": true }],
     "no-shadow": [2, { "ignoreOnInitialization": true }]
   },
