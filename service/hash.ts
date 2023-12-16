@@ -21,7 +21,9 @@ export const jwt = {
   sign<T extends keyof JWTPayload>(mode: T, payload: JWTPayload[T]) {
     return new jose.SignJWT({ payload, mode })
       .setProtectedHeader({ alg: 'HS256' })
-      .setExpirationTime('30d')
+      .setExpirationTime(
+        mode === 'cookie' ? '30d' : mode === 'auth' ? '3d' : '5m'
+      )
       .setIssuedAt()
       .sign(JWT_SECRET)
   },
