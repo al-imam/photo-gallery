@@ -1,13 +1,16 @@
-import { Response } from 'express'
+import {
+  USER_SAFE_FIELDS_QUERY,
+  USER_PUBLIC_FIELDS_QUERY,
+} from '../../service/config'
 import db from '../../service/db'
-import { mediaInputSchema } from './config'
+import { Response } from 'express'
 import { UserRequest } from './middleware'
-import { USER_PUBLIC_FIELDS_QUERY } from '../../service/config'
-import { MediaWithLoves } from '../../service/types'
-import discord from './discord'
 import ReqErr from '../../service/ReqError'
+import { mediaInputSchema } from './config'
+import discord from '../../service/discord'
+import { MediaWithLoves } from '../../service/types'
 
-export default async function (req: UserRequest, res: Response) {
+export async function createMedia(req: UserRequest, res: Response) {
   const buffer = req.file?.buffer
   if (!buffer) throw new ReqErr('No file provided')
   const body = mediaInputSchema.parse(req.body)
@@ -39,7 +42,7 @@ export default async function (req: UserRequest, res: Response) {
     delete body.note
   }
 
-  const result = await discord.upload(buffer)
+  const result = await discord.uploadMedia(buffer)
   const media = await db.media.create({
     data: {
       ...body,
@@ -62,4 +65,29 @@ export default async function (req: UserRequest, res: Response) {
 
   const data: MediaWithLoves = { ...media, isLoved: false, loves: 0 }
   res.json({ data })
+}
+
+export async function postAvatar(req: UserRequest, res: Response) {
+  const buffer = req.file?.buffer
+  if (!buffer) throw new ReqErr('No file provided')
+  if (req.file!.size > 1024 * 1024 * 5 /* 5 MB */) {
+    throw new ReqErr('Max file size is 5 MB')
+  }
+
+  const result = await discord.uploadAvatar(buffer)
+  const user = await db.user.update({
+    where: { id: req.user.id },
+    data: {
+      avatarId: result.id,
+      avatar_sm: result.avatar_sm.url,
+      avatar_md: result.avatar_md.url,
+      avatar_lg: result.avatar_lg.url,
+    },
+    select: USER_SAFE_FIELDS_QUERY,
+  })
+
+  res.json({ user })
+  if (req.user.avatarId) {
+    await discord.deleteAvatar(req.user.avatarId).catch(console.error)
+  }
 }

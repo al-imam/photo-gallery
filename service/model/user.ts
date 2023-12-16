@@ -10,7 +10,7 @@ export function fetch(id: string) {
 
 export async function create(
   token: string,
-  data: PrettifyPick<User, 'name' | 'password', 'avatar'>
+  data: PrettifyPick<User, 'name' | 'password'>
 ) {
   const { payload: email } = await hash.jwt.verify('signup-email', token)
 
@@ -18,7 +18,6 @@ export async function create(
     data: {
       email: email,
       name: data.name,
-      avatar: data.avatar,
       password: await hash.bcrypt.encrypt(data.password),
     },
   })
@@ -26,7 +25,7 @@ export async function create(
 
 export function update(
   userId: string,
-  data: PrettifyPick<User, never, 'avatar' | 'name'>
+  data: PrettifyPick<User, never, 'name'>
 ) {
   return db.user.update({
     where: { id: userId },
