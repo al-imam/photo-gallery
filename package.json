@@ -11,11 +11,11 @@
     "format": "prettier --write .",
     "type-check": "tsc --noEmit",
     "prisma": "prisma db push",
-    "express:dev":"npm-run-all --parallel express:tsc-watch express:serve-watch",
+    "express:dev":"npm-run-all --parallel express:dev:*",
     "express:serve": "node ./dist/server/express",
-    "express:serve-watch": "nodemon ./dist/server/express",
+    "express:dev:serve": "nodemon ./dist/server/express",
     "express:build": "prisma generate & tsc ./server/express/index.ts --outDir dist --noEmit false --esModuleInterop --skipLibCheck",
-    "express:tsc-watch": "tsc ./server/express/index.ts --outDir dist --noEmit false --esModuleInterop --skipLibCheck -w",
+    "express:dev:build": "tsc ./server/express/index.ts --outDir dist --noEmit false --esModuleInterop --skipLibCheck -w",
     "render:build": "npm install;npm install --force @img/sharp-linux-x64;npm run express:build"
   },
   "dependencies": {
