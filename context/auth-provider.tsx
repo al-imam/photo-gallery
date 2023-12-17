@@ -1,21 +1,7 @@
-import {
-  FunctionComponent,
-  ReactNode,
-  createContext,
-  useEffect,
-  useState,
-} from 'react'
+import { User } from '@prisma/client'
+import { FunctionComponent, ReactNode, createContext, useState } from 'react'
 import { POST, PUT } from '/lib'
 import { Prettify } from '/types'
-
-interface User {
-  name: string
-  email: string
-  id: string
-  createdAt: string
-  updatedAt: string
-  photoUrl?: string
-}
 
 interface CallBackFun<Res = any> {
   onError: (error: unknown) => void
@@ -46,6 +32,7 @@ interface Value {
   signIn: SignInFun
   signOut: signOutFun
   currentUser: User | null
+  signUpComplete: SignUpCompleteFun
   changePassword: ChangePasswordFun
   setCurrentUser: (user: unknown) => void
   auth: null | string
@@ -173,6 +160,7 @@ const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children }) => {
         currentUser,
         setCurrentUser,
         changePassword,
+        signUpComplete,
         auth,
       }}
     >
