@@ -52,6 +52,7 @@ model User {
 
 model Media {
   id        String   @id @default(uuid())
+  no        Int      @default(autoincrement())
   createdAt DateTime @default(now())
   messageId String
 
@@ -100,15 +101,16 @@ model MediaReaction {
 
 model MediaCategory {
   id        String   @id @default(uuid())
-  name      String   @unique
   createdAt DateTime @default(now())
+  name      String   @unique
   media     Media[]  @relation("MediaCategory")
 }
 
 model BookMark {
-  id      String @id @default(uuid())
-  mediaId String
-  userId  String
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  mediaId   String
+  userId    String
 
   NONE_MEDIA Media @relation("Bookmark", fields: [mediaId], references: [id])
   NONE_USER  User  @relation("Bookmark", fields: [userId], references: [id])
