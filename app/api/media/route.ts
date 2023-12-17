@@ -8,14 +8,14 @@ export type GETBody = {
 }
 
 export const GET = optionalAuthRouter(async (req, ctx) => {
-  const query = Object.fromEntries(req.nextUrl.searchParams.entries())
-
+  // const query = Object.fromEntries(req.nextUrl.searchParams.entries())
+  // console.log(query)
   return NextResponse.json<GETBody>({
     media: await service.media.getFeaturedMedia(ctx.user?.id, {
-      limit: queryToNumber(query.limit),
-      skip: queryToNumber(query.skip),
-      category: query.category,
-      authorId: query.authorId,
+      // limit: queryToNumber(query.limit),
+      // skip: queryToNumber(query.skip),
+      // category: query.category,
+      // authorId: query.authorId,
     }),
   })
 })
