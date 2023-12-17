@@ -16,7 +16,7 @@ export async function createMedia(req: UserRequest, res: Response) {
   if (req.file!.size > 1024 * 1024 * 20 /* 20 MiB */) {
     throw new ReqErr('Max file size is 20 MiB')
   }
-  
+
   const body = mediaInputSchema.parse(req.body)
   if (body.newCategory && body.categoryId) {
     throw new ReqErr('Cannot provide both newCategory and categoryId')
@@ -29,9 +29,9 @@ export async function createMedia(req: UserRequest, res: Response) {
   }
 
   if (
-    req.user.role === 'VERIFIED' ||
-    req.user.role === 'MODERATOR' ||
-    req.user.role === 'ADMIN'
+    req.user.status === 'VERIFIED' ||
+    req.user.status === 'MODERATOR' ||
+    req.user.status === 'ADMIN'
   ) {
     if (body.newCategory) {
       const name = body.newCategory.toLowerCase()
@@ -86,7 +86,7 @@ export async function postAvatar(req: UserRequest, res: Response) {
   const user = await db.user.update({
     where: { id: req.user.id },
     data: {
-      avatarId: result.id,
+      avatar_messageId: result.id,
       avatar_sm: result.avatar_sm.url,
       avatar_md: result.avatar_md.url,
       avatar_lg: result.avatar_lg.url,
@@ -95,7 +95,7 @@ export async function postAvatar(req: UserRequest, res: Response) {
   })
 
   res.json({ user })
-  if (req.user.avatarId) {
-    await discord.deleteAvatar(req.user.avatarId).catch(console.error)
+  if (req.user.avatar_messageId) {
+    await discord.deleteAvatar(req.user.avatar_messageId).catch(console.error)
   }
 }

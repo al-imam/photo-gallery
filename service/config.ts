@@ -3,22 +3,15 @@ import { Prettify } from './utils'
 
 export const USER_PUBLIC_FIELDS = [
   'id',
-  'role',
-  'bio',
-  'links',
   'name',
+  'status',
   'avatar_sm',
   'avatar_md',
   'avatar_lg',
   'username',
-  'hasBeenBanned',
 ] as const
 
-export const USER_SAFE_FIELDS = [
-  ...USER_PUBLIC_FIELDS,
-  'email',
-  'createdAt',
-] as const
+export const USER_SAFE_FIELDS = [...USER_PUBLIC_FIELDS, 'email'] as const
 
 let keys = 0 as unknown as (typeof USER_SAFE_FIELDS)[number]
 keys satisfies keyof User

@@ -14,13 +14,21 @@ export async function create(
 ) {
   const { payload: email } = await hash.jwt.verify('signup-email', token)
 
-  return db.user.create({
+  const user = await db.user.create({
     data: {
       email: email,
       name: data.name,
       password: await hash.bcrypt.encrypt(data.password),
     },
   })
+
+  await db.profile.create({
+    data: {
+      id: user.id,
+    },
+  })
+
+  return user
 }
 
 export function update(
@@ -46,8 +54,7 @@ export async function requestEmailChange(
 
   const token = await hash.jwt.sign('change-email', {
     id: user.id,
-    email: user.email,
-    newEmail,
+    newEmail: newEmail,
   })
 
   mail.sendChangeEmailToken(newEmail, token)
@@ -60,7 +67,7 @@ export async function confirmEmailChange(token: string) {
   iatVerify(user.authModifiedAt)
 
   return db.user.update({
-    where: { id: payload.id, email: payload.email },
+    where: { id: payload.id, email: payload.newEmail },
     data: { email: payload.newEmail, authModifiedAt: new Date() },
   })
 }
@@ -83,16 +90,17 @@ export async function confirmPasswordReset(token: string, newPassword: string) {
   })
   iatVerify(user.authModifiedAt)
 
-  return db.user.update({
-    where: { id: payload.id },
-    data: {
-      password: await hash.bcrypt.encrypt(newPassword),
-      authModifiedAt: new Date(),
-    },
-  })
+  return changePassword(user.id, newPassword)
 }
 
 export async function changePassword(userId: string, newPassword: string) {
+  if (newPassword.length < 6) {
+    throw new ReqErr('Password is too short min length is 6')
+  }
+  if (newPassword.length > 64) {
+    throw new ReqErr('Password is too long max length is 32')
+  }
+
   return db.user.update({
     where: { id: userId },
     data: {
@@ -103,7 +111,7 @@ export async function changePassword(userId: string, newPassword: string) {
 }
 
 export async function changeUsername(userId: string, newUsername: string) {
-  if (newUsername.length < 3) throw new ReqErr('Username is too short')
+  if (newUsername.length < 4) throw new ReqErr('Username is too short')
   if (newUsername.length > 32) throw new ReqErr('Username is too long')
   if (!/^[a-z0-9\_\-]+$/i.test(newUsername)) {
     throw new ReqErr(

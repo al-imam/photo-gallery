@@ -28,8 +28,11 @@ export type JWTPayload = {
   'signup-email': string
   'change-email': {
     id: string
-    email: string
     newEmail: string
+  }
+  'public-email': {
+    id: string
+    publicEmail: string
   }
   'reset-password': {
     id: string

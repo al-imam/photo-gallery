@@ -17,6 +17,8 @@ export const POST = router(async (req, ctx, next) => {
     name,
     password,
   })
+  
+   
   return next()
 }, sendUserAndToken)
 
