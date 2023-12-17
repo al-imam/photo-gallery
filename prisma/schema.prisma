@@ -9,7 +9,8 @@ datasource db {
 }
 
 enum UserRole {
-  USER
+  PUBLIC
+  VERIFIED
   MODERATOR
   ADMIN
 }
@@ -26,7 +27,7 @@ model User {
   createdAt DateTime @default(now())
 
   name          String
-  role          UserRole @default(USER)
+  role          UserRole @default(PUBLIC)
   username      String   @unique @default(cuid())
   hasBeenBanned Boolean  @default(false)
 
