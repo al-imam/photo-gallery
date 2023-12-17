@@ -1,5 +1,9 @@
-const baseSource = '/api/yandex-disk'
-const baseDestination = `https://cdn.discordapp.com/attachments`
+function generateRewrite(src, dest) {
+  return {
+    source: `/api/yandex-disk/${src}/:id/:name`,
+    destination: `https://cdn.discordapp.com/attachments/${dest}/:id/:name`,
+  }
+}
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -7,14 +11,8 @@ const nextConfig = {
   pageExtensions: ['ts', 'tsx'],
   rewrites() {
     return [
-      {
-        source: `${baseSource}/media/:path*`,
-        destination: `${baseDestination}/${process.env.DISCORD_CHANNEL_MEDIA}/:path*`,
-      },
-      {
-        source: `${baseSource}/avatar/:path*`,
-        destination: `${baseDestination}/${process.env.DISCORD_CHANNEL_AVATAR}/:path*`,
-      },
+      generateRewrite('media', process.env.DISCORD_CHANNEL_MEDIA),
+      generateRewrite('avatar', process.env.DISCORD_CHANNEL_AVATAR),
     ]
   },
 }
