@@ -10,7 +10,7 @@
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write .",
     "type-check": "tsc --noEmit",
-    "prisma": "prisma generate",
+    "prisma": "prisma db push",
     "express:dev":"npm-run-all --parallel express:tsc-watch express:serve-watch",
     "express:serve": "node ./dist/server/express",
     "express:serve-watch": "nodemon ./dist/server/express",

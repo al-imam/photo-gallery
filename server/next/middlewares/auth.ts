@@ -6,9 +6,11 @@ import { NextUserHandler } from '/service/types'
 import { pick } from '/service/utils'
 import ReqErr from '/service/ReqError'
 import { User } from '@prisma/client'
+import db from '/service/db'
 
 export type SendUserAndToken = {
-  user: Pick<User, (typeof USER_SAFE_FIELDS)[number]>
+  user: Pick<User, (typeof USER_SAFE_FIELDS)[number]> & {}
+
   jwt_token: string
 }
 
@@ -26,9 +28,10 @@ export const sendUserAndToken: NextUserHandler = async (_, ctx) => {
 
   return NextResponse.json<SendUserAndToken>({
     ...ctx.response,
-    user: pick(ctx.user, ...USER_SAFE_FIELDS),
+    user: {
+      ...pick(ctx.user, ...USER_SAFE_FIELDS),
+    },
     jwt_token: authToken,
-    
   })
 }
 

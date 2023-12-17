@@ -6,22 +6,13 @@ import {
 import Router from 'router13'
 import service from '/service'
 import { NextResponse } from 'next/server'
-import ReqErr from '/service/ReqError'
+import errorFormat from '/service/errorFormat'
 
 export const router = Router.create<NextHandler>({
   middleware: [],
   errorHandler: async (err: any) => {
-    let error = "Something's went wrong!"
-    let status = 500
-
-    if (err instanceof ReqErr) {
-      error = err.message
-      status = err.statusCode
-    } else {
-      console.error(err)
-    }
-
-    return NextResponse.json({ error: error.toString() }, { status })
+    const [message, status] = errorFormat(err)
+    return NextResponse.json({ error: message.toString() }, { status })
   },
 })
 

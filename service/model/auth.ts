@@ -16,7 +16,7 @@ export async function checkAuth(
 
   const user = await userService.fetch(payload)
   if (!user) throw new ReqErr('User not found')
-  if (user.hasBeenBanned) throw new ReqErr('User has been banned')
+  if (user.status === 'BANNED') throw new ReqErr('User has been banned')
   iatVerify(user.authModifiedAt)
 
   return user

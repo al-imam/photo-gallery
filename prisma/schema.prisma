@@ -1,67 +1,66 @@
-generator client {
-  provider = "prisma-client-js"
-}
-
-datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
-}
-
-enum UserRole {
-  PUBLIC
-  VERIFIED
-  MODERATOR
-  ADMIN
-}
-
-enum MediaStatus {
-  PENDING
-  APPROVED
-  REJECTED
-  PASSED_TO_ADMIN
-}
-
 model User {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
+  id String @id @default(uuid()) @db.Uuid()
 
-  name      String
-  links     String[]
-  bio       String?
-  avatar_sm String?
-  avatar_md String?
-  avatar_lg String?
-  avatarId  String?
+  name     String   @db.VarChar(24)
+  profile  Profile?
+  status   UserRole @default(PUBLIC)
+  username String   @unique @default(cuid())
 
-  role          UserRole @default(PUBLIC)
-  hasBeenBanned Boolean  @default(false)
+  avatar_sm        String?
+  avatar_md        String?
+  avatar_lg        String?
+  avatar_messageId String?
 
-  email          String   @unique
-  username       String   @unique @default(cuid())
   password       String
+  email          String   @unique
   authModifiedAt DateTime @default(now())
 
   media         Media[]        @relation("User")
   bookmarks     BookMark[]     @relation("Bookmark")
   notifications Notification[] @relation("Notification")
 
-  NONE_APPROVED_MEDIA Media[]         @relation("Media")
-  NONE_REACTIONS      MediaReaction[] @relation("MediaReaction")
+  Z_REACTIONS                         MediaReaction[]         @relation("MediaReaction")
+  Z_LOG_ROLE                          Log_RoleChange[]        @relation("LogRoleChange")
+  Z_LOG_ROLE_MODERATED                Log_RoleChange[]        @relation("LogRoleChangeModerated")
+  Z_LOG_MEDIA_STATUS_CHANGE_MODERATED Log_MediaStatusChange[] @relation("LogMediaStatusChangeModerated")
+}
+
+model Profile {
+  id        String   @id @db.Uuid()
+  createdAt DateTime @default(now())
+
+  bio          String?              @db.VarChar(200)
+  location     String?              @db.VarChar(48)
+  public_email String?
+  social_links ProfileSocialLinks[] @relation("ProfileSocialLinks")
+
+  ZZZ_USER User? @relation(fields: [id], references: [id], onDelete: Cascade)
+}
+
+model ProfileSocialLinks {
+  id        String   @id @default(uuid()) @db.Uuid()
+  createdAt DateTime @default(now())
+  profileId String   @db.Uuid()
+
+  type ProfileLinkType @default(OTHER)
+  url  String          @db.VarChar(48)
+
+  Profile Profile? @relation("ProfileSocialLinks", fields: [profileId], references: [id])
 }
 
 model Media {
-  id        String   @id @default(uuid())
+  id        String   @id @default(uuid()) @db.Uuid()
   createdAt DateTime @default(now())
   messageId String
 
-  title       String   @default("")
-  description String   @default("")
-  tags        String[]
-  note        String?
+  title       String?     @db.VarChar(48)
+  description String?     @db.VarChar(300)
+  note        String?     @db.VarChar(200)
+  tags        String[]    @db.VarChar(16)
+  status      MediaStatus @default(PENDING)
 
   newCategory String?
-  categoryId  String?
+  categoryId  String?        @db.Uuid()
   category    MediaCategory? @relation("MediaCategory", fields: [categoryId], references: [id])
 
   media_size              Int
@@ -72,56 +71,114 @@ model Media {
   url_media     String
   url_thumbnail String
 
-  authorId String
+  authorId String @db.Uuid()
   author   User   @relation("User", fields: [authorId], references: [id])
 
-  status               MediaStatus @default(PENDING)
-  status_moderatedById String?
-  status_moderatedBy   User?       @relation("Media", fields: [status_moderatedById], references: [id])
-  status_moderatedAt   DateTime?
-  status_approvedAt    DateTime?
+  Z_BOOKMARK  BookMark[]              @relation("Bookmark")
+  Z_REACTIONS MediaReaction[]         @relation("MediaReaction")
+  Z_LOG_MEDIA Log_MediaStatusChange[] @relation("LogMediaStatusChange")
+}
 
-  NONE_BOOKMARK  BookMark[]      @relation("Bookmark")
-  NONE_REACTIONS MediaReaction[] @relation("MediaReaction")
+model MediaCategory {
+  id        String   @id @default(uuid()) @db.Uuid()
+  createdAt DateTime @default(now())
+  name      String   @unique @db.VarChar(16)
+  media     Media[]  @relation("MediaCategory")
 }
 
 model MediaReaction {
-  id        String   @id @default(uuid())
+  id        String   @id @default(uuid()) @db.Uuid()
   createdAt DateTime @default(now())
+  mediaId   String   @db.Uuid()
+  userId    String   @db.Uuid()
 
-  mediaId String
-  media   Media  @relation("MediaReaction", fields: [mediaId], references: [id])
-
-  userId String
-  user   User   @relation("MediaReaction", fields: [userId], references: [id])
+  Z_MEDIA Media @relation("MediaReaction", fields: [mediaId], references: [id])
+  Z_USER  User  @relation("MediaReaction", fields: [userId], references: [id])
 
   @@unique([mediaId, userId])
 }
 
-model MediaCategory {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  name      String   @unique
-  media     Media[]  @relation("MediaCategory")
-}
-
 model BookMark {
-  id        String   @id @default(uuid())
+  id        String   @id @default(uuid()) @db.Uuid()
   createdAt DateTime @default(now())
-  mediaId   String
-  userId    String
+  mediaId   String   @db.Uuid()
+  userId    String   @db.Uuid()
 
-  NONE_MEDIA Media @relation("Bookmark", fields: [mediaId], references: [id])
-  NONE_USER  User  @relation("Bookmark", fields: [userId], references: [id])
+  Z_MEDIA Media @relation("Bookmark", fields: [mediaId], references: [id])
+  Z_USER  User  @relation("Bookmark", fields: [userId], references: [id])
 }
 
 model Notification {
-  id        String   @id @default(uuid())
+  id        String   @id @default(uuid()) @db.Uuid()
   createdAt DateTime @default(now())
+  userId    String   @db.Uuid()
+  message   String   @db.VarChar(128)
+  read      Boolean  @default(false)
 
-  userId String
-  user   User   @relation("Notification", fields: [userId], references: [id])
+  Z_USER User @relation("Notification", fields: [userId], references: [id])
+}
 
-  message String
-  read    Boolean @default(false)
+model Log_RoleChange {
+  id        String   @id @default(uuid()) @db.Uuid()
+  createdAt DateTime @default(now())
+  reason    String?  @db.VarChar(128)
+
+  role_old UserRole
+  role_new UserRole
+
+  userId        String @db.Uuid()
+  moderatedById String @db.Uuid()
+
+  Z_USER        User @relation("LogRoleChange", fields: [userId], references: [id])
+  Z_MODERATEDBY User @relation("LogRoleChangeModerated", fields: [moderatedById], references: [id])
+}
+
+model Log_MediaStatusChange {
+  id        String   @id @default(uuid()) @db.Uuid()
+  createdAt DateTime @default(now())
+  comment   String?  @db.VarChar(128)
+
+  status_old MediaStatus
+  status_new MediaStatus
+
+  mediaId       String @db.Uuid()
+  moderatedById String @db.Uuid()
+
+  Z_MEDIA       Media @relation("LogMediaStatusChange", fields: [mediaId], references: [id])
+  Z_MODERATEDBY User  @relation("LogMediaStatusChangeModerated", fields: [moderatedById], references: [id])
+}
+
+enum UserRole {
+  BANNED
+  PUBLIC
+  VERIFIED
+  MODERATOR
+  ADMIN
+}
+
+enum ProfileLinkType {
+  TWITTER
+  INSTAGRAM
+  FACEBOOK
+  YOUTUBE
+  TIKTOK
+  WEBSITE
+  OTHER
+}
+
+enum MediaStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PASSED_TO_ADMIN
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
 }
