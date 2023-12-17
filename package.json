@@ -16,7 +16,7 @@
     "express:dev:serve": "nodemon ./dist/server/express",
     "express:build": "prisma generate & tsc ./server/express/index.ts --outDir dist --noEmit false --esModuleInterop --skipLibCheck",
     "express:dev:build": "tsc ./server/express/index.ts --outDir dist --noEmit false --esModuleInterop --skipLibCheck -w",
-    "render:build": "npm install;npm install --force @img/sharp-linux-x64;npm run express:build"
+    "render:build": "npm install; npm install --os=linux --cpu=x64 sharp; npm install --force @img/sharp-linux-x64; npm run express:build"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
