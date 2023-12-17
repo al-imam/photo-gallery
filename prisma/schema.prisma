@@ -52,7 +52,6 @@ model User {
 
 model Media {
   id        String   @id @default(uuid())
-  no        Int      @default(autoincrement())
   createdAt DateTime @default(now())
   messageId String
 
