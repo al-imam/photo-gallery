@@ -7,7 +7,8 @@ import service from '/service'
 import { NextResponse } from 'next/server'
 import { authRouter } from '/server/next/router'
 
-export type PATCHBody = SendUserAndToken
+export type PatchBody = { password: string; token: string }
+export type PatchData = SendUserAndToken
 export const PATCH = authRouter(
   checkPassword,
   async (_, ctx, next) => {
@@ -17,11 +18,12 @@ export const PATCH = authRouter(
   sendUserAndToken
 )
 
-export type POSTBody = { message: string }
+export type PostBody = { newEmail: string }
+export type PostData = { message: string }
 export const POST = authRouter(async (req, ctx) => {
-  const { newEmail } = await req.json()
+  const { newEmail } = (await req.json()) as PostBody
   await service.user.requestEmailChange(ctx.user, newEmail)
-  return NextResponse.json<POSTBody>({
+  return NextResponse.json<PostData>({
     message: 'Check your email',
   })
 })
