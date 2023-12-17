@@ -21,7 +21,7 @@ export const router = Router.create<NextHandler>({
       console.error(err)
     }
 
-    return NextResponse.json({ error }, { status })
+    return NextResponse.json({ error: error.toString() }, { status })
   },
 })
 

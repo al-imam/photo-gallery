@@ -9,7 +9,8 @@ datasource db {
 }
 
 enum UserRole {
-  USER
+  PUBLIC
+  VERIFIED
   MODERATOR
   ADMIN
 }
@@ -25,17 +26,19 @@ model User {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
 
-  name          String
-  role          UserRole @default(USER)
-  username      String   @unique @default(cuid())
-  hasBeenBanned Boolean  @default(false)
-
+  name      String
+  links     String[]
+  bio       String?
   avatar_sm String?
   avatar_md String?
   avatar_lg String?
   avatarId  String?
 
+  role          UserRole @default(PUBLIC)
+  hasBeenBanned Boolean  @default(false)
+
   email          String   @unique
+  username       String   @unique @default(cuid())
   password       String
   authModifiedAt DateTime @default(now())
 

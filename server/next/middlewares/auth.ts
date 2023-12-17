@@ -5,6 +5,12 @@ import * as hash from '/service/hash'
 import { NextUserHandler } from '/service/types'
 import { pick } from '/service/utils'
 import ReqErr from '/service/ReqError'
+import { User } from '@prisma/client'
+
+export type SendUserAndToken = {
+  user: Pick<User, (typeof USER_SAFE_FIELDS)[number]>
+  jwt_token: string
+}
 
 export const sendUserAndToken: NextUserHandler = async (_, ctx) => {
   const cookieToken = await hash.jwt.sign('cookie', ctx.user.id)
@@ -18,10 +24,11 @@ export const sendUserAndToken: NextUserHandler = async (_, ctx) => {
     maxAge: Date.now() + 86400000 * 30,
   })
 
-  return NextResponse.json({
+  return NextResponse.json<SendUserAndToken>({
     ...ctx.response,
     user: pick(ctx.user, ...USER_SAFE_FIELDS),
     jwt_token: authToken,
+    
   })
 }
 

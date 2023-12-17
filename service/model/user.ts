@@ -113,6 +113,6 @@ export async function changeUsername(userId: string, newUsername: string) {
 
   return db.user.update({
     where: { id: userId },
-    data: { username: newUsername },
+    data: { username: newUsername.toLowerCase() },
   })
 }

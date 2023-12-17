@@ -4,6 +4,8 @@ import { Prettify } from './utils'
 export const USER_PUBLIC_FIELDS = [
   'id',
   'role',
+  'bio',
+  'links',
   'name',
   'avatar_sm',
   'avatar_md',

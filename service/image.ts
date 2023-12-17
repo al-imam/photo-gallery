@@ -37,6 +37,7 @@ export async function generateAvatar(
   return new Promise((resolve, reject) => {
     sharp(imageBuffer)
       .resize({
+        withoutEnlargement: true,
         fit: 'cover',
         width: size,
         height: size,
