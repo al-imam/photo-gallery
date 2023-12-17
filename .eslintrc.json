@@ -1,14 +1,18 @@
 {
+  "parser": "@typescript-eslint/parser",
   "extends": [
     "next/core-web-vitals",
     "airbnb-base",
+    "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended"
   ],
-  "plugins": ["prettier"],
+  "plugins": ["prettier", "@typescript-eslint"],
 
   "rules": {
     "import/no-absolute-path": 0,
-    "no-unused-vars": 1,
+    "no-unused-vars": 0,
+    "@typescript-eslint/no-unused-vars": ["error", { "ignorePattern": "^_" }],
+    "@typescript-eslint/no-explicit-any": 0,
     "prettier/prettier": 1,
     "arrow-body-style": 0,
     "prefer-arrow-callback": 0,
