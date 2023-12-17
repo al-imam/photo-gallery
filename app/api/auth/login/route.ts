@@ -5,7 +5,7 @@ import {
 import { router } from '/server/next/router'
 import service from '/service'
 
-export type POST = SendUserAndToken
+export type POSTBody = SendUserAndToken
 export const POST = router(async (req, ctx, next) => {
   const body = await req.json()
   const result = await service.auth.login(body.email, body.password)

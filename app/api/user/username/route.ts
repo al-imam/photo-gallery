@@ -1,8 +1,13 @@
-import { checkPassword, sendUserAndToken } from '/server/next/middlewares/auth'
-import { authRouter } from '/server/next/router'
+import {
+  checkPassword,
+  SendUserAndToken,
+  sendUserAndToken,
+} from '/server/next/middlewares/auth'
 import service from '/service'
 import ReqErr from '/service/ReqError'
+import { authRouter } from '/server/next/router'
 
+export type PATCHBody = SendUserAndToken
 export const PATCH = authRouter(
   checkPassword,
   async (_, ctx, next) => {

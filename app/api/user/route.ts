@@ -7,10 +7,10 @@ import { authRouter, router } from '/server/next/router'
 import { NextResponse } from 'next/server'
 import service from '/service'
 
-export type GET = SendUserAndToken
+export type GETBody = SendUserAndToken
 export const GET = authRouter(sendUserAndToken)
 
-export type POST = SendUserAndToken
+export type POSTBody = SendUserAndToken
 export const POST = router(async (req, ctx, next) => {
   const { token, name, password } = await req.json()
   ctx.user = await service.user.create(token, {
@@ -20,10 +20,10 @@ export const POST = router(async (req, ctx, next) => {
   return next()
 }, sendUserAndToken)
 
-export type DELETE = { message: string }
+export type DELETEBody = { message: string }
 export const DELETE = authRouter(checkPassword, async (_, ctx) => {
   ctx.user = await service.user.remove(ctx.user.id)
-  return NextResponse.json({
+  return NextResponse.json<DELETEBody>({
     message: 'User deleted',
   })
 })
