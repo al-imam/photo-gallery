@@ -8,4 +8,5 @@ export default env({
   DISCORD_TOKEN: r.string(),
   JWT_SECRET: r.string(),
   BCRYPT_SALT_ROUNDS: r.number(),
+  VERCEL_URL: r.string().default('http://localhost:3000'),
 })
