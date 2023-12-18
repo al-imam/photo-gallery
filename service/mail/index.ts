@@ -17,7 +17,6 @@ function mail(to: string, subject: string, body: string) {
     .sendMail({
       replyTo: supportEmailAddress,
       from: noReplyEmailAddress,
-      priority: 'high',
       html: body,
       subject,
       to,
