@@ -10,7 +10,7 @@ export type GetData = SendUserAndToken
 export const GET = authRouter(sendUserAndToken)
 
 export type PostQuery = { token: string }
-export type PostBody = { name: string; password: string }
+export type PostBody = PostQuery & { name: string; password: string }
 export type PostData = SendUserAndToken
 export const POST = router(
   setTokenFromQuery,
