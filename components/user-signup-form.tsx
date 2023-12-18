@@ -12,26 +12,30 @@ import { Input } from '$shadcn/ui/input'
 import { cn } from '$shadcn/utils'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { useAuth } from '/hooks'
 import { SpinnerIcon } from '/icons'
+import { emailRegex } from '/util'
 
 interface UserSignupFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 interface FormValues {
   email: string
-  password: string
-  confirmPassword: string
 }
 
 export function UserSignupForm({ className, ...props }: UserSignupFormProps) {
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
-  const form = useForm<FormValues>()
+  const form = useForm<FormValues>({
+    defaultValues: {
+      email: '',
+    },
+  })
+  const { signUp } = useAuth()
 
-  async function onSubmit() {
-    setIsLoading(true)
-
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 3000)
+  async function onSubmit({ email }: FormValues) {
+    const [_, error] = await signUp({ email })
+    if (error) return toast.error('Something went wrong')
+    toast.success('Check your mail, you have 5 minuets', { duration: 10000 })
+    form.reset()
   }
 
   return (
@@ -46,7 +50,7 @@ export function UserSignupForm({ className, ...props }: UserSignupFormProps) {
                 required: 'Email is required',
                 pattern: {
                   message: 'Please enter a valid email address',
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  value: emailRegex,
                 },
               }}
               render={({ field }) => (
@@ -58,46 +62,9 @@ export function UserSignupForm({ className, ...props }: UserSignupFormProps) {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="password"
-              rules={{
-                required: 'Password is required',
-                minLength: {
-                  message: 'Password must be at least 6 characters',
-                  value: 6,
-                },
-              }}
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input placeholder="Password" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="confirmPassword"
-              rules={{
-                required: 'Confirm Password is required',
-                validate: (value) => {
-                  if (value !== form.getValues('password'))
-                    return 'Password does not match'
-                },
-              }}
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input placeholder="Confirm Password" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button disabled={isLoading} className="mt-1">
-              {isLoading && (
+
+            <Button disabled={form.formState.isSubmitting} className="mt-1">
+              {form.formState.isSubmitting && (
                 <SpinnerIcon className="mr-2 h-4 w-4 animate-spin" />
               )}
               Signup

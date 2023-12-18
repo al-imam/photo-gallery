@@ -10,9 +10,12 @@ import {
 } from '$shadcn/ui/form'
 import { Input } from '$shadcn/ui/input'
 import { cn } from '$shadcn/utils'
-import * as React from 'react'
+import { redirect, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { useAuth } from '/hooks'
 import { GoogleIcon, SpinnerIcon } from '/icons'
+import { emailRegex } from '/util'
 
 interface UserSigninFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -22,15 +25,22 @@ interface FormValues {
 }
 
 export function UserSigninForm({ className, ...props }: UserSigninFormProps) {
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
-  const form = useForm<FormValues>()
+  const { signIn } = useAuth()
+  const qp = useSearchParams()
+  const form = useForm<FormValues>({
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  })
 
-  async function onSubmit() {
-    setIsLoading(true)
+  async function onSubmit(value: FormValues) {
+    const [_, error] = await signIn(value)
 
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 3000)
+    if (error) return toast.error('Invalid email and password!')
+    toast.success('Welcome back, nice to see you again!')
+
+    redirect(qp.get('callbackURL') ?? '/')
   }
 
   return (
@@ -45,7 +55,7 @@ export function UserSigninForm({ className, ...props }: UserSigninFormProps) {
                 required: 'Email is required',
                 pattern: {
                   message: 'Please enter a valid email address',
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  value: emailRegex,
                 },
               }}
               render={({ field }) => (
@@ -76,8 +86,8 @@ export function UserSigninForm({ className, ...props }: UserSigninFormProps) {
                 </FormItem>
               )}
             />
-            <Button disabled={isLoading} className="mt-2">
-              {isLoading && (
+            <Button disabled={form.formState.isSubmitting} className="mt-2">
+              {form.formState.isSubmitting && (
                 <SpinnerIcon className="mr-2 h-4 w-4 animate-spin" />
               )}
               Signin
@@ -95,8 +105,12 @@ export function UserSigninForm({ className, ...props }: UserSigninFormProps) {
           </span>
         </div>
       </div>
-      <Button variant="outline" type="button" disabled={isLoading}>
-        {isLoading ? (
+      <Button
+        variant="outline"
+        type="button"
+        disabled={form.formState.isSubmitting}
+      >
+        {form.formState.isSubmitting ? (
           <SpinnerIcon className="mr-2 h-4 w-4 animate-spin" />
         ) : (
           <GoogleIcon className="mr-2 h-4 w-4" />
