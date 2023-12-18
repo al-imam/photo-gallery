@@ -15,8 +15,8 @@ export type PostData = SendUserAndToken
 export const POST = router(
   setTokenFromQuery,
   async (req, ctx, next) => {
-    const { name, password } = await req.json<PostBody>()
-    ctx.user = await service.user.create(ctx.token, {
+    const { name, password, token } = await req.json<PostBody>()
+    ctx.user = await service.user.create(ctx.token ?? token, {
       name,
       password,
     })
