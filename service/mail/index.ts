@@ -12,8 +12,8 @@ const transporter = nodemailer.createTransport({
   port: 465,
 })
 
-function mail(to: string, subject: string, body: string) {
-  transporter
+async function mail(to: string, subject: string, body: string) {
+  return transporter
     .sendMail({
       replyTo: supportEmailAddress,
       from: noReplyEmailAddress,
