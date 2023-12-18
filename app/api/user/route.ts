@@ -1,6 +1,7 @@
 import {
   sendUserAndToken,
   SendUserAndToken,
+  setTokenFromQuery,
 } from '/server/next/middlewares/auth'
 import { authRouter, router } from '/server/next/router'
 import service from '/service'
@@ -8,14 +9,19 @@ import service from '/service'
 export type GetData = SendUserAndToken
 export const GET = authRouter(sendUserAndToken)
 
-export type PostBody = { token: string; name: string; password: string }
+export type PostQuery = { token: string }
+export type PostBody = { name: string; password: string }
 export type PostData = SendUserAndToken
-export const POST = router(async (req, ctx, next) => {
-  const { token, name, password } = (await req.json()) as PostBody
-  ctx.user = await service.user.create(token, {
-    name,
-    password,
-  })
+export const POST = router(
+  setTokenFromQuery,
+  async (req, ctx, next) => {
+    const { name, password } = await req.json<PostBody>()
+    ctx.user = await service.user.create(ctx.token, {
+      name,
+      password,
+    })
 
-  return next()
-}, sendUserAndToken)
+    return next()
+  },
+  sendUserAndToken
+)

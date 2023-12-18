@@ -6,7 +6,6 @@ import { NextUserHandler } from '/service/types'
 import { pick } from '/service/utils'
 import ReqErr from '/service/ReqError'
 import { User } from '@prisma/client'
-import db from '/service/db'
 
 export type SendUserAndToken = {
   user: Pick<User, (typeof USER_SAFE_FIELDS)[number]> & {}
@@ -48,4 +47,11 @@ export const checkPassword: NextUserHandler = async (req, ctx, next) => {
   }
 
   throw new ReqErr('Password is incorrect')
+}
+
+export const setTokenFromQuery: NextUserHandler = async (req, ctx, next) => {
+  const token = req.nextUrl.searchParams.get('token')
+  if (!token) throw new ReqErr('Token is required!', 400)
+  ctx.token = token
+  return next()
 }

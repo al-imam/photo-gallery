@@ -5,7 +5,7 @@ import service from '/service'
 export type PostBody = { email: string }
 export type PostData = { message: string }
 export const POST = router(async (req) => {
-  const { email } = (await req.json()) as PostBody
+  const { email } = await req.json<PostBody>()
   await service.auth.signup(email)
   return NextResponse.json<PostData>({ message: 'Check your email' })
 })

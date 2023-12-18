@@ -1,14 +1,12 @@
-import {
-  USER_SAFE_FIELDS_QUERY,
-  USER_PUBLIC_FIELDS_QUERY,
-} from '../../service/config'
-import db from '../../service/db'
+import { MEDIA_INCLUDE_QUERY, USER_SAFE_FIELDS_QUERY } from '/service/config'
+import db from '/service/db'
 import { Response } from 'express'
 import { UserRequest } from './middleware'
-import ReqErr from '../../service/ReqError'
+import ReqErr from '/service/ReqError'
 import { mediaInputSchema } from './config'
-import discord from '../../service/discord'
-import { MediaWithLoves } from '../../service/types'
+import discord from '/service/discord'
+import { MediaWithLoves } from '/service/types'
+import { checkIfCategoryExists } from '/service/model/media/helpers'
 
 export async function createMedia(req: UserRequest, res: Response) {
   const buffer = req.file?.buffer
@@ -21,11 +19,8 @@ export async function createMedia(req: UserRequest, res: Response) {
   if (body.newCategory && body.categoryId) {
     throw new ReqErr('Cannot provide both newCategory and categoryId')
   }
-
   if (body.categoryId) {
-    await db.mediaCategory.findUniqueOrThrow({
-      where: { id: body.categoryId },
-    })
+    await checkIfCategoryExists(body.categoryId)
   }
 
   if (
@@ -65,10 +60,7 @@ export async function createMedia(req: UserRequest, res: Response) {
       url_media: result.media.url,
       url_thumbnail: result.thumbnail.url,
     },
-    include: {
-      author: { select: USER_PUBLIC_FIELDS_QUERY },
-      category: true,
-    },
+    include: MEDIA_INCLUDE_QUERY,
   })
 
   const data: MediaWithLoves = { ...media, isLoved: false, loves: 0 }

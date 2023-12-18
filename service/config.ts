@@ -1,6 +1,7 @@
 import { User } from '@prisma/client'
-import { Prettify } from './utils'
+import { createIncludeQuery } from './utils'
 
+// User fields that can be accessed by anyone
 export const USER_PUBLIC_FIELDS = [
   'id',
   'name',
@@ -10,17 +11,15 @@ export const USER_PUBLIC_FIELDS = [
   'avatar_lg',
   'username',
 ] as const
-
 export const USER_SAFE_FIELDS = [...USER_PUBLIC_FIELDS, 'email'] as const
+export const USER_PUBLIC_FIELDS_QUERY = createIncludeQuery(USER_PUBLIC_FIELDS)
+export const USER_SAFE_FIELDS_QUERY = createIncludeQuery(USER_SAFE_FIELDS)
 
-let keys = 0 as unknown as (typeof USER_SAFE_FIELDS)[number]
+let keys = {} as (typeof USER_SAFE_FIELDS)[number]
 keys satisfies keyof User
 
-function createQuery<T extends readonly string[]>(args: T) {
-  return Object.fromEntries(args.map((a) => [a, true])) as Prettify<
-    Record<T[number], true>
-  >
+// User fields that needs to be in media
+export const MEDIA_INCLUDE_QUERY = {
+  user: { select: USER_PUBLIC_FIELDS_QUERY },
+  category: true,
 }
-
-export const USER_PUBLIC_FIELDS_QUERY = createQuery(USER_PUBLIC_FIELDS)
-export const USER_SAFE_FIELDS_QUERY = createQuery(USER_SAFE_FIELDS)

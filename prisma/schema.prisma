@@ -60,7 +60,7 @@ model Media {
   description String?     @db.VarChar(300)
   note        String?     @db.VarChar(200)
   tags        String[]    @db.VarChar(16)
-  status      MediaStatus @default(PENDING)
+  status      ContentStatus @default(PENDING)
 
   newCategory String?
   categoryId  String?        @db.Uuid()
@@ -110,7 +110,7 @@ model Article {
 
   note   String?     @db.VarChar(200)
   tags   String[]    @db.VarChar(16)
-  status MediaStatus @default(PENDING)
+  status ContentStatus @default(PENDING)
 
   authorId String @db.Uuid()
   author   User   @relation("User", fields: [authorId], references: [id])
@@ -175,8 +175,8 @@ model LOG_MediaStatusChange {
   createdAt DateTime @default(now())
   comment   String?  @db.VarChar(128)
 
-  status_old MediaStatus
-  status_new MediaStatus
+  status_old ContentStatus
+  status_new ContentStatus
 
   mediaId       String @db.Uuid()
   moderatedById String @db.Uuid()
@@ -190,8 +190,8 @@ model LOG_ArticleStatusChange {
   createdAt DateTime @default(now())
   comment   String?  @db.VarChar(128)
 
-  status_old MediaStatus
-  status_new MediaStatus
+  status_old ContentStatus
+  status_new ContentStatus
 
   articleId     String @db.Uuid()
   moderatedById String @db.Uuid()
@@ -219,7 +219,7 @@ enum ProfileLinkType {
   OTHER
 }
 
-enum MediaStatus {
+enum ContentStatus {
   PENDING
   APPROVED
   REJECTED
