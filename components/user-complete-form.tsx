@@ -52,7 +52,10 @@ export function UserCompleteForm({
 
   async function onSubmit() {
     await new Promise((r) => {
-      setTimeout(r, 3000)
+      setTimeout(() => {
+        r(0)
+        redirect(qp.get('callbackURL') ?? '/')
+      }, 3000)
     })
   }
 

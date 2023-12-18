@@ -10,7 +10,10 @@ import {
 } from '$shadcn/ui/form'
 import { Input } from '$shadcn/ui/input'
 import { cn } from '$shadcn/utils'
+import { redirect, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { useAuth } from '/hooks'
 import { GoogleIcon, SpinnerIcon } from '/icons'
 import { emailRegex } from '/util'
 
@@ -22,6 +25,8 @@ interface FormValues {
 }
 
 export function UserSigninForm({ className, ...props }: UserSigninFormProps) {
+  const { signIn } = useAuth()
+  const qp = useSearchParams()
   const form = useForm<FormValues>({
     defaultValues: {
       email: '',
@@ -29,10 +34,13 @@ export function UserSigninForm({ className, ...props }: UserSigninFormProps) {
     },
   })
 
-  async function onSubmit() {
-    await new Promise((r) => {
-      setTimeout(r, 3000)
-    })
+  async function onSubmit(value: FormValues) {
+    const [_, error] = await signIn(value)
+
+    if (error) return toast.error('Invalid email and password!')
+    toast.success('Welcome back, nice to see you again!')
+
+    redirect(qp.get('callbackURL') ?? '/')
   }
 
   return (

@@ -2,12 +2,19 @@
 
 /* eslint-disable no-async-promise-executor */
 
-import { User as U } from '@prisma/client'
 import { FunctionComponent, ReactNode, createContext, useState } from 'react'
+import {
+  PostBody as SignInBody,
+  PostData as SignInRes,
+} from '/app/api/auth/signin/route'
+import {
+  PostBody as SignUpBody,
+  PostData as SignUpRes,
+} from '/app/api/auth/signup/route'
 import { POST, PUT } from '/lib'
-import { Prettify } from '/types'
+import { Prettify, SafeUser } from '/types'
 
-type User = Omit<U, 'password'>
+type User = SafeUser
 
 interface CallBackFun<Res = any> {
   onError: (error: unknown) => void
@@ -18,15 +25,12 @@ type AuthFunWrapper<AugmentType, ReturnType = any> = (
   values: AugmentType & Partial<CallBackFun<ReturnType>>
 ) => Promise<[ReturnType, null] | [null, unknown]>
 
-type SignUpFun = AuthFunWrapper<{ email: string }, { success: true }>
+type SignUpFun = AuthFunWrapper<SignUpBody, SignUpRes>
 type SignUpCompleteFun = AuthFunWrapper<
   { email: string; password: string },
   User
 >
-type SignInFun = AuthFunWrapper<
-  Omit<{ email: string; password: string }, 'name'>,
-  User
->
+type SignInFun = AuthFunWrapper<SignInBody, SignInRes>
 type signOutFun = AuthFunWrapper<object, { success: true }>
 type ChangePasswordFun = AuthFunWrapper<
   { current: string; password: string },
@@ -40,7 +44,7 @@ interface Value {
   currentUser: User | null
   signUpComplete: SignUpCompleteFun
   changePassword: ChangePasswordFun
-  setCurrentUser: (user: unknown) => void
+  setCurrentUser: (user: User) => void
   auth: null | string
 }
 
@@ -83,7 +87,7 @@ const AuthProvider: FunctionComponent<AuthProviderProps> = ({
   }) => {
     return new Promise(async (resolve) => {
       try {
-        const { data: res } = await POST<{ success: true }>('auth/signup', body)
+        const { data: res } = await POST<SignUpRes>('auth/signup', body)
 
         onSuccess(res)
         resolve([res, null])
@@ -123,15 +127,15 @@ const AuthProvider: FunctionComponent<AuthProviderProps> = ({
   }) => {
     return new Promise(async (resolve) => {
       try {
-        const { data: res } = await POST<{ user: User; auth: string }>(
+        const { data: res } = await POST<SignInRes>(
           'auth/signin',
           userCredential
         )
 
-        _setAuth(res.auth)
+        _setAuth(res.jwt_token)
         _setCurrentUser(res.user)
-        onSuccess(res.user)
-        resolve([res.user, null])
+        onSuccess(res)
+        resolve([res, null])
       } catch (error) {
         onError(error)
         resolve([null, error])
@@ -159,8 +163,8 @@ const AuthProvider: FunctionComponent<AuthProviderProps> = ({
     })
   }
 
-  function setCurrentUser(user: unknown) {
-    _setCurrentUser(user as any)
+  function setCurrentUser(user: User) {
+    _setCurrentUser(user)
   }
 
   return (
