@@ -1,7 +1,13 @@
-import { User } from '@prisma/client'
+'use client'
+
+/* eslint-disable no-async-promise-executor */
+
+import { User as U } from '@prisma/client'
 import { FunctionComponent, ReactNode, createContext, useState } from 'react'
 import { POST, PUT } from '/lib'
 import { Prettify } from '/types'
+
+type User = Omit<U, 'password'>
 
 interface CallBackFun<Res = any> {
   onError: (error: unknown) => void
@@ -42,13 +48,19 @@ const AuthContext = createContext<Prettify<Value> | null>(null)
 
 interface AuthProviderProps {
   children: ReactNode
+  currentUser: User | null
+  auth: string | null
 }
 
 function cb(..._: any[]) {}
 
-const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children }) => {
-  const [currentUser, _setCurrentUser] = useState<User | null>(null)
-  const [auth, _setAuth] = useState<string | null>(null)
+const AuthProvider: FunctionComponent<AuthProviderProps> = ({
+  children,
+  auth: _auth,
+  currentUser: _currentUser,
+}) => {
+  const [currentUser, _setCurrentUser] = useState<User | null>(_currentUser)
+  const [auth, _setAuth] = useState<string | null>(_auth)
 
   const signOut: signOutFun = ({ onError = cb, onSuccess = cb }) => {
     return new Promise((resolve) => {

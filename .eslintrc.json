@@ -11,7 +11,7 @@
   "rules": {
     "import/no-absolute-path": 0,
     "no-unused-vars": 0,
-    "@typescript-eslint/no-unused-vars": ["error", { "ignorePattern": "^_" }],
+
     "@typescript-eslint/no-explicit-any": 0,
     "prettier/prettier": 1,
     "arrow-body-style": 0,
@@ -24,7 +24,16 @@
     "import/no-unresolved": 0,
     "@next/next/no-img-element": 0,
     "no-plusplus": [2, { "allowForLoopAfterthoughts": true }],
-    "no-shadow": [2, { "ignoreOnInitialization": true }]
+    "no-shadow": [2, { "ignoreOnInitialization": true }],
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "destructuredArrayIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_",
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
+      }
+    ]
   },
 
   "globals": {

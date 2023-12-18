@@ -11,7 +11,7 @@
     "format": "prettier --write .",
     "type-check": "tsc --noEmit",
     "prisma": "prisma db push",
-    "express:dev":"npm-run-all --parallel express:dev:*",
+    "express:dev": "npm-run-all --parallel express:dev:*",
     "express:serve": "node ./dist/server/express",
     "express:dev:serve": "nodemon ./dist/server/express",
     "express:build": "prisma generate & tsc ./server/express/index.ts --outDir dist --noEmit false --esModuleInterop --skipLibCheck",
@@ -81,6 +81,7 @@
     "router13": "^0.0.7",
     "rype": "^2.0.4",
     "sharp": "^0.33.0",
+    "sonner": "^1.2.4",
     "tailwind-merge": "^2.1.0",
     "xss-clean": "^0.1.4"
   },
