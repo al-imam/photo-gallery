@@ -5,15 +5,13 @@ export async function GET(req: NextRequest) {
   try {
     await db.$connect()
     return NextResponse.json({
-      ip: req.ip,
-      ping: 'pong',
       db: 'connected',
+      date: new Date().toString(),
     })
   } catch {
     return NextResponse.json({
-      ip: req.ip,
-      ping: 'pong',
       db: 'error',
+      date: new Date().toString(),
     })
   }
 }
