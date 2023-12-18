@@ -10,12 +10,10 @@
 
   "rules": {
     "import/no-absolute-path": 0,
-    "no-unused-vars": 0,
-
     "@typescript-eslint/no-explicit-any": 0,
-    "prettier/prettier": 1,
+    "prettier/prettier": "error",
     "arrow-body-style": 0,
-    "prefer-arrow-callback": 0,
+    "prefer-arrow-callback": "warn",
     "import/prefer-default-export": 0,
     "react-hooks/exhaustive-deps": 0,
     "import/extensions": 0,
@@ -23,10 +21,10 @@
     "no-underscore-dangle": 0,
     "import/no-unresolved": 0,
     "@next/next/no-img-element": 0,
-    "no-plusplus": [2, { "allowForLoopAfterthoughts": true }],
-    "no-shadow": [2, { "ignoreOnInitialization": true }],
+    "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
+    "no-shadow": ["error", { "ignoreOnInitialization": true }],
     "@typescript-eslint/no-unused-vars": [
-      "error",
+      "warn",
       {
         "destructuredArrayIgnorePattern": "^_",
         "caughtErrorsIgnorePattern": "^_",
