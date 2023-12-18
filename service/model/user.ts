@@ -57,7 +57,7 @@ export async function requestEmailChange(
     newEmail: newEmail,
   })
 
-  mail.sendChangeEmailToken(newEmail, token)
+  await mail.sendChangeEmailToken(newEmail, token)
 }
 
 export async function confirmEmailChange(token: string) {
@@ -80,7 +80,7 @@ export async function requestPasswordReset(email: string) {
     email: user.email,
   })
 
-  mail.sendResetToken(email, token)
+  await mail.sendResetToken(email, token)
 }
 
 export async function confirmPasswordReset(token: string, newPassword: string) {

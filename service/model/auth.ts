@@ -27,7 +27,7 @@ export async function signup(email: string) {
   if (isAlreadyExist) throw new ReqErr('Already exist')
 
   const token = await hash.jwt.sign('signup-email', email)
-  mail.sendSignupToken(email, token)
+  await mail.sendSignupToken(email, token)
 }
 
 export async function login(email: string, password: string) {
