@@ -22,10 +22,10 @@ model User {
 
   Z_REACTIONS                           MediaReaction[]           @relation("MediaReaction")
   Z_ARTICLE_REACTION                    ArticleReaction[]         @relation("ArticleReaction")
-  Z_LOG_ROLE                            Log_RoleChange[]          @relation("LogRoleChange")
-  Z_LOG_ROLE_MODERATED                  Log_RoleChange[]          @relation("LogRoleChangeModerated")
-  Z_LOG_MEDIA_STATUS_CHANGE_MODERATED   Log_MediaStatusChange[]   @relation("LogMediaStatusChangeModerated")
-  Z_LOG_ARTICLE_STATUS_CHANGE_MODERATED Log_ArticleStatusChange[] @relation("LogArticleStatusChangeModerated")
+  Z_LOG_ROLE                            LOG_RoleChange[]          @relation("LogRoleChange")
+  Z_LOG_ROLE_MODERATED                  LOG_RoleChange[]          @relation("LogRoleChangeModerated")
+  Z_LOG_MEDIA_STATUS_CHANGE_MODERATED   LOG_MediaStatusChange[]   @relation("LogMediaStatusChangeModerated")
+  Z_LOG_ARTICLE_STATUS_CHANGE_MODERATED LOG_ArticleStatusChange[] @relation("LogArticleStatusChangeModerated")
 }
 
 model Profile {
@@ -79,7 +79,7 @@ model Media {
 
   Z_BOOKMARK  BookMark[]              @relation("Bookmark")
   Z_REACTIONS MediaReaction[]         @relation("MediaReaction")
-  Z_LOG_MEDIA Log_MediaStatusChange[] @relation("LogMediaStatusChange")
+  Z_LOG_MEDIA LOG_MediaStatusChange[] @relation("LogMediaStatusChange")
 }
 
 model MediaCategory {
@@ -117,7 +117,7 @@ model Article {
 
   Z_BOOKMARK           BookMark[]                @relation("Bookmark")
   Z_ARTICLE_REACTION   ArticleReaction[]         @relation("ArticleReaction")
-  Z_LOG_ARTICLE_STATUS Log_ArticleStatusChange[] @relation("LogArticleStatusChange")
+  Z_LOG_ARTICLE_STATUS LOG_ArticleStatusChange[] @relation("LogArticleStatusChange")
 }
 
 model ArticleReaction {
@@ -155,7 +155,7 @@ model Notification {
   Z_USER User @relation("Notification", fields: [userId], references: [id])
 }
 
-model Log_RoleChange {
+model LOG_RoleChange {
   id        String   @id @default(uuid()) @db.Uuid()
   createdAt DateTime @default(now())
   comment   String?  @db.VarChar(128)
@@ -170,7 +170,7 @@ model Log_RoleChange {
   Z_MODERATEDBY User @relation("LogRoleChangeModerated", fields: [moderatedById], references: [id])
 }
 
-model Log_MediaStatusChange {
+model LOG_MediaStatusChange {
   id        String   @id @default(uuid()) @db.Uuid()
   createdAt DateTime @default(now())
   comment   String?  @db.VarChar(128)
@@ -185,7 +185,7 @@ model Log_MediaStatusChange {
   Z_MODERATEDBY User  @relation("LogMediaStatusChangeModerated", fields: [moderatedById], references: [id])
 }
 
-model Log_ArticleStatusChange {
+model LOG_ArticleStatusChange {
   id        String   @id @default(uuid()) @db.Uuid()
   createdAt DateTime @default(now())
   comment   String?  @db.VarChar(128)
