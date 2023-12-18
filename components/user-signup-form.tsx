@@ -24,12 +24,12 @@ interface FormValues {
 }
 
 export function UserSignupForm({ className, ...props }: UserSignupFormProps) {
+  const { signUp } = useAuth()
   const form = useForm<FormValues>({
     defaultValues: {
       email: '',
     },
   })
-  const { signUp } = useAuth()
 
   async function onSubmit({ email }: FormValues) {
     const [_, error] = await signUp({ email })

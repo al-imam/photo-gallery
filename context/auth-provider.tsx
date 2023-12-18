@@ -11,6 +11,10 @@ import {
   PostBody as SignUpBody,
   PostData as SignUpRes,
 } from '/app/api/auth/signup/route'
+import {
+  PostBody as SignUpCompleteBody,
+  PostData as SignUpCompleteRes,
+} from '/app/api/user/route'
 import { POST, PUT } from '/lib'
 import { Prettify, SafeUser } from '/types'
 
@@ -26,10 +30,7 @@ type AuthFunWrapper<AugmentType, ReturnType = any> = (
 ) => Promise<[ReturnType, null] | [null, unknown]>
 
 type SignUpFun = AuthFunWrapper<SignUpBody, SignUpRes>
-type SignUpCompleteFun = AuthFunWrapper<
-  { email: string; password: string },
-  User
->
+type SignUpCompleteFun = AuthFunWrapper<SignUpCompleteBody, SignUpCompleteRes>
 type SignInFun = AuthFunWrapper<SignInBody, SignInRes>
 type signOutFun = AuthFunWrapper<object, { success: true }>
 type ChangePasswordFun = AuthFunWrapper<
@@ -105,14 +106,12 @@ const AuthProvider: FunctionComponent<AuthProviderProps> = ({
   }) => {
     return new Promise(async (resolve) => {
       try {
-        const { data: res } = await POST<{ user: User; auth: string }>(
-          'auth/signup/complete',
-          body
-        )
+        const { data: res } = await POST<SignUpCompleteRes>('user', body)
 
-        _setAuth(res.auth)
-        onSuccess(res.user)
-        resolve([res.user, null])
+        _setAuth(res.jwt_token)
+        _setCurrentUser(res.user)
+        onSuccess(res)
+        resolve([res, null])
       } catch (error) {
         onError(error)
         resolve([null, error])
