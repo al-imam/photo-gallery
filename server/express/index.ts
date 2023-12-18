@@ -1,3 +1,5 @@
+import 'module-alias/register'
+
 import { configDotenv } from 'dotenv'
 configDotenv()
 configDotenv({ path: '/etc/secrets/.env' })

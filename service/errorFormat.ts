@@ -5,13 +5,13 @@ import {
 import ReqErr from './ReqError'
 
 export default function errorFormat(err: any): [string, number] {
-  try {
-    if (process.env.NODE_ENV !== 'production') log(err)
-  } catch {}
-
   if (err instanceof ReqErr) {
     return [err.message, err.statusCode ?? 400]
   }
+
+  try {
+    if (process.env.NODE_ENV !== 'production' || err instanceof ReqErr) log(err)
+  } catch {}
 
   if (
     err instanceof PrismaClientKnownRequestError ||

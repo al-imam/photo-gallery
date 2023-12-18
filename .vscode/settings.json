@@ -13,6 +13,7 @@
     "source.fixAll.eslint": "always"
   },
   "cSpell.words": [
+    "onrender",
     "rype"
   ],
   "eslint.validate": [

@@ -2,20 +2,24 @@ import { Media, User } from '@prisma/client'
 import { NextRequest } from 'next/server'
 import { NextFunction } from 'router13'
 
+type ModifiedNextRequest = NextRequest & {
+  json<T = unknown>(): Promise<T>
+}
+
 export type NextHandler = (
-  req: NextRequest,
+  req: ModifiedNextRequest,
   ctx: Record<string, any>,
   next: NextFunction
 ) => void
 
 export type NextUserHandler = (
-  req: NextRequest,
+  req: ModifiedNextRequest,
   ctx: Record<string, any> & { user: User },
   next: NextFunction
 ) => void
 
 export type NextOptUserHandler = (
-  req: NextRequest,
+  req: ModifiedNextRequest,
   ctx: Record<string, any> & { user?: User },
   next: NextFunction
 ) => void
