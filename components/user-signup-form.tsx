@@ -15,6 +15,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { useAuth } from '/hooks'
 import { SpinnerIcon } from '/icons'
+import { emailRegex } from '/util'
 
 interface UserSignupFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -23,7 +24,11 @@ interface FormValues {
 }
 
 export function UserSignupForm({ className, ...props }: UserSignupFormProps) {
-  const form = useForm<FormValues>()
+  const form = useForm<FormValues>({
+    defaultValues: {
+      email: '',
+    },
+  })
   const { signUp } = useAuth()
 
   async function onSubmit({ email }: FormValues) {
@@ -45,7 +50,7 @@ export function UserSignupForm({ className, ...props }: UserSignupFormProps) {
                 required: 'Email is required',
                 pattern: {
                   message: 'Please enter a valid email address',
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  value: emailRegex,
                 },
               }}
               render={({ field }) => (

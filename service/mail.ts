@@ -1,5 +1,6 @@
-import env from './env'
 import nodemailer from 'nodemailer'
+import env from './env'
+
 const emailAddress = 'no-reply@palestinian.top'
 const transporter = nodemailer.createTransport({
   auth: { user: env.GOOGLE_EMAIL, pass: env.GOOGLE_PASSWORD },
@@ -25,7 +26,7 @@ export default {
     return mail(
       to,
       'Create your account',
-      `<a href="http://localhost:3000/api/redirect/create-account?token=${token}">Click here to verify your email</a>`
+      `<a href="http://localhost:3000/signup/complete?token=${token}">Click here to verify your email</a>`
     )
   },
 
