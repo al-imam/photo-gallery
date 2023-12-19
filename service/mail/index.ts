@@ -28,6 +28,7 @@ async function mail(to: string, subject: string, body: string) {
 export default {
   sendSignupToken(to: string, token: string) {
     const url = `${env.VERCEL_URL}/signup/complete?token=${token}`
+    console.log(to, token)
 
     return mail(
       to,

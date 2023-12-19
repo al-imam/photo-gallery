@@ -3,6 +3,7 @@ import { PrettifyPick } from '@/service/utils'
 
 export type UpdateMediaBody = PrettifyPick<
   Media,
+  never,
   | 'title'
   | 'description'
   | 'note'
@@ -10,7 +11,8 @@ export type UpdateMediaBody = PrettifyPick<
   | 'newCategory'
   | 'tags'
   | 'categoryId'
->
+  | 'status'
+> & { moderatorNote?: string }
 
 export type FeaturedMediaOptions = {
   cursor?: string
