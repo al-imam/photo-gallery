@@ -1,18 +1,22 @@
+import {
+  mediaInputSchema,
+  MAX_MEDIA_FILE_SIZE,
+  MAX_AVATAR_FILE_SIZE_HUMAN,
+} from './config'
 import { MEDIA_INCLUDE_QUERY, USER_SAFE_FIELDS_QUERY } from '@/service/config'
-import db from '@/service/db'
-import { Response } from 'express'
-import ReqErr from '@/service/ReqError'
-import discord from '@/service/discord'
-import { MediaWithLoves } from '@/service/types'
 import { checkIfCategoryExists } from '@/service/model/media/helpers'
-import { mediaInputSchema } from './config'
+import { MediaWithLoves } from '@/service/types'
 import { UserRequest } from './middleware'
+import discord from '@/service/discord'
+import ReqErr from '@/service/ReqError'
+import { Response } from 'express'
+import db from '@/service/db'
 
 export async function createMedia(req: UserRequest, res: Response) {
   const buffer = req.file?.buffer
   if (!buffer) throw new ReqErr('No file provided')
-  if (req.file!.size > 1024 * 1024 * 20 /* 20 MiB */) {
-    throw new ReqErr('Max file size is 20 MiB')
+  if (req.file!.size > MAX_MEDIA_FILE_SIZE) {
+    throw new ReqErr('Max file size is 25 MiB')
   }
 
   const body = mediaInputSchema.parse(req.body)
@@ -38,9 +42,6 @@ export async function createMedia(req: UserRequest, res: Response) {
     }
 
     body.status = 'APPROVED'
-    body.status_approvedAt = new Date()
-    body.status_moderatedAt = new Date()
-    body.status_moderatedById = req.user.id
     delete body.newCategory
     delete body.note
   }
@@ -63,14 +64,19 @@ export async function createMedia(req: UserRequest, res: Response) {
     include: MEDIA_INCLUDE_QUERY,
   })
 
-  const data: MediaWithLoves = { ...media, isLoved: false, loves: 0 }
+  const data: MediaWithLoves = {
+    ...media,
+    isLoved: false,
+    loves: 0,
+    messageId: undefined as never,
+  }
   res.json({ data })
 }
 
 export async function postAvatar(req: UserRequest, res: Response) {
   const buffer = req.file?.buffer
   if (!buffer) throw new ReqErr('No file provided')
-  if (req.file!.size > 1024 * 1024 * 5 /* 5 MiB */) {
+  if (req.file!.size > MAX_AVATAR_FILE_SIZE_HUMAN) {
     throw new ReqErr('Max file size is 5 MiB')
   }
 

@@ -20,6 +20,6 @@ keys satisfies keyof User
 
 // User fields that needs to be in media
 export const MEDIA_INCLUDE_QUERY = {
-  user: { select: USER_PUBLIC_FIELDS_QUERY },
+  author: { select: USER_PUBLIC_FIELDS_QUERY },
   category: true,
 }

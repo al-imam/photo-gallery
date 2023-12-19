@@ -6,25 +6,21 @@ type ModifiedNextRequest = NextRequest & {
   json<T = unknown>(): Promise<T>
 }
 
-export type NextHandler = (
+export type NextHandler<T = {}> = (
   req: ModifiedNextRequest,
-  ctx: Record<string, any>,
+  ctx: Record<string, any> & T,
   next: NextFunction
 ) => void
 
-export type NextUserHandler = (
-  req: ModifiedNextRequest,
-  ctx: Record<string, any> & { user: User },
-  next: NextFunction
-) => void
+export type NextUserHandler<T = {}> = NextHandler<{ user: User } & T>
+export type NextOptUserHandler<T = {}> = NextHandler<{ user?: User } & T>
+export type NextUserMediaHandler = NextUserHandler<{ media: Media }>
 
-export type NextOptUserHandler = (
-  req: ModifiedNextRequest,
-  ctx: Record<string, any> & { user?: User },
-  next: NextFunction
-) => void
-
-export type MediaWithLoves = Media & { isLoved: boolean; loves: number }
+export type MediaWithLoves = Media & {
+  isLoved: boolean
+  loves: number
+  messageId: never
+}
 
 export type JWTPayload = {
   auth: string

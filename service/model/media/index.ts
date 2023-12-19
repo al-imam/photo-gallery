@@ -1,60 +1,34 @@
-import { MEDIA_INCLUDE_QUERY } from '@/service/config'
-import db, { User } from '@/service/db'
+import db, { Media, User } from '@/service/db'
 import { PrettifyPick } from '@/service/utils'
-import {
-  addLovesToMediaList,
-  checkIfCategoryExists,
-  checkIfUserCanEdit,
-} from './helpers'
-import { FeaturedMediaOptions, UpdateMediaBody } from './types'
+import { mediaPermissionFactory } from './helpers'
+import ReqErr from '@/service/ReqError'
 
-export async function getFeaturedMedia(
-  userId?: null | string,
-  options: FeaturedMediaOptions = {}
-) {
-  const media = await db.media.findMany({
-    ...(options.cursor
-      ? { cursor: { id: options.cursor }, skip: 1 }
-      : undefined),
-    take: options.limit,
+export * from './get'
+export * from './modify'
 
-    where: {
-      status: 'APPROVED',
-      categoryId: options.category,
-      authorId: options.authorId,
+export async function createLove(userId: string, mediaId: string) {
+  return db.mediaReaction.create({
+    data: {
+      mediaId,
+      userId,
     },
-    orderBy: {
-      id: 'desc',
-    },
-    include: MEDIA_INCLUDE_QUERY,
   })
-
-  return addLovesToMediaList(userId, ...media)
 }
 
-// TODO: Add loves to media
-export async function updateMedia(
-  user: PrettifyPick<User, 'id' | 'status'>,
-  id: string,
-  body: UpdateMediaBody
-) {
-  const oldMedia = await db.media.findUnique({ where: { id } })
-  if (!oldMedia) throw new Error('Media not found')
-  checkIfUserCanEdit(user, oldMedia)
-  body.categoryId && (await checkIfCategoryExists(body.categoryId))
-
-  const media = await db.media.update({
-    where: { id },
-    data: {
-      title: body.title,
-      description: body.description,
-      note: body.note,
-      media_hasGraphicContent: body.media_hasGraphicContent,
-      categoryId: body.categoryId,
-      tags: body.tags,
-    },
-    include: MEDIA_INCLUDE_QUERY,
+export async function removeLove(userId: string, mediaId: string) {
+  return db.mediaReaction.delete({
+    where: { mediaId_userId: { mediaId, userId } },
   })
+}
 
-  return media
+export async function deleteMedia(
+  user: PrettifyPick<User, 'id' | 'status'>,
+  media: PrettifyPick<Media, 'id' | 'status' | 'authorId'>
+) {
+  const permission = mediaPermissionFactory(media)
+  if (!permission.delete(user)) {
+    throw new ReqErr('You have no permission to delete this media')
+  }
+
+  return db.media.delete({ where: { id: media.id } })
 }
