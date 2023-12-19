@@ -4,7 +4,9 @@ import db from '@/service/db'
 export const dynamic = 'force-dynamic'
 export async function GET() {
   try {
-    await db.user.findFirst()
+    await db.$queryRaw`SELECT 1;`
+    // await db.user.findFirst()
+
     return NextResponse.json({
       db: 'connected',
       date: new Date().toString(),
