@@ -1,16 +1,25 @@
 import { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-
 import { buttonVariants } from '@/shadcn/ui/button'
 import { cn } from '@/shadcn/utils'
+import { redirect } from 'next/navigation'
 import { UserSignupForm } from '@/components/user-signup-form'
+import sdk from '@/sdk'
+
 
 export const metadata: Metadata = {
   title: 'signup',
 }
 
-export default function Signin() {
+export default async function Signin({
+  searchParams,
+}: {
+  searchParams: Record<string, string>
+}) {
+  const [currentUser, auth] = await sdk.auth.checkAuth()
+  if (currentUser && auth) redirect(searchParams.callbackURL ?? '/')
+
   return (
     <div className="bg-background">
       <div className="flex min-h-screen [&>*]:flex-1 ">

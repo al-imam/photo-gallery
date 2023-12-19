@@ -10,11 +10,14 @@ import {
 } from '@/shadcn/ui/form'
 import { Input } from '@/shadcn/ui/input'
 import { cn } from '@/shadcn/utils'
-import { redirect, useSearchParams } from 'next/navigation'
-import { useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { useAuth } from '@/hooks'
 import { SpinnerIcon } from '@/icons'
 import { decode, emailRegex } from '@/util'
+
 
 interface UserCompleteFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -22,41 +25,48 @@ interface FormValues {
   email: string
   password: string
   confirmPassword: string
+  name: string
 }
 
 export function UserCompleteForm({
   className,
   ...props
 }: UserCompleteFormProps) {
+  const { signUpComplete } = useAuth()
   const qp = useSearchParams()
+  const router = useRouter()
+  const [token, setToken] = useState<string | null>(null)
   const form = useForm<FormValues>({
     defaultValues: {
       email: '',
       password: '',
       confirmPassword: '',
+      name: '',
     },
   })
 
   useEffect(() => {
-    const token = qp.get('token')
-    if (!token) return
+    const _token = qp.get('token')
+    if (!_token) return
 
-    const decoded = decode(token)
+    const decoded = decode(_token)
 
     if (decoded.payload && emailRegex.test(decoded.payload.toString())) {
+      setToken(_token)
       return form.setValue('email', decoded.payload.toString())
     }
 
-    redirect('/signup')
+    router.replace('/signup')
   }, [])
 
-  async function onSubmit() {
-    await new Promise((r) => {
-      setTimeout(() => {
-        r(0)
-        redirect(qp.get('callbackURL') ?? '/')
-      }, 3000)
-    })
+  async function onSubmit({ name, password }: FormValues) {
+    if (!token) return router.replace('/signup')
+    const [_, error] = await signUpComplete({ name, password, token })
+
+    if (error) return toast.error('Something went wrong!')
+    toast.success("Welcome you're in!")
+
+    router.replace(qp.get('callbackURL') ?? '/')
   }
 
   return (

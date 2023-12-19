@@ -10,7 +10,7 @@ import {
 } from '@/shadcn/ui/form'
 import { Input } from '@/shadcn/ui/input'
 import { cn } from '@/shadcn/utils'
-import { redirect, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { useAuth } from '@/hooks'
@@ -26,6 +26,7 @@ interface FormValues {
 
 export function UserSigninForm({ className, ...props }: UserSigninFormProps) {
   const { signIn } = useAuth()
+  const router = useRouter()
   const qp = useSearchParams()
   const form = useForm<FormValues>({
     defaultValues: {
@@ -40,7 +41,7 @@ export function UserSigninForm({ className, ...props }: UserSigninFormProps) {
     if (error) return toast.error('Invalid email and password!')
     toast.success('Welcome back, nice to see you again!')
 
-    redirect(qp.get('callbackURL') ?? '/')
+    router.replace(qp.get('callbackURL') ?? '/')
   }
 
   return (
