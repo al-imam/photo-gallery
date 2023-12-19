@@ -1,7 +1,7 @@
 import { Media, MediaReaction, User } from '@prisma/client'
-import { Prettify } from '/types'
-import db from '/service/db'
-import { MediaWithLoves } from '/service/types'
+import { Prettify } from '@/types'
+import db from '@/service/db'
+import { MediaWithLoves } from '@/service/types'
 
 export function checkIfUserCanEdit(
   user: Pick<User, 'id' | 'status'>,

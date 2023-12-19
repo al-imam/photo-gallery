@@ -2,10 +2,10 @@ import {
   checkPassword,
   SendUserAndToken,
   sendUserAndToken,
-} from '/server/next/middlewares/auth'
-import service from '/service'
-import ReqErr from '/service/ReqError'
-import { authRouter } from '/server/next/router'
+} from '@/server/next/middlewares/auth'
+import service from '@/service'
+import ReqErr from '@/service/ReqError'
+import { authRouter } from '@/server/next/router'
 
 export type PatchBody = { newPassword: string; password: string }
 export type PatchData = SendUserAndToken

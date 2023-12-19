@@ -1,13 +1,13 @@
 'use client'
 
-import { Button } from '$shadcn/ui/button'
+import { Button } from '@/shadcn/ui/button'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-} from '$shadcn/ui/dropdown-menu'
+} from '@/shadcn/ui/dropdown-menu'
 import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu'
 import { Table } from '@tanstack/react-table'
 import { SlidersHorizontal } from 'lucide-react'

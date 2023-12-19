@@ -1,7 +1,7 @@
 import { User } from '@prisma/client'
 import { NextFunction, Request, Response } from 'express'
-import service from '/service'
-import errorFormat from '/service/errorFormat'
+import service from '@/service'
+import errorFormat from '@/service/errorFormat'
 
 export type UserRequest = Request & { user: User }
 

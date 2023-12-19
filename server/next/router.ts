@@ -2,11 +2,11 @@ import {
   NextHandler,
   NextUserHandler,
   NextOptUserHandler,
-} from '/service/types'
+} from '@/service/types'
 import Router from 'router13'
-import service from '/service'
+import service from '@/service'
 import { NextResponse } from 'next/server'
-import errorFormat from '/service/errorFormat'
+import errorFormat from '@/service/errorFormat'
 
 export const router = Router.create<NextHandler>({
   middleware: [],

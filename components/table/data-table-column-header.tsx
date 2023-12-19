@@ -1,14 +1,14 @@
 import { Column } from '@tanstack/react-table'
 
-import { Button } from '$shadcn/ui/button'
+import { Button } from '@/shadcn/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '$shadcn/ui/dropdown-menu'
-import { cn } from '$shadcn/utils'
+} from '@/shadcn/ui/dropdown-menu'
+import { cn } from '@/shadcn/utils'
 import {
   ArrowDownIcon,
   ArrowUpIcon,

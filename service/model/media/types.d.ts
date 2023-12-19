@@ -1,5 +1,5 @@
 import { Media } from '@prisma/client'
-import { PrettifyPick } from '/service/utils'
+import { PrettifyPick } from '@/service/utils'
 
 export type UpdateMediaBody = PrettifyPick<
   Media,

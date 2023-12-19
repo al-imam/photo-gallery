@@ -6,17 +6,18 @@ import { FunctionComponent, ReactNode, createContext, useState } from 'react'
 import {
   PostBody as SignInBody,
   PostData as SignInRes,
-} from '/app/api/auth/signin/route'
+} from '@/app/api/auth/signin/route'
 import {
   PostBody as SignUpBody,
   PostData as SignUpRes,
-} from '/app/api/auth/signup/route'
+} from '@/app/api/auth/signup/route'
 import {
   PostBody as SignUpCompleteBody,
   PostData as SignUpCompleteRes,
-} from '/app/api/user/route'
-import { POST, PUT } from '/lib'
-import { Prettify, SafeUser } from '/types'
+} from '@/app/api/user/route'
+import { POST, PUT } from '@/lib'
+import { Prettify, SafeUser } from '@/types'
+
 
 type User = SafeUser
 

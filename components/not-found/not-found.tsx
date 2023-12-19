@@ -1,6 +1,6 @@
-import { cn } from '$shadcn/utils'
+import { cn } from '@/shadcn/utils'
 import Link from 'next/link'
-import style from '/components/not-found/not-found.module.css'
+import style from '@/components/not-found/not-found.module.css'
 
 export function NotFound({ home = '/' }) {
   return (

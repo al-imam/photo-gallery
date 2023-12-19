@@ -1,10 +1,10 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { USER_SAFE_FIELDS } from '/service/config'
-import * as hash from '/service/hash'
-import { NextUserHandler } from '/service/types'
-import { pick } from '/service/utils'
-import ReqErr from '/service/ReqError'
+import { USER_SAFE_FIELDS } from '@/service/config'
+import * as hash from '@/service/hash'
+import { NextUserHandler } from '@/service/types'
+import { pick } from '@/service/utils'
+import ReqErr from '@/service/ReqError'
 import { User } from '@prisma/client'
 
 export type SendUserAndToken = {

@@ -1,7 +1,7 @@
 'use client'
 
-import { Button } from '$shadcn/ui/button'
-import { Checkbox } from '$shadcn/ui/checkbox'
+import { Button } from '@/shadcn/ui/button'
+import { Checkbox } from '@/shadcn/ui/checkbox'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +9,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '$shadcn/ui/dropdown-menu'
+} from '@/shadcn/ui/dropdown-menu'
 import { ColumnDef } from '@tanstack/react-table'
 import { MoreHorizontal } from 'lucide-react'
 import { DataTableColumnHeader } from './data-table-column-header'

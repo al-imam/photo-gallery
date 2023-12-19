@@ -17,8 +17,8 @@
     "plugins": [{ "name": "next" }],
     "baseUrl": ".",
     "paths": {
-      "$shadcn/*": ["shadcn/components/*", "shadcn/lib/*"],
-      "/*": ["*"]
+      "@/shadcn/*": ["shadcn/components/*", "shadcn/lib/*"],
+      "@/*": ["*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

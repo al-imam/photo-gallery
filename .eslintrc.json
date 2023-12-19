@@ -9,7 +9,7 @@
   "plugins": ["prettier", "@typescript-eslint"],
 
   "rules": {
-    "import/no-absolute-path": 0,
+    "import/no-absolute-path": "error",
     "@typescript-eslint/no-explicit-any": 0,
     "prettier/prettier": "error",
     "arrow-body-style": 0,

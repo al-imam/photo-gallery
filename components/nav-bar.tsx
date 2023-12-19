@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, buttonVariants } from '$shadcn/ui/button'
+import { Button, buttonVariants } from '@/shadcn/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,8 +11,8 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from '$shadcn/ui/dropdown-menu'
-import { cn } from '$shadcn/utils'
+} from '@/shadcn/ui/dropdown-menu'
+import { cn } from '@/shadcn/utils'
 import { ChevronDown, Moon, MoreHorizontal, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'

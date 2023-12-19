@@ -2,9 +2,9 @@ import {
   sendUserAndToken,
   SendUserAndToken,
   setTokenFromQuery,
-} from '/server/next/middlewares/auth'
-import { authRouter, router } from '/server/next/router'
-import service from '/service'
+} from '@/server/next/middlewares/auth'
+import { authRouter, router } from '@/server/next/router'
+import service from '@/service'
 
 export type GetData = SendUserAndToken
 export const GET = authRouter(sendUserAndToken)
