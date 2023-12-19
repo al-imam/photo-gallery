@@ -1,5 +1,5 @@
-import { cn } from '$shadcn/utils'
-import { ThemeSwitcher } from '/components/theme-switcher'
+import { cn } from '@/shadcn/utils'
+import { ThemeSwitcher } from '@/components/theme-switcher'
 
 export function ThemePreview() {
   const cs =

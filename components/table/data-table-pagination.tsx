@@ -1,11 +1,11 @@
-import { Button } from '$shadcn/ui/button'
+import { Button } from '@/shadcn/ui/button'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '$shadcn/ui/select'
+} from '@/shadcn/ui/select'
 import { Table } from '@tanstack/react-table'
 import {
   ChevronLeft,

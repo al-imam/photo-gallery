@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
-import { router } from '/server/next/router'
-import service from '/service'
+import { router } from '@/server/next/router'
+import service from '@/service'
 
 export type PostBody = { email: string }
 export type PostData = { message: string }

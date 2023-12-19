@@ -1,5 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from '$shadcn/ui/avatar'
-import { Button } from '$shadcn/ui/button'
+import { Avatar, AvatarFallback, AvatarImage } from '@/shadcn/ui/avatar'
+import { Button } from '@/shadcn/ui/button'
 import { Bookmark, Download, Heart } from 'lucide-react'
 import Link from 'next/link'
 

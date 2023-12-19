@@ -1,6 +1,6 @@
 'use client'
 
-import { Input } from '$shadcn/ui/input'
+import { Input } from '@/shadcn/ui/input'
 import {
   Table,
   TableBody,
@@ -8,7 +8,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '$shadcn/ui/table'
+} from '@/shadcn/ui/table'
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -22,8 +22,8 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import * as React from 'react'
-import { DataTablePagination } from '/components/table/data-table-pagination'
-import { DataTableViewOptions } from '/components/table/data-table-view-options'
+import { DataTablePagination } from '@/components/table/data-table-pagination'
+import { DataTableViewOptions } from '@/components/table/data-table-view-options'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]

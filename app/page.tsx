@@ -1,10 +1,10 @@
-import { buttonVariants } from '$shadcn/ui/button'
+import { buttonVariants } from '@/shadcn/ui/button'
 import Link from 'next/link'
 import Marquee from 'react-fast-marquee'
-import { NavBar } from '/components/nav-bar'
-import { PhotoCard } from '/components/photo-card'
-import { SearchInput } from '/components/search-input'
-import { random } from '/lib'
+import { NavBar } from '@/components/nav-bar'
+import { PhotoCard } from '@/components/photo-card'
+import { SearchInput } from '@/components/search-input'
+import { random } from '@/lib'
 
 export default function Home() {
   return (

@@ -1,7 +1,7 @@
 import { Media } from '@prisma/client'
-import { PrettifyPick } from '/service/utils'
-import { authRouter } from '/server/next/router'
-import service from '/service'
+import { PrettifyPick } from '@/service/utils'
+import { authRouter } from '@/server/next/router'
+import service from '@/service'
 import { NextResponse } from 'next/server'
 
 export type PatchBody = PrettifyPick<

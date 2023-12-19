@@ -1,12 +1,12 @@
-import { MEDIA_INCLUDE_QUERY, USER_SAFE_FIELDS_QUERY } from '/service/config'
-import db from '/service/db'
+import { MEDIA_INCLUDE_QUERY, USER_SAFE_FIELDS_QUERY } from '@/service/config'
+import db from '@/service/db'
 import { Response } from 'express'
 import { UserRequest } from './middleware'
-import ReqErr from '/service/ReqError'
+import ReqErr from '@/service/ReqError'
 import { mediaInputSchema } from './config'
-import discord from '/service/discord'
-import { MediaWithLoves } from '/service/types'
-import { checkIfCategoryExists } from '/service/model/media/helpers'
+import discord from '@/service/discord'
+import { MediaWithLoves } from '@/service/types'
+import { checkIfCategoryExists } from '@/service/model/media/helpers'
 
 export async function createMedia(req: UserRequest, res: Response) {
   const buffer = req.file?.buffer

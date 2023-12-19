@@ -2,9 +2,9 @@ import { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { buttonVariants } from '$shadcn/ui/button'
-import { cn } from '$shadcn/utils'
-import { UserSignupForm } from '/components/user-signup-form'
+import { buttonVariants } from '@/shadcn/ui/button'
+import { cn } from '@/shadcn/utils'
+import { UserSignupForm } from '@/components/user-signup-form'
 
 export const metadata: Metadata = {
   title: 'signup',

@@ -3,19 +3,21 @@ import {
   sendUserAndToken,
   SendUserAndToken,
   setTokenFromQuery,
-} from '/server/next/middlewares/auth'
-import service from '/service'
+} from '@/server/next/middlewares/auth'
+import service from '@/service'
 import { NextResponse } from 'next/server'
-import { authRouter } from '/server/next/router'
+import { authRouter } from '@/server/next/router'
 
 export type PatchQuery = { token: string }
-export type PatchBody = { password: string }
+export type PatchBody = PatchQuery & { password: string }
 export type PatchData = SendUserAndToken
 export const PATCH = authRouter(
   checkPassword,
   setTokenFromQuery,
   async (_, ctx, next) => {
-    ctx.user = await service.user.confirmEmailChange(ctx.token)
+    ctx.user = await service.user.confirmEmailChange(
+      ctx.token ?? ctx.data.token
+    )
     return next()
   },
   sendUserAndToken

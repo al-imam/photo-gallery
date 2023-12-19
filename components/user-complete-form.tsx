@@ -1,20 +1,20 @@
 'use client'
 
-import { Button } from '$shadcn/ui/button'
+import { Button } from '@/shadcn/ui/button'
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from '$shadcn/ui/form'
-import { Input } from '$shadcn/ui/input'
-import { cn } from '$shadcn/utils'
+} from '@/shadcn/ui/form'
+import { Input } from '@/shadcn/ui/input'
+import { cn } from '@/shadcn/utils'
 import { redirect, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { SpinnerIcon } from '/icons'
-import { decode, emailRegex } from '/util'
+import { SpinnerIcon } from '@/icons'
+import { decode, emailRegex } from '@/util'
 
 interface UserCompleteFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 

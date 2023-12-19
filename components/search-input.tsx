@@ -1,6 +1,6 @@
 'use client'
 
-import { cn } from '$shadcn/utils'
+import { cn } from '@/shadcn/utils'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
 

@@ -1,21 +1,21 @@
 'use client'
 
-import { Button } from '$shadcn/ui/button'
+import { Button } from '@/shadcn/ui/button'
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from '$shadcn/ui/form'
-import { Input } from '$shadcn/ui/input'
-import { cn } from '$shadcn/utils'
+} from '@/shadcn/ui/form'
+import { Input } from '@/shadcn/ui/input'
+import { cn } from '@/shadcn/utils'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { useAuth } from '/hooks'
-import { SpinnerIcon } from '/icons'
-import { emailRegex } from '/util'
+import { useAuth } from '@/hooks'
+import { SpinnerIcon } from '@/icons'
+import { emailRegex } from '@/util'
 
 interface UserSignupFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
