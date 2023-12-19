@@ -1,3 +1,4 @@
+import Discord, { TextChannel } from 'discord.js'
 import {
   Attachment,
   generateMedia,
@@ -6,7 +7,6 @@ import {
 } from './image'
 import env from './env'
 import ReqErr from './ReqError'
-import Discord, { TextChannel } from 'discord.js'
 
 const client = new Discord.Client({ intents: [] })
 client.login(env.DISCORD_TOKEN)

@@ -1,5 +1,5 @@
-import { html } from './utils'
 import Color from 'color'
+import { html } from './utils'
 
 type Body = {
   welcome: string

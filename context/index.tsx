@@ -1,8 +1,8 @@
 import { Toaster } from 'sonner'
-import { AuthProvider } from './auth-provider'
-import { ThemeProvider } from './theme-provider'
 import { SmoothScroll } from '@/components/smooth-scroll'
 import sdk from '@/sdk'
+import { AuthProvider } from './auth-provider'
+import { ThemeProvider } from './theme-provider'
 
 export async function Provider({ children }: React.PropsWithChildren) {
   const [currentUser, auth] = (await sdk.auth.checkAuth()) as any

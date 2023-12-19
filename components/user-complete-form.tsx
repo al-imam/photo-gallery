@@ -18,7 +18,6 @@ import { useAuth } from '@/hooks'
 import { SpinnerIcon } from '@/icons'
 import { decode, emailRegex } from '@/util'
 
-
 interface UserCompleteFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 interface FormValues {

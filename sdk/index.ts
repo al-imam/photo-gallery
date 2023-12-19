@@ -1,4 +1,5 @@
 import * as auth from './auth'
+
 export type * from './auth'
 
 const service = { auth }
@@ -45,6 +46,5 @@ interface SDKMethod<Fn extends (...args: any) => any> {
     ? Promise<[Awaited<ReturnType<Fn>> | null, string | null]>
     : [ReturnType<Fn> | null, string | null]
 }
-
 
 export default sdk

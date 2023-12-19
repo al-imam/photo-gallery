@@ -1,9 +1,12 @@
-import { addLovesToMediaList } from './helpers'
-import { checkIfCategoryExists, checkIfUserCanEdit } from './helpers'
-import { FeaturedMediaOptions, UpdateMediaBody } from './types'
 import { MEDIA_INCLUDE_QUERY } from '@/service/config'
 import db, { User } from '@/service/db'
 import { PrettifyPick } from '@/service/utils'
+import {
+  addLovesToMediaList,
+  checkIfCategoryExists,
+  checkIfUserCanEdit,
+} from './helpers'
+import { FeaturedMediaOptions, UpdateMediaBody } from './types'
 
 export async function getFeaturedMedia(
   userId?: null | string,

@@ -16,7 +16,7 @@ export async function create(
 
   const user = await db.user.create({
     data: {
-      email: email,
+      email,
       name: data.name,
       password: await hash.bcrypt.encrypt(data.password),
     },
@@ -54,7 +54,7 @@ export async function requestEmailChange(
 
   const token = await hash.jwt.sign('change-email', {
     id: user.id,
-    newEmail: newEmail,
+    newEmail,
   })
 
   await mail.sendChangeEmailToken(newEmail, token)

@@ -26,7 +26,6 @@ export function pick<T extends object, K extends keyof T>(
   return newObj as PrettifyPick<T, K>
 }
 
-
 export function createIncludeQuery<T extends readonly string[]>(args: T) {
   return Object.fromEntries(args.map((a) => [a, true])) as Prettify<
     Record<T[number], true>

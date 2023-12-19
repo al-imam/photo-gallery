@@ -1,8 +1,9 @@
-import env from './env'
 import * as jose from 'jose'
 import * as bcryptjs from 'bcryptjs'
+import env from './env'
 import { JWTPayload } from './types'
 import ReqErr from './ReqError'
+
 const JWT_SECRET = new TextEncoder().encode(env.JWT_SECRET)
 
 export const bcrypt = {

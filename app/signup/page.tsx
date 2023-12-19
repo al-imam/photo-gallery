@@ -7,7 +7,6 @@ import { redirect } from 'next/navigation'
 import { UserSignupForm } from '@/components/user-signup-form'
 import sdk from '@/sdk'
 
-
 export const metadata: Metadata = {
   title: 'signup',
 }

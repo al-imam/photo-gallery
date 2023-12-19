@@ -18,7 +18,6 @@ import {
 import { POST, PUT } from '@/lib'
 import { Prettify, SafeUser } from '@/types'
 
-
 type User = SafeUser
 
 interface CallBackFun<Res = any> {

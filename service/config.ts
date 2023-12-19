@@ -15,7 +15,7 @@ export const USER_SAFE_FIELDS = [...USER_PUBLIC_FIELDS, 'email'] as const
 export const USER_PUBLIC_FIELDS_QUERY = createIncludeQuery(USER_PUBLIC_FIELDS)
 export const USER_SAFE_FIELDS_QUERY = createIncludeQuery(USER_SAFE_FIELDS)
 
-let keys = {} as (typeof USER_SAFE_FIELDS)[number]
+const keys = {} as (typeof USER_SAFE_FIELDS)[number]
 keys satisfies keyof User
 
 // User fields that needs to be in media
