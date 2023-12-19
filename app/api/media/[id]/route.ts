@@ -5,9 +5,10 @@ import { NextResponse } from 'next/server'
 import { UpdateMediaBody } from '@/service/model/media/types'
 import { sendMediaWithLoves, setMedia } from '@/server/next/middlewares/media'
 import { MediaWithLoves } from '@/service/types'
+import router from 'router13'
 
 export type GetData = { media: MediaWithLoves }
-export const GET = authRouter(setMedia, sendMediaWithLoves)
+export const GET = router(setMedia, sendMediaWithLoves)
 
 export type PatchBody = UpdateMediaBody
 export type PatchData = { media: Media }

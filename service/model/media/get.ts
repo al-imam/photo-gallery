@@ -7,7 +7,7 @@ import ReqErr from '@/service/ReqError'
 
 export async function getMedia(
   id: string,
-  user: PrettifyPick<User, 'id' | 'status'>
+  user?: PrettifyPick<User, 'id' | 'status'>
 ) {
   const media = (await db.media.findUnique({
     where: { id },
@@ -27,7 +27,7 @@ export async function getFeaturedMedia(
     ...(options.cursor
       ? { cursor: { id: options.cursor }, skip: 1 }
       : undefined),
-    take: options.limit,
+    take: options.limit ?? 20,
 
     where: {
       status: 'APPROVED',
