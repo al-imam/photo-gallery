@@ -9,14 +9,13 @@ export async function getMedia(
   id: string,
   user?: PrettifyPick<User, 'id' | 'status'>
 ) {
-  const media = (await db.media.findUnique({
+  const media = await db.media.findUnique({
     where: { id },
     include: MEDIA_INCLUDE_QUERY,
-  }))!
+  })
 
-  const permission = mediaPermissionFactory(media)
-  if (!permission.view(user)) throw new ReqErr('Media not found')
-  return media
+  if (media && mediaPermissionFactory(media).view(user)) return media
+  throw new ReqErr('Media not found')
 }
 
 export async function getFeaturedMedia(
