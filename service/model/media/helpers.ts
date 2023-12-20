@@ -6,10 +6,8 @@ import ReqErr from '@/service/ReqError'
 import { PrettifyPick } from '@/service/utils'
 
 export function mediaPermissionFactory(
-  media?: PrettifyPick<Media, 'authorId' | 'status'> | null
+  media: PrettifyPick<Media, 'authorId' | 'status'>
 ) {
-  if (!media) throw new ReqErr('Media not found')
-
   return {
     view(user?: Pick<User, 'id' | 'status'> | null) {
       return media.status === 'APPROVED' || this.edit(user)

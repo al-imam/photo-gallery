@@ -1,4 +1,4 @@
-import db, { Media, User } from '@/service/db'
+import db, { Media, MediaReport, User } from '@/service/db'
 import { PrettifyPick } from '@/service/utils'
 import { mediaPermissionFactory } from './helpers'
 import ReqErr from '@/service/ReqError'
@@ -31,4 +31,20 @@ export async function deleteMedia(
   }
 
   return db.media.delete({ where: { id: media.id } })
+}
+
+export type CreateReportBody = PrettifyPick<MediaReport, 'type' | 'message'>
+export async function createReport(
+  userId: string,
+  mediaId: string,
+  body: CreateReportBody
+) {
+  return db.mediaReport.create({
+    data: {
+      mediaId,
+      userId,
+      type: body.type,
+      message: body.message,
+    },
+  })
 }
