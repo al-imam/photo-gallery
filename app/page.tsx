@@ -1,10 +1,11 @@
+import InfiniteScrollList from '@/components/infinit-scroll'
+import { NavBar } from '@/components/nav-bar'
+// import { PhotoCard } from '@/components/photo-card'
+import { SearchInput } from '@/components/search-input'
+// import { random } from '@/lib'
 import { buttonVariants } from '@/shadcn/ui/button'
 import Link from 'next/link'
 import Marquee from 'react-fast-marquee'
-import { NavBar } from '@/components/nav-bar'
-import { PhotoCard } from '@/components/photo-card'
-import { SearchInput } from '@/components/search-input'
-import { random } from '@/lib'
 
 export default function Home() {
   return (
@@ -50,19 +51,7 @@ export default function Home() {
       </div>
 
       <main className="pb-6">
-        <div className="md:columns-2 xl:columns-3 space-y-4">
-          {Array(20)
-            .fill(null)
-            .map((_, i) => (
-              <PhotoCard
-                key={i}
-                photoURL={`https://source.unsplash.com/random/${random(
-                  50,
-                  100
-                )}x${random(50, 100)}`}
-              />
-            ))}
-        </div>
+        <InfiniteScrollList />
       </main>
     </div>
   )

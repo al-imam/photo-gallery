@@ -22,7 +22,7 @@ export function SearchInput({ className }: SearchInputProps) {
     >
       <input
         type="text"
-        placeholder="Search.."
+        placeholder="Search ..."
         className="h-10 w-full border-none bg-transparent px-4 py-3  ring-offset-background placeholder:text-muted-foreground focus:border-none focus:outline-none"
         onFocus={() => setFocus(true)}
         onBlur={() => setFocus(false)}
