@@ -79,9 +79,9 @@ export default {
   async uploadAvatar(buffer: Buffer) {
     const { attachments, ...data } = await sendAttachments(
       env.DISCORD_CHANNEL_AVATAR,
+      await generateAvatar(buffer, 64),
       await generateAvatar(buffer, 128),
-      await generateAvatar(buffer, 256),
-      await generateAvatar(buffer, 512)
+      await generateAvatar(buffer, 256)
     )
 
     return {
