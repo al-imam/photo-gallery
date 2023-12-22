@@ -40,8 +40,12 @@ import { uploadMedia } from '@/server/express/service'
     userList.push(user)
 
     const images = await getImages(10)
+    console.log('Images Loaded for user:', user.email)
+
     for (let element of images) {
-      const media = await uploadMedia({ ...user, status: 'ADMIN' }, element, {})
+      const media = await uploadMedia({ ...user, status: 'ADMIN' }, element, {
+        newCategory: Math.random().toString(36).substring(7),
+      })
       console.log('created:', media.id)
       mediaList.push(media)
     }
