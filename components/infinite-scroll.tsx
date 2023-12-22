@@ -1,28 +1,26 @@
 'use client'
 
+import { GetData } from '@/app/api/media/route'
+import { PhotoCard } from '@/components/photo-card'
 import { SpinnerIcon } from '@/icons'
-import { random } from '@/lib'
+import { GET } from '@/lib'
 import { MediaWithLoves } from '@/service/types'
-import { getColor, getId } from '@/util'
 import { useEffect, useRef, useState } from 'react'
 import Masonry from 'react-masonry-css'
+import { toast } from 'sonner'
 
 interface InfiniteScrollProps {
   initialItems: MediaWithLoves[]
+  cursor?: string
 }
 
 export function InfiniteScroll({
   initialItems: _initialItems,
+  cursor: _cursor,
 }: InfiniteScrollProps) {
   const [hasMore] = useState(true)
-  const [items, setItems] = useState(
-    Array.from({ length: 10 }).map((_, i) => ({
-      id: getId(),
-      color: getColor(),
-      aspectRatio: random(2, 6) / random(2, 6),
-      num: i + 1,
-    }))
-  )
+  const [cursor, setCursor] = useState(_cursor)
+  const [items, setItems] = useState<MediaWithLoves[]>(_initialItems)
 
   const observerTarget = useRef(null)
 
@@ -30,21 +28,16 @@ export function InfiniteScroll({
     const observer = new IntersectionObserver(
       async ([entry]) => {
         if (entry.isIntersecting && hasMore) {
-          await new Promise((r) => {
-            setTimeout(r, 2000)
-          })
-          setItems((prev) => [
-            ...prev,
-            ...Array.from({ length: 10 }).map((_, i) => ({
-              id: getId(),
-              color: getColor(),
-              aspectRatio: random(4, 6) / random(4, 6),
-              num: i + prev.length + 1,
-            })),
-          ])
+          try {
+            const { data } = await GET<GetData>('media', { params: { cursor } })
+            setItems((prev) => [...prev, ...data.media])
+            setCursor(data.media.at(-1)?.id)
+          } catch (error) {
+            toast.error('Something went wrong!')
+          }
         }
       },
-      { threshold: 1 }
+      { threshold: 1, rootMargin: '200px 0px' }
     )
 
     if (observerTarget.current) {
@@ -56,28 +49,21 @@ export function InfiniteScroll({
         observer.unobserve(observerTarget.current)
       }
     }
-  }, [observerTarget, hasMore])
+  }, [observerTarget, hasMore, cursor])
 
   return (
     <div className="[--gap-img:1rem]">
       <Masonry
+        className="flex ml-[calc(var(--gap-img)*-1)] w-auto"
+        columnClassName="pl-[--gap-img] bg-clip-padding [&>*]:mb-[--gap-img]"
         breakpointCols={{
           default: 3,
           1024: 2,
           640: 1,
         }}
-        className="flex ml-[calc(var(--gap-img)*-1)] w-auto"
-        columnClassName="pl-[--gap-img] bg-clip-padding [&>*]:mb-[--gap-img]"
       >
         {items.map((item) => (
-          <div
-            key={item.id}
-            className="rounded"
-            style={{
-              backgroundColor: item.color,
-              aspectRatio: item.aspectRatio,
-            }}
-          />
+          <PhotoCard key={item.id} {...item} />
         ))}
       </Masonry>
       <div ref={observerTarget} />
