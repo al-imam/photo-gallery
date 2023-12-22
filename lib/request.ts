@@ -1,11 +1,15 @@
+import { joinUrl } from '@/util'
 import axios from 'axios'
 
-export const request = axios.create({
-  baseURL: '/api',
+const api = axios.create({
+  baseURL: joinUrl(process.env.NEXT_URL, 'api'),
+  headers: {
+    'Content-Type': 'application/json',
+  },
 })
 
-export const GET = request.get
-export const POST = request.post
-export const PUT = request.put
-export const PATCH = request.patch
-export const DELETE = request.delete
+export const GET = api.get
+export const POST = api.post
+export const PUT = api.put
+export const PATCH = api.patch
+export const DELETE = api.delete

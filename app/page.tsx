@@ -1,11 +1,15 @@
+import { GetData } from '@/app/api/media/route'
 import { InfiniteScroll } from '@/components/infinite-scroll'
 import { NavBar } from '@/components/nav-bar'
 import { SearchInput } from '@/components/search-input'
+import { GET } from '@/lib'
 import { buttonVariants } from '@/shadcn/ui/button'
 import Link from 'next/link'
 import Marquee from 'react-fast-marquee'
 
-export default function Home() {
+export default async function Home() {
+  const { data: res } = await GET<GetData>('media')
+
   return (
     <div className="content relative isolate min-h-[200vh] overflow-hidden bg-background">
       <NavBar takeHeight={false} />
@@ -49,7 +53,7 @@ export default function Home() {
       </div>
 
       <main className="pb-6">
-        <InfiniteScroll />
+        <InfiniteScroll initialItems={res.media} />
       </main>
     </div>
   )

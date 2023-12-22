@@ -2,11 +2,18 @@
 
 import { SpinnerIcon } from '@/icons'
 import { random } from '@/lib'
+import { MediaWithLoves } from '@/service/types'
 import { getColor, getId } from '@/util'
 import { useEffect, useRef, useState } from 'react'
 import Masonry from 'react-masonry-css'
 
-export function InfiniteScroll() {
+interface InfiniteScrollProps {
+  initialItems: MediaWithLoves[]
+}
+
+export function InfiniteScroll({
+  initialItems: _initialItems,
+}: InfiniteScrollProps) {
   const [hasMore] = useState(true)
   const [items, setItems] = useState(
     Array.from({ length: 10 }).map((_, i) => ({
