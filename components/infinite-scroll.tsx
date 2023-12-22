@@ -5,7 +5,8 @@ import { PhotoCard } from '@/components/photo-card'
 import { SpinnerIcon } from '@/icons'
 import { GET } from '@/lib'
 import { MediaWithLoves } from '@/service/types'
-import { useEffect, useRef, useState } from 'react'
+import { debounce } from '@/util'
+import { useEffect, useState } from 'react'
 import Masonry from 'react-masonry-css'
 import { toast } from 'sonner'
 
@@ -21,35 +22,37 @@ export function InfiniteScroll({
   const [hasMore] = useState(true)
   const [cursor, setCursor] = useState(_cursor)
   const [items, setItems] = useState<MediaWithLoves[]>(_initialItems)
-
-  const observerTarget = useRef(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      async ([entry]) => {
-        if (entry.isIntersecting && hasMore) {
-          try {
-            const { data } = await GET<GetData>('media', { params: { cursor } })
-            setItems((prev) => [...prev, ...data.media])
-            setCursor(data.media.at(-1)?.id)
-          } catch (error) {
-            toast.error('Something went wrong!')
-          }
-        }
-      },
-      { threshold: 1, rootMargin: '200px 0px' }
-    )
+    const handleScroll = debounce(async () => {
+      const { scrollTop, scrollHeight, clientHeight } = document.documentElement
+      const scrollPercentage = (scrollTop / (scrollHeight - clientHeight)) * 100
 
-    if (observerTarget.current) {
-      observer.observe(observerTarget.current)
-    }
+      if (scrollPercentage >= 90 && !loading && !error && hasMore) {
+        try {
+          setLoading(true)
+          const { data } = await GET<GetData>('media', {
+            params: { cursor, limit: 20 },
+          })
+          setItems((prev) => [...prev, ...data.media])
+          setCursor(data.media.at(-1)?.id)
+        } catch (_error) {
+          setError(true)
+          toast.error('Something went wrong!')
+        } finally {
+          setLoading(false)
+        }
+      }
+    }, 100)
+
+    window.addEventListener('scroll', handleScroll)
 
     return () => {
-      if (observerTarget.current) {
-        observer.unobserve(observerTarget.current)
-      }
+      window.removeEventListener('scroll', handleScroll)
     }
-  }, [observerTarget, hasMore, cursor])
+  }, [loading, error, hasMore, cursor])
 
   return (
     <div className="[--gap-img:1rem]">
@@ -61,12 +64,13 @@ export function InfiniteScroll({
           1024: 2,
           640: 1,
         }}
+        allowFullScreen
       >
         {items.map((item) => (
           <PhotoCard key={item.id} {...item} />
         ))}
       </Masonry>
-      <div ref={observerTarget} />
+
       <div>
         {hasMore ? (
           <div className="mx-auto py-20 flex justify-center items-center text-foreground">
