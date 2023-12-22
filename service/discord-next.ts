@@ -13,11 +13,9 @@ export default {
   async deleteAvatar(id: string) {
     const apiUrl = `https://discord.com/api/v10/channels/${env.DISCORD_CHANNEL_AVATAR}/messages/${id}`
 
-    const res = await fetch(apiUrl, {
+    return fetch(apiUrl, {
       method: 'DELETE',
       headers: { Authorization: `Bot ${env.DISCORD_TOKEN}` },
     })
-
-    console.log(await res.json())
   },
 }
