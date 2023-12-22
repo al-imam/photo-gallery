@@ -1,35 +1,17 @@
 'use client'
 
-/* eslint-disable no-bitwise */
 import { SpinnerIcon } from '@/icons'
 import { random } from '@/lib'
+import { getColor, getId } from '@/util'
 import { useEffect, useRef, useState } from 'react'
 import Masonry from 'react-masonry-css'
-import { PhotoCard } from './photo-card'
 
-const getRandomColor = () => {
-  const letters = '0123456789ABCDEF'
-  let color = '#'
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)]
-  }
-  return color
-}
-
-const generateUUID = () => {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0
-    const v = c === 'x' ? r : (r & 0x3) | 0x8
-    return v.toString(16)
-  })
-}
-
-const InfiniteScrollList = () => {
+export function InfiniteScroll() {
   const [hasMore] = useState(true)
   const [items, setItems] = useState(
     Array.from({ length: 10 }).map((_, i) => ({
-      id: generateUUID(),
-      color: getRandomColor(),
+      id: getId(),
+      color: getColor(),
       aspectRatio: random(2, 6) / random(2, 6),
       num: i + 1,
     }))
@@ -47,9 +29,9 @@ const InfiniteScrollList = () => {
           setItems((prev) => [
             ...prev,
             ...Array.from({ length: 10 }).map((_, i) => ({
-              id: generateUUID(),
-              color: getRandomColor(),
-              aspectRatio: random(4, 6) / random(3, 6),
+              id: getId(),
+              color: getColor(),
+              aspectRatio: random(4, 6) / random(4, 6),
               num: i + prev.length + 1,
             })),
           ])
@@ -81,12 +63,13 @@ const InfiniteScrollList = () => {
         columnClassName="pl-[--gap-img] bg-clip-padding [&>*]:mb-[--gap-img]"
       >
         {items.map((item) => (
-          <PhotoCard
+          <div
             key={item.id}
-            photoURL={`https://source.unsplash.com/random/${random(
-              10,
-              30
-            )}x${random(10, 30)}`}
+            className="rounded"
+            style={{
+              backgroundColor: item.color,
+              aspectRatio: item.aspectRatio,
+            }}
           />
         ))}
       </Masonry>
@@ -107,5 +90,3 @@ const InfiniteScrollList = () => {
     </div>
   )
 }
-
-export default InfiniteScrollList
