@@ -1,5 +1,7 @@
 console.clear()
 
+import { configDotenv } from 'dotenv'
+configDotenv()
 import service from '@/service'
 import db, { Media, User } from '@/service/db'
 import { jwt } from '@/service/hash'
