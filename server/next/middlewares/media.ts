@@ -13,5 +13,6 @@ export const setMedia: NextUserMediaHandler = async (_, ctx, next) => {
 
 export const sendMediaWithLoves: NextUserMediaHandler = async (_, ctx) => {
   const [media] = await addLovesToMediaList(ctx.user?.id, ctx.media)
+  console.log(media)
   return NextResponse.json({ media })
 }

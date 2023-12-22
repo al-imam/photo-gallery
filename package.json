@@ -11,6 +11,7 @@
     "format": "prettier --write .",
     "type-check": "tsc --noEmit",
     "prisma": "prisma db push",
+    "demo": "nodemon -r tsconfig-paths/register ./demo/index.ts",
     "express:serve": "ts-node -r tsconfig-paths/register ./server/express/index.ts",
     "express:dev": "nodemon -r tsconfig-paths/register ./server/express/index.ts",
     "render:build": "npm install; npm install --os=linux --cpu=x64 sharp; npm install --force @img/sharp-linux-x64; prisma generate"

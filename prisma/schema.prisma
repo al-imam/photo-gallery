@@ -73,7 +73,7 @@ model Media {
   url_thumbnail String
 
   authorId String @db.Uuid()
-  author   User   @relation("User", fields: [authorId], references: [id])
+  author   User   @relation("User", fields: [authorId], references: [id], onDelete: Cascade)
 
   Z_BOOKMARK  BookMark[]              @relation("Bookmark")
   Z_REACTIONS MediaReaction[]         @relation("MediaReaction")
