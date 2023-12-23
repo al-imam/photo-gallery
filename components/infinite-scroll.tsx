@@ -7,8 +7,7 @@ import { MediaWithLoves } from '@/service/types'
 import { debounce } from '@/util'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Masonry } from 'react-masonry'
-import { PhotoCard } from './photo-card'
+import { PhotosMasonry1 } from './photos-masonry'
 
 interface InfiniteScrollProps {
   initialItems: MediaWithLoves[]
@@ -59,21 +58,9 @@ export function InfiniteScroll({
     }
   }, [loading, error, hasMore, cursor])
 
-  console.log({ items: items.length })
-
   return (
     <div>
-      <Masonry>
-        {items.map((item) => (
-          <div
-            className="p-2 sm:!w-1/2 lg:!w-1/3"
-            style={{ width: '100%' }}
-            key={item.id}
-          >
-            <PhotoCard key={item.id} {...item} />
-          </div>
-        ))}
-      </Masonry>
+      <PhotosMasonry1 items={items} />
 
       <div>
         {hasMore ? (

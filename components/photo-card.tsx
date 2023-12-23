@@ -17,8 +17,6 @@ export function PhotoCard({
   title,
   author,
   createdAt,
-  media_height,
-  media_width,
   description,
   tags,
 }: MediaWithLoves) {
@@ -26,11 +24,12 @@ export function PhotoCard({
     <div className="stack-content group cursor-pointer rounded overflow-hidden shadow shadow-muted">
       <Link href="#">
         <img
+          // FIXME: centralize this url
           src={`/api/yandex-disk/media/${url_thumbnail}`}
           alt={`${title}`}
+          decoding="async"
           loading="lazy"
           className="w-full"
-          style={{ aspectRatio: `${media_width} / ${media_height}` }}
         />
       </Link>
       <div className="flex opacity-0 mt-auto group-hover:opacity-100 transition-opacity duration-300 flex-col justify-between p-4 pointer-events-none">
@@ -82,6 +81,7 @@ export function PhotoCard({
           </HoverCard>
           <div className="flex flex-row-reverse gap-2">
             <a
+              // FIXME: centralize this url
               href={joinUrl(
                 process.env.NEXT_PUBLIC_URL ?? 'http://localhost:3000',
                 'api/yandex-disk/media',
