@@ -60,14 +60,10 @@ export function InfiniteScroll({
   }, [loading, error, hasMore, cursor])
 
   return (
-    <div className="[--gap-img:1rem]">
+    <div>
       <Masonry>
         {items.map((item) => (
-          <div
-            className={'p-2 w-full sm:w-1/2 lg:w-1/3'}
-            key={item.id}
-            style={{ aspectRatio: item.media_width / item.media_height }}
-          >
+          <div className="p-2 w-full sm:w-1/2 lg:w-1/3" key={item.id}>
             <PhotoCard key={item.id} {...item} />
           </div>
         ))}

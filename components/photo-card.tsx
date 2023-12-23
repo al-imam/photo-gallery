@@ -17,6 +17,8 @@ export function PhotoCard({
   title,
   author,
   createdAt,
+  media_height,
+  media_width,
   description,
   tags,
 }: MediaWithLoves) {
@@ -27,7 +29,8 @@ export function PhotoCard({
           src={`/api/yandex-disk/media/${url_thumbnail}`}
           alt={`${title}`}
           loading="lazy"
-          className="min-w-full"
+          className="w-full"
+          style={{ aspectRatio: `${media_width} / ${media_height}` }}
         />
       </Link>
       <div className="flex opacity-0 mt-auto group-hover:opacity-100 transition-opacity duration-300 flex-col justify-between p-4 pointer-events-none">
