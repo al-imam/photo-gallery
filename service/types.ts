@@ -16,7 +16,7 @@ export type NextHandler<T = {}> = (
 
 export type NextUserHandler<T = {}> = NextHandler<{ user: User } & T>
 export type NextOptUserHandler<T = {}> = NextHandler<{ user?: User } & T>
-export type NextUserMediaHandler = NextUserHandler<{ media: Media }>
+export type NextUserMediaHandler = NextUserHandler<{ media: MediaPopulated }>
 
 export type MediaPopulated = Media & {
   author: PrettifyPick<User, (typeof USER_PUBLIC_FIELDS)[number]>
