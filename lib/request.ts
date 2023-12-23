@@ -2,7 +2,10 @@ import { joinUrl } from '@/util'
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: joinUrl(process.env.NEXT_URL, 'api'),
+  baseURL: joinUrl(
+    process.env.NEXT_PUBLIC_URL ?? 'http://localhost:3000',
+    'api'
+  ),
   headers: {
     'Content-Type': 'application/json',
   },

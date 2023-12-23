@@ -64,7 +64,6 @@ export function InfiniteScroll({
           1024: 2,
           640: 1,
         }}
-        allowFullScreen
       >
         {items.map((item) => (
           <PhotoCard key={item.id} {...item} />
