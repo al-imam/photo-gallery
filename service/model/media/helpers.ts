@@ -1,7 +1,7 @@
 import { Media, MediaReaction, User } from '@prisma/client'
 import { Prettify } from '@/types'
 import db from '@/service/db'
-import { MediaWithLoves } from '@/service/types'
+import { MediaPopulated, MediaWithLoves } from '@/service/types'
 import ReqErr from '@/service/ReqError'
 import { PrettifyPick } from '@/service/utils'
 
@@ -66,7 +66,7 @@ function mapMediaReaction<
 
 export async function addLovesToMediaList(
   userId?: null | string,
-  ...mediaList: Media[]
+  ...mediaList: MediaPopulated[]
 ) {
   const result: MediaWithLoves[] = []
 

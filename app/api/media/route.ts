@@ -9,6 +9,8 @@ export type GetData = {
   media: Awaited<ReturnType<typeof service.media.getFeaturedMedia>>
 }
 
+let a: GetData
+
 export const dynamic = 'force-dynamic'
 export const GET = optionalAuthRouter(async (req, ctx) => {
   const query = Object.fromEntries(
