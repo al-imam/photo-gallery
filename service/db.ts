@@ -1,6 +1,14 @@
 import { PrismaClient } from '@prisma/client'
 
-const db = new PrismaClient({ errorFormat: 'pretty' })
+let db: PrismaClient
 
-export * from '@prisma/client'
+if (process.env.NODE_ENV === 'production') {
+  db = new PrismaClient({ errorFormat: 'minimal' })
+} else {
+  // @ts-ignore
+  global.prisma ??= new PrismaClient({ errorFormat: 'pretty' })
+  // @ts-ignore
+  db = global.prisma
+}
+
 export default db
