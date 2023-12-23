@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    .masonry-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      grid-gap: 16px;
+      grid-auto-rows: minmax(100px, auto);
+    }
+
+    .masonry-item {
+      background-color: #ececec;
+      padding: 16px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="masonry-container">
+    <div class="masonry-item">Item 1<br>Content here.</div>
+    <div class="masonry-item">Item 2<br>Longer content here.</div>
+    <div class="masonry-item">Item 3</div>
+    <div class="masonry-item">Item 4<br>Short content.</div>
+    <div class="masonry-item">Item 5<br>More content.</div>
+    <!-- Add more items as needed -->
+  </div>
+</body>
+</html>

@@ -29,6 +29,7 @@ import { uploadMedia } from '@/server/express/service'
 
   const userList: User[] = []
   const mediaList: Media[] = []
+  let imageN = 0
 
   for (let name of usernames) {
     const user = await service.user.create(
@@ -47,6 +48,7 @@ import { uploadMedia } from '@/server/express/service'
     for (let element of images) {
       const media = await uploadMedia({ ...user, status: 'ADMIN' }, element, {
         newCategory: Math.random().toString(36).substring(7),
+        title: `Test Media ${imageN++}`,
       })
       console.log('created:', media.id)
       mediaList.push(media)
@@ -63,4 +65,7 @@ import { uploadMedia } from '@/server/express/service'
       })
     }
   }
+
+  console.log('Done')
+  process.exit()
 })()
