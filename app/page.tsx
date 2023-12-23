@@ -1,13 +1,17 @@
-import InfiniteScrollList from '@/components/infinit-scroll'
+import { GetData } from '@/app/api/media/route'
+import { InfiniteScroll } from '@/components/infinite-scroll'
 import { NavBar } from '@/components/nav-bar'
-// import { PhotoCard } from '@/components/photo-card'
 import { SearchInput } from '@/components/search-input'
-// import { random } from '@/lib'
+import { GET } from '@/lib'
 import { buttonVariants } from '@/shadcn/ui/button'
 import Link from 'next/link'
 import Marquee from 'react-fast-marquee'
 
-export default function Home() {
+export default async function Home() {
+  const { data: res } = await GET<GetData>('media', {
+    params: { limit: 50 },
+  })
+
   return (
     <div className="content relative isolate min-h-[200vh] overflow-hidden bg-background">
       <NavBar takeHeight={false} />
@@ -35,7 +39,7 @@ export default function Home() {
       <div className="relative isolate overlay py-14 content-expand">
         <Marquee className="gap-2" pauseOnHover>
           <div className="flex gap-2 items-center">
-            {Array(20)
+            {Array(50)
               .fill(null)
               .map((_, i) => (
                 <Link
@@ -51,7 +55,10 @@ export default function Home() {
       </div>
 
       <main className="pb-6">
-        <InfiniteScrollList />
+        <InfiniteScroll
+          initialItems={res.media}
+          cursor={res.media.at(-1)?.id}
+        />
       </main>
     </div>
   )

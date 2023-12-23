@@ -21,6 +21,7 @@
     "no-underscore-dangle": 0,
     "import/no-unresolved": 0,
     "@next/next/no-img-element": 0,
+    "camelcase": 0,
     "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
     "no-shadow": ["error", { "ignoreOnInitialization": true }],
     "@typescript-eslint/no-unused-vars": [
