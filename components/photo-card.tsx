@@ -15,8 +15,6 @@ export function PhotoCard({
   url_thumbnail,
   url_media,
   title,
-  media_height,
-  media_width,
   author,
   createdAt,
   description,
@@ -30,9 +28,6 @@ export function PhotoCard({
           alt={`${title}`}
           loading="lazy"
           className="min-w-full"
-          style={{
-            aspectRatio: media_width / media_height,
-          }}
         />
       </Link>
       <div className="flex opacity-0 mt-auto group-hover:opacity-100 transition-opacity duration-300 flex-col justify-between p-4 pointer-events-none">

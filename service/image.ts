@@ -39,10 +39,10 @@ export async function generateAvatar(
       .resize({
         withoutEnlargement: true,
         fit: 'cover',
-        width: size,
         height: size,
+        width: size,
       })
-      .webp({ quality: 75 })
+      .webp({ quality: 90 })
       .toBuffer((err, buffer) => {
         if (err) reject(err.message)
         else makeImageBody(buffer, 'avatar').then(resolve)
@@ -58,10 +58,10 @@ export async function generateThumbnail(
       .resize({
         withoutEnlargement: true,
         fit: 'inside',
-        width: 768,
-        height: 768,
+        height: 640,
+        width: 640,
       })
-      .webp({ quality: 75 })
+      .webp({ quality: 70 })
       .toBuffer((err, buffer) => {
         if (err) reject(err.message)
         else makeImageBody(buffer, 'thumbnail').then(resolve)

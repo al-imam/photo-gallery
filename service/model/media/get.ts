@@ -34,7 +34,7 @@ export async function getFeaturedMedia(
       authorId: options.authorId,
     },
     orderBy: {
-      id: 'desc',
+      createdAt: 'desc',
     },
     include: MEDIA_INCLUDE_QUERY,
   })

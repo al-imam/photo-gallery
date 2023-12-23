@@ -1,14 +1,14 @@
 'use client'
 
 import { GetData } from '@/app/api/media/route'
-import { PhotoCard } from '@/components/photo-card'
 import { SpinnerIcon } from '@/icons'
 import { GET } from '@/lib'
 import { MediaWithLoves } from '@/service/types'
 import { debounce } from '@/util'
 import { useEffect, useState } from 'react'
-import Masonry from 'react-masonry-css'
 import { toast } from 'sonner'
+import { Masonry } from 'react-masonry'
+import { PhotoCard } from './photo-card'
 
 interface InfiniteScrollProps {
   initialItems: MediaWithLoves[]
@@ -19,7 +19,7 @@ export function InfiniteScroll({
   initialItems: _initialItems,
   cursor: _cursor,
 }: InfiniteScrollProps) {
-  const [hasMore] = useState(true)
+  const [hasMore, setHasMore] = useState(true)
   const [cursor, setCursor] = useState(_cursor)
   const [items, setItems] = useState<MediaWithLoves[]>(_initialItems)
   const [loading, setLoading] = useState(false)
@@ -36,8 +36,13 @@ export function InfiniteScroll({
           const { data } = await GET<GetData>('media', {
             params: { cursor, limit: 20 },
           })
-          setItems((prev) => [...prev, ...data.media])
-          setCursor(data.media.at(-1)?.id)
+
+          if (data.media.length === 0) {
+            setHasMore(false)
+          } else {
+            setItems((prev) => [...prev, ...data.media])
+            setCursor(data.media.at(-1)?.id)
+          }
         } catch (_error) {
           setError(true)
           toast.error('Something went wrong!')
@@ -56,17 +61,15 @@ export function InfiniteScroll({
 
   return (
     <div className="[--gap-img:1rem]">
-      <Masonry
-        className="flex ml-[calc(var(--gap-img)*-1)] w-auto"
-        columnClassName="pl-[--gap-img] bg-clip-padding [&>*]:mb-[--gap-img]"
-        breakpointCols={{
-          default: 3,
-          1024: 2,
-          640: 1,
-        }}
-      >
+      <Masonry>
         {items.map((item) => (
-          <PhotoCard key={item.id} {...item} />
+          <div
+            className={'p-2 w-full sm:w-1/2 lg:w-1/3'}
+            key={item.id}
+            style={{ aspectRatio: item.media_width / item.media_height }}
+          >
+            <PhotoCard key={item.id} {...item} />
+          </div>
         ))}
       </Masonry>
 
