@@ -9,7 +9,7 @@ import Marquee from 'react-fast-marquee'
 
 export default async function Home() {
   const { data: res } = await GET<GetData>('media', {
-    params: { limit: 20 },
+    params: { limit: 50 },
   })
 
   return (
