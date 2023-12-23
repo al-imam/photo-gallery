@@ -19,7 +19,7 @@ export function InfiniteScroll({
   initialItems: _initialItems,
   cursor: _cursor,
 }: InfiniteScrollProps) {
-  const [hasMore, setHasMore] = useState(true)
+  const [hasMore, setHasMore] = useState(_initialItems?.length >= 50)
   const [cursor, setCursor] = useState(_cursor)
   const [items, setItems] = useState<MediaWithLoves[]>(_initialItems)
   const [loading, setLoading] = useState(false)
@@ -59,11 +59,17 @@ export function InfiniteScroll({
     }
   }, [loading, error, hasMore, cursor])
 
+  console.log({ items: items.length })
+
   return (
     <div>
       <Masonry>
         {items.map((item) => (
-          <div className="p-2 w-full sm:w-1/2 lg:w-1/3" key={item.id}>
+          <div
+            className="p-2 sm:!w-1/2 lg:!w-1/3"
+            style={{ width: '100%' }}
+            key={item.id}
+          >
             <PhotoCard key={item.id} {...item} />
           </div>
         ))}
