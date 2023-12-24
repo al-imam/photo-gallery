@@ -1,5 +1,3 @@
-'use client'
-
 import { MediaWithLoves } from '@/service/types'
 import PhotoAlbum from 'react-photo-album'
 import { PhotoCard } from './photo-card'

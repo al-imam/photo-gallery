@@ -21,7 +21,7 @@ export function PhotoCard({
   tags,
 }: MediaWithLoves) {
   return (
-    <div className="stack-content group cursor-pointer rounded overflow-hidden shadow shadow-muted">
+    <div className="stack-content group cursor-pointer rounded overflow-hidden shadow shadow-muted h-full">
       <Link href="#">
         <img
           // FIXME: centralize this url
@@ -29,7 +29,7 @@ export function PhotoCard({
           alt={`${title}`}
           decoding="async"
           loading="lazy"
-          className="w-full"
+          className="w-full h-full"
         />
       </Link>
       <div className="flex opacity-0 mt-auto group-hover:opacity-100 transition-opacity duration-300 flex-col justify-between p-4 pointer-events-none">
