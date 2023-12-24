@@ -61,7 +61,7 @@ export async function generateThumbnail(
         height: 640,
         width: 640,
       })
-      .webp({ quality: 70 })
+      .webp({ quality: 50 })
       .toBuffer((err, buffer) => {
         if (err) reject(err.message)
         else makeImageBody(buffer, 'thumbnail').then(resolve)
