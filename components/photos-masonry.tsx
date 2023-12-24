@@ -2,13 +2,13 @@ import { MediaWithLoves } from '@/service/types'
 import PhotoAlbum from 'react-photo-album'
 import { PhotoCard } from './photo-card'
 
-export function PhotosMasonry1({ items }: { items: MediaWithLoves[] }) {
+export function PhotosMasonry({ items }: { items: MediaWithLoves[] }) {
   return (
     <PhotoAlbum
       layout="masonry"
       photos={items.map((item) => ({
         item,
-        src: 'NONE',
+        src: item.id,
         height: item.media_height,
         width: item.media_width,
       }))}
@@ -18,8 +18,8 @@ export function PhotosMasonry1({ items }: { items: MediaWithLoves[] }) {
         return 3
       }}
       renderPhoto={({ photo: { item }, wrapperStyle }) => (
-        <div style={wrapperStyle}>
-          <PhotoCard key={item.id} {...item} />
+        <div key={item.id} style={wrapperStyle}>
+          <PhotoCard {...item} />
         </div>
       )}
     />

@@ -1,4 +1,4 @@
-/* eslint-disable global-require, import/no-extraneous-dependencies */
+/* eslint-disable global-require, import/no-extraneous-dependencies, @typescript-eslint/no-var-requires */
 
 const defaultTheme = require('tailwindcss/defaultTheme')
 
@@ -37,6 +37,10 @@ module.exports = {
             .map(([key, value]) => [key, parseColor(value)?.color.join(' ')])
             .filter(([, value]) => value)
         )
+      },
+
+      screens: {
+        'hover-unavailable': { raw: '(hover: none)' },
       },
 
       transitionDuration: generateTimes(),

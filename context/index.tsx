@@ -1,6 +1,6 @@
-import { Toaster } from 'sonner'
 import { SmoothScroll } from '@/components/smooth-scroll'
 import sdk from '@/sdk'
+import { Toaster } from '@/shadcn/ui/sonner'
 import { AuthProvider } from './auth-provider'
 import { ThemeProvider } from './theme-provider'
 
