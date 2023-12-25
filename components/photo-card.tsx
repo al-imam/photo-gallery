@@ -24,15 +24,14 @@ export function PhotoCard({
     <div className="stack-content group cursor-pointer rounded overflow-hidden shadow shadow-muted h-full">
       <Link href="#">
         <img
-          // FIXME: centralize this url
           src={`/api/yandex-disk/media/${url_thumbnail}`}
           alt={`${title}`}
           decoding="async"
           loading="lazy"
-          className="w-full h-full"
+          className="w-full h-full image-loading"
         />
       </Link>
-      <div className="flex opacity-0 mt-auto group-hover:opacity-100 transition-opacity duration-300 flex-col justify-between p-4 pointer-events-none">
+      <div className="flex opacity-0 mt-auto hover-unavailable:opacity-100 group-hover:opacity-100 transition-opacity duration-300 flex-col justify-between p-4 pointer-events-none">
         <div className="flex gap-1 justify-end"></div>
         <div className="flex gap-1 justify-between font-sans">
           <HoverCard>
@@ -49,7 +48,7 @@ export function PhotoCard({
                 </Avatar>
               </Link>
             </HoverCardTrigger>
-            <HoverCardContent className="w-80">
+            <HoverCardContent className="w-80 group-hover:pointer-events-auto">
               <div className="flex flex-col gap-2">
                 <div className="flex justify-between items-center">
                   <span className="font-display">{author.name}</span>
@@ -81,7 +80,6 @@ export function PhotoCard({
           </HoverCard>
           <div className="flex flex-row-reverse gap-2">
             <a
-              // FIXME: centralize this url
               href={joinUrl(
                 process.env.NEXT_PUBLIC_URL ?? 'http://localhost:3000',
                 'api/yandex-disk/media',

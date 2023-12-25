@@ -171,4 +171,25 @@
 
     inset: 0 0 0 auto;
   }
+
+  .image-loading {
+    @apply bg-background w-full h-full;
+    background: linear-gradient(
+      -85deg,
+      transparent 35%,
+      rgb(var(--foreground) / 0.05) 50%,
+      transparent 65%
+    );
+    background-size: 400% 400%;
+    animation: loading 1500ms ease infinite;
+  }
+
+  @keyframes loading {
+    0% {
+      background-position: 100%;
+    }
+    100% {
+      background-position: 0%;
+    }
+  }
 }

@@ -4,10 +4,9 @@ import { GetData } from '@/app/api/media/route'
 import { SpinnerIcon } from '@/icons'
 import { GET } from '@/lib'
 import { MediaWithLoves } from '@/service/types'
-import { debounce } from '@/util'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { PhotosMasonry1 } from './photos-masonry'
+import { PhotosMasonry } from './photos-masonry'
 
 interface InfiniteScrollProps {
   initialItems: MediaWithLoves[]
@@ -21,47 +20,53 @@ export function InfiniteScroll({
   const [hasMore, setHasMore] = useState(_initialItems?.length >= 50)
   const [cursor, setCursor] = useState(_cursor)
   const [items, setItems] = useState<MediaWithLoves[]>(_initialItems)
-  const [loading, setLoading] = useState(false)
+  const observerTarget = useRef<HTMLDivElement>(null)
   const [error, setError] = useState(false)
 
   useEffect(() => {
-    const handleScroll = debounce(async () => {
-      const { scrollTop, scrollHeight, clientHeight } = document.documentElement
-      const scrollPercentage = (scrollTop / (scrollHeight - clientHeight)) * 100
+    const observer = new IntersectionObserver(
+      async ([entry]) => {
+        if (entry.isIntersecting && hasMore && !error) {
+          try {
+            const { data } = await GET<GetData>('media', {
+              params: { cursor, limit: 20 },
+            })
 
-      if (scrollPercentage >= 90 && !loading && !error && hasMore) {
-        try {
-          setLoading(true)
-          const { data } = await GET<GetData>('media', {
-            params: { cursor, limit: 20 },
-          })
-
-          if (data.media.length === 0) {
-            setHasMore(false)
-          } else {
-            setItems((prev) => [...prev, ...data.media])
-            setCursor(data.media.at(-1)?.id)
+            if (data.media.length === 0) {
+              setHasMore(false)
+            } else {
+              setItems((prev) => [...prev, ...data.media])
+              setCursor(data.media.at(-1)?.id)
+            }
+          } catch {
+            setError(true)
+            toast('Something went wrong!', {
+              action: {
+                label: 'Try again',
+                onClick: () => setError(false),
+              },
+            })
           }
-        } catch (_error) {
-          setError(true)
-          toast.error('Something went wrong!')
-        } finally {
-          setLoading(false)
         }
-      }
-    }, 100)
+      },
+      { threshold: 1, rootMargin: '1000px 0px' }
+    )
 
-    window.addEventListener('scroll', handleScroll)
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current)
+    }
 
     return () => {
-      window.removeEventListener('scroll', handleScroll)
+      if (observerTarget.current) {
+        observer.unobserve(observerTarget.current)
+      }
     }
-  }, [loading, error, hasMore, cursor])
+  }, [observerTarget, hasMore, cursor, error])
 
   return (
     <div>
-      <PhotosMasonry1 items={items} />
-
+      <PhotosMasonry items={items} />
+      <div ref={observerTarget} />
       <div>
         {hasMore ? (
           <div className="mx-auto py-20 flex justify-center items-center text-foreground">
