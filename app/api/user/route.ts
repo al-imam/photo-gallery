@@ -25,3 +25,14 @@ export const POST = router(
   },
   sendUserAndToken
 )
+
+export type PatchBody = { name?: string }
+export type PatchData = SendUserAndToken
+export const PATCH = authRouter(async (req, ctx, next) => {
+  const { name } = await req.json<PatchBody>()
+  ctx.user = await service.user.update(ctx.token, {
+    name,
+  })
+
+  return next()
+}, sendUserAndToken)

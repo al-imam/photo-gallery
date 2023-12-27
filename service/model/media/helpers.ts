@@ -33,15 +33,6 @@ export function mediaPermissionFactory(
   }
 }
 
-export async function checkIfCategoryExists(categoryId: string) {
-  if (!categoryId) return
-  const category = await db.mediaCategory.findUnique({
-    where: { id: categoryId },
-  })
-
-  if (!category) throw new ReqErr('Category not found')
-}
-
 export async function findOrCreateCategory(name: string) {
   const lowerName = name.toLowerCase()
   return (

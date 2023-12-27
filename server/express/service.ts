@@ -1,7 +1,6 @@
 import { Media, User } from '@prisma/client'
 import { mediaInputSchema } from './config'
 import ReqErr from '@/service/ReqError'
-import { checkIfCategoryExists } from '@/service/model/media/helpers'
 import db from '@/service/db'
 import discord from '@/service/discord'
 import { MEDIA_INCLUDE_QUERY, USER_SAFE_FIELDS_QUERY } from '@/service/config'
@@ -15,9 +14,6 @@ export async function uploadMedia(
   const body = mediaInputSchema.parse(reqBody)
   if (body.newCategory && body.categoryId) {
     throw new ReqErr('Cannot provide both newCategory and categoryId')
-  }
-  if (body.categoryId) {
-    await checkIfCategoryExists(body.categoryId)
   }
 
   if (

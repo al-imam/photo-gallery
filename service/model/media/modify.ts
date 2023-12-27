@@ -1,8 +1,4 @@
-import {
-  checkIfCategoryExists,
-  findOrCreateCategory,
-  mediaPermissionFactory,
-} from './helpers'
+import { findOrCreateCategory, mediaPermissionFactory } from './helpers'
 import { MEDIA_INCLUDE_QUERY } from '@/service/config'
 import db, { Media, User } from '@/service/db'
 import { PrettifyPick } from '@/service/utils'
@@ -30,7 +26,6 @@ export async function updateMedia(
     throw new ReqErr('Cannot provide both categoryId and newCategory')
   }
 
-  if (body.categoryId) await checkIfCategoryExists(body.categoryId)
   if (body.newCategory) {
     if (
       (permission.moderate(user) &&

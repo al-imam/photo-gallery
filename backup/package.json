@@ -2,9 +2,13 @@
   "name": "ps-backup",
   "version": "0.0.0",
   "bin": "./index.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "nodemon ./index.js"
+  },
   "dependencies": {
     "adm-zip": "^0.5.10",
     "archiver": "^6.0.1",
-    "mongodb": "^6.3.0"
+    "axios": "^1.6.3"
   }
 }
