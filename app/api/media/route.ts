@@ -16,13 +16,13 @@ export const GET = optionalAuthRouter(async (req, ctx) => {
     req.nextUrl.searchParams.entries()
   ) as GetQuery
 
-  return NextResponse.json<GetData>({
-    mediaList: await service.media.getLatestMediaList(ctx.user, {
-      cursor: query.cursor,
-      category: query.category,
-      authorId: query.authorId,
-      status: query.status as ContentStatus,
-      limit: queryToNumber(query.limit),
-    }),
+  const mediaList = await service.media.getLatestMediaList(ctx.user, {
+    cursor: query.cursor,
+    category: query.category,
+    authorId: query.authorId,
+    status: query.status as ContentStatus,
+    limit: queryToNumber(query.limit),
   })
+
+  return NextResponse.json<GetData>({ mediaList })
 })
