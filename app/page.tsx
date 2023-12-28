@@ -56,8 +56,8 @@ export default async function Home() {
 
       <main className="pb-6">
         <InfiniteScroll
-          initialItems={res.media}
-          cursor={res.media.at(-1)?.id}
+          initialItems={res.mediaList}
+          cursor={res.mediaList.at(-1)?.id}
         />
       </main>
     </div>

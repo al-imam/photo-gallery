@@ -108,6 +108,7 @@ model MediaReport {
 
   type    MediaReportType
   message String?         @db.VarChar(192)
+  status  ContentStatus   @default(PENDING)
 
   Z_MEDIA Media @relation("MediaReport", fields: [mediaId], references: [id], onDelete: Cascade)
   Z_USER  User  @relation("MediaReport", fields: [userId], references: [id], onDelete: Cascade)

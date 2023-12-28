@@ -9,35 +9,37 @@ import { getImages, getRandomItems } from './utils'
 import { uploadMedia } from '@/server/express/service'
 ;(async () => {
   await db.user.deleteMany({})
-  const usernames = [
-    'Aarif',
-    'Aarman',
-    'Abir',
-    'Anik',
-    'Farhan',
-    'Fahim',
-    'Imran',
-    'Jamal',
-    'Khaled',
-    'Nabil',
-    'Rafiq',
-    'Rehan',
-    'Riaz',
-    'Shahid',
-    'Taher',
+  const fullNameList = [
+    'Mohammad Rahman',
+    'Fatima Khanam',
+    'Abul Hasan Chowdhury',
+    'Shabnam Akhtar Chowdhury',
+    'Aminul Islam Miah',
+    'Taslima Begum',
+    'Rafiqul Haque Siddique',
+    'Farida Yasmin Khan',
+    'Nurul Islam Mia',
+    'Rukhsar Ahmed Chowdhury',
+    'Sadia Rahman',
+    'Shahidul Islam',
+    'Nasrin Akhtar',
+    'Mizanur Rahman',
+    'Sultana Ahmed',
+    'Kamrul Hasan',
+    'Ayesha Begum',
+    'Zahidul Haque',
+    'Maliha Khan',
   ]
 
   const userList: User[] = []
   const mediaList: Media[] = []
+  let userN = 0
   let imageN = 0
 
-  for (let name of usernames) {
+  for (let name of fullNameList) {
     const user = await service.user.create(
-      await jwt.sign('signup-email', `me+${name.toLowerCase()}@sayad.dev`),
-      {
-        name,
-        password: '123',
-      }
+      await jwt.sign('signup-email', `247sayad+dev-${++userN}@gmail.com`),
+      { name, password: '123' }
     )
     console.log('created:', user.email)
     userList.push(user)
@@ -48,7 +50,7 @@ import { uploadMedia } from '@/server/express/service'
     for (let element of images) {
       const media = await uploadMedia({ ...user, status: 'ADMIN' }, element, {
         newCategory: Math.random().toString(36).substring(7),
-        title: `Test Media ${imageN++}`,
+        title: `Test Media ${++imageN}`,
       })
       console.log('created:', media.id)
       mediaList.push(media)

@@ -1,9 +1,10 @@
 import { addLovesToMediaList, mediaPermissionFactory } from './helpers'
 import { MEDIA_INCLUDE_QUERY } from '@/service/config'
-import db, { User } from '@/service/db'
+import db, { ContentStatus, User } from '@/service/db'
 import { PrettifyPick } from '@/service/utils'
 import { FeaturedMediaOptions } from './types'
 import ReqErr from '@/service/ReqError'
+import { userPermissionFactory } from '../helpers'
 
 export async function getMedia(
   id: string,
@@ -18,10 +19,21 @@ export async function getMedia(
   throw new ReqErr('Media not found')
 }
 
-export async function getFeaturedMedia(
-  userId?: null | string,
+export async function getLatestMediaList(
+  user?: PrettifyPick<User, 'id' | 'status'>,
   options: FeaturedMediaOptions = {}
 ) {
+  if (
+    options.status &&
+    !(
+      user &&
+      ((options.authorId && user.id === options.authorId) ||
+        userPermissionFactory(user).isModeratorLevel)
+    )
+  ) {
+    delete options.status
+  }
+
   const mediaList = await db.media.findMany({
     ...(options.cursor
       ? { cursor: { id: options.cursor }, skip: 1 }
@@ -29,9 +41,9 @@ export async function getFeaturedMedia(
     take: options.limit ?? 20,
 
     where: {
-      status: 'APPROVED',
-      categoryId: options.category,
+      status: options.status ?? ContentStatus.APPROVED,
       authorId: options.authorId,
+      categoryId: options.category,
     },
     orderBy: {
       createdAt: 'desc',
@@ -39,7 +51,7 @@ export async function getFeaturedMedia(
     include: MEDIA_INCLUDE_QUERY,
   })
 
-  return addLovesToMediaList(userId, ...mediaList)
+  return addLovesToMediaList(user?.id, ...mediaList)
 }
 
 export async function getBackup(cursor?: string, take = 20000) {

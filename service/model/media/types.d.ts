@@ -1,4 +1,4 @@
-import { Media } from '@prisma/client'
+import { ContentStatus, Media } from '@prisma/client'
 import { PrettifyPick } from '@/service/utils'
 
 export type UpdateMediaBody = PrettifyPick<
@@ -19,4 +19,5 @@ export type FeaturedMediaOptions = {
   limit?: number
   category?: string
   authorId?: string
+  status?: ContentStatus
 }

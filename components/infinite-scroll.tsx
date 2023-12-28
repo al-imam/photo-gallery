@@ -32,11 +32,11 @@ export function InfiniteScroll({
               params: { cursor, limit: 20 },
             })
 
-            if (data.media.length === 0) {
+            if (data.mediaList.length === 0) {
               setHasMore(false)
             } else {
-              setItems((prev) => [...prev, ...data.media])
-              setCursor(data.media.at(-1)?.id)
+              setItems((prev) => [...prev, ...data.mediaList])
+              setCursor(data.mediaList.at(-1)?.id)
             }
           } catch {
             setError(true)

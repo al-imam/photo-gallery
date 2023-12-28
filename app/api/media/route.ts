@@ -3,13 +3,12 @@ import service from '@/service'
 import { optionalAuthRouter } from '@/server/next/router'
 import { queryToNumber } from '@/server/next/utils'
 import { FeaturedMediaOptions } from '@/service/model/media/types'
+import { ContentStatus } from '@prisma/client'
 
 export type GetQuery = Partial<Record<keyof FeaturedMediaOptions, string>>
 export type GetData = {
-  media: Awaited<ReturnType<typeof service.media.getFeaturedMedia>>
+  mediaList: Awaited<ReturnType<typeof service.media.getLatestMediaList>>
 }
-
-let a: GetData
 
 export const dynamic = 'force-dynamic'
 export const GET = optionalAuthRouter(async (req, ctx) => {
@@ -18,10 +17,11 @@ export const GET = optionalAuthRouter(async (req, ctx) => {
   ) as GetQuery
 
   return NextResponse.json<GetData>({
-    media: await service.media.getFeaturedMedia(ctx.user?.id, {
+    mediaList: await service.media.getLatestMediaList(ctx.user, {
       cursor: query.cursor,
       category: query.category,
       authorId: query.authorId,
+      status: query.status as ContentStatus,
       limit: queryToNumber(query.limit),
     }),
   })

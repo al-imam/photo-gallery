@@ -4,8 +4,14 @@ import { PrettifyPick } from '../utils'
 import mail from '../mail'
 import ReqErr from '../ReqError'
 
-export function fetch(id: string) {
+export function fetchById(id: string) {
   return db.user.findUnique({ where: { id } })
+}
+
+export function fetchByUsername(username: string) {
+  return db.user.findUniqueOrThrow({
+    where: { username },
+  })
 }
 
 export async function create(
@@ -62,8 +68,7 @@ export async function requestEmailChange(
 
 export async function confirmEmailChange(token: string) {
   const { payload, iatVerify } = await hash.jwt.verify('change-email', token)
-  const user = await db.user.findUnique({ where: { id: payload.id } })
-  if (!user) throw new ReqErr('User not found')
+  const user = await db.user.findUniqueOrThrow({ where: { id: payload.id } })
   iatVerify(user.authModifiedAt)
 
   return db.user.update({
@@ -73,8 +78,7 @@ export async function confirmEmailChange(token: string) {
 }
 
 export async function requestPasswordReset(email: string) {
-  const user = await db.user.findUnique({ where: { email } })
-  if (!user) throw new ReqErr('User not found')
+  const user = await db.user.findUniqueOrThrow({ where: { email } })
   const token = await hash.jwt.sign('reset-password', {
     id: user.id,
     email: user.email,
