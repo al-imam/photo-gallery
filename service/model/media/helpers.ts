@@ -2,7 +2,6 @@ import { Media, MediaReaction, User } from '@prisma/client'
 import { Prettify } from '@/types'
 import db from '@/service/db'
 import { MediaPopulated, MediaWithLoves } from '@/service/types'
-import ReqErr from '@/service/ReqError'
 import { PrettifyPick } from '@/service/utils'
 
 export function mediaPermissionFactory(
@@ -71,6 +70,8 @@ export async function addLovesToMediaList(
   for (const media of mediaList) {
     result.push({
       ...media,
+      url_media: media.url_media,
+      url_thumbnail: media.url_thumbnail,
       isLoved: Boolean(userId && reactions[media.id]?.has(userId)),
       loves: reactions[media.id]?.size ?? 0,
       messageId: undefined as never,
