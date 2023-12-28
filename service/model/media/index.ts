@@ -1,26 +1,13 @@
-import db, { Media, MediaReport, User } from '@/service/db'
+import db, { Media, User } from '@/service/db'
 import { PrettifyPick } from '@/service/utils'
 import { mediaPermissionFactory } from './helpers'
 import ReqErr from '@/service/ReqError'
 import discordNext from '@/service/discord-next'
 
 export * from './get'
+export * from './love'
 export * from './modify'
-
-export async function createLove(userId: string, mediaId: string) {
-  return db.mediaReaction.create({
-    data: {
-      mediaId,
-      userId,
-    },
-  })
-}
-
-export async function removeLove(userId: string, mediaId: string) {
-  return db.mediaReaction.delete({
-    where: { mediaId_userId: { mediaId, userId } },
-  })
-}
+export * from './report'
 
 export async function deleteMedia(
   user: PrettifyPick<User, 'id' | 'status'>,
@@ -33,20 +20,4 @@ export async function deleteMedia(
 
   await db.media.delete({ where: { id: media.id } })
   await discordNext.deleteMedia(media.messageId)
-}
-
-export type CreateReportBody = PrettifyPick<MediaReport, 'type' | 'message'>
-export async function createReport(
-  userId: string,
-  mediaId: string,
-  body: CreateReportBody
-) {
-  return db.mediaReport.create({
-    data: {
-      mediaId,
-      userId,
-      type: body.type,
-      message: body.message,
-    },
-  })
 }
