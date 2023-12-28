@@ -10,27 +10,35 @@ import { PhotosMasonry } from './photos-masonry'
 
 interface InfiniteScrollProps {
   initialItems: MediaWithLoves[]
-  cursor?: string
+  cursor: string
+  userId: string
 }
 
 export function InfiniteScroll({
   initialItems: _initialItems,
   cursor: _cursor,
-}: InfiniteScrollProps) {
-  const [hasMore, setHasMore] = useState(_initialItems?.length >= 50)
+  userId,
+}: Partial<InfiniteScrollProps>) {
   const [cursor, setCursor] = useState(_cursor)
-  const [items, setItems] = useState<MediaWithLoves[]>(_initialItems)
+  const [items, setItems] = useState<MediaWithLoves[]>(_initialItems ?? [])
   const observerTarget = useRef<HTMLDivElement>(null)
   const [error, setError] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       async ([entry]) => {
         if (entry.isIntersecting && hasMore && !error) {
           try {
-            const { data } = await GET<GetData>('media', {
-              params: { cursor, limit: 20 },
-            })
+            const con = {
+              params: { limit: 20 } as Record<string, any>,
+              body: {} as Record<string, any>,
+            }
+
+            if (cursor) con.params.cursor = cursor
+            if (userId) con.body.userId = userId
+
+            const { data } = await GET<GetData>('media', con)
 
             if (data.mediaList.length === 0) {
               setHasMore(false)
@@ -61,7 +69,7 @@ export function InfiniteScroll({
         observer.unobserve(observerTarget.current)
       }
     }
-  }, [observerTarget, hasMore, cursor, error])
+  }, [observerTarget, hasMore, cursor, error, userId])
 
   return (
     <div>
