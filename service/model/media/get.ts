@@ -2,9 +2,9 @@ import { addLovesToMediaList, mediaPermissionFactory } from './helpers'
 import { MEDIA_INCLUDE_QUERY } from '@/service/config'
 import db, { ContentStatus, User } from '@/service/db'
 import { PrettifyPick } from '@/service/utils'
-import { FeaturedMediaOptions } from './types'
 import ReqErr from '@/service/ReqError'
 import { userPermissionFactory } from '../helpers'
+import { FeaturedMediaOptions } from '@/service/types'
 
 export async function getMedia(
   id: string,

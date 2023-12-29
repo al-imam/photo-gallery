@@ -1,8 +1,22 @@
-import { Media, MediaReaction, User } from '@prisma/client'
+import { ContentStatus, Media, MediaReaction, User } from '@prisma/client'
 import { Prettify } from '@/types'
 import db from '@/service/db'
 import { MediaPopulated, MediaWithLoves } from '@/service/types'
 import { PrettifyPick } from '@/service/utils'
+import r from 'rype'
+
+export const mediaInputSchema = r.object({
+  note: r.string().optional(),
+  title: r.string().optional(),
+  categoryId: r.string().optional(),
+  newCategory: r.string().optional(),
+  description: r.string().optional(),
+  tags: r.array(r.string()).optional(),
+  status: r.fixed('PENDING' as ContentStatus),
+})
+
+let a = {} as keyof r.inferOutput<typeof mediaInputSchema>
+a satisfies keyof Media
 
 export function mediaPermissionFactory(
   media: PrettifyPick<Media, 'authorId' | 'status'>

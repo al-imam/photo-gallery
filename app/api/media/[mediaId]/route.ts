@@ -2,9 +2,8 @@ import { Media } from '@prisma/client'
 import { authRouter, router } from '@/server/next/router'
 import service from '@/service'
 import { NextResponse } from 'next/server'
-import { UpdateMediaBody } from '@/service/model/media/types'
 import { sendMediaWithLoves, setMedia } from '@/server/next/middlewares/media'
-import { MediaWithLoves } from '@/service/types'
+import { MediaWithLoves, UpdateMediaBody } from '@/service/types'
 
 export type GetData = { media: MediaWithLoves }
 export const GET = router(setMedia, sendMediaWithLoves)

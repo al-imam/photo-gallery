@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server'
 import service from '@/service'
 import { optionalAuthRouter } from '@/server/next/router'
 import { queryToNumber } from '@/server/next/utils'
-import { FeaturedMediaOptions } from '@/service/model/media/types'
 import { ContentStatus } from '@prisma/client'
+import { FeaturedMediaOptions } from '@/service/types'
 
 export type GetQuery = Partial<Record<keyof FeaturedMediaOptions, string>>
 export type GetData = {

@@ -2,8 +2,8 @@ import { findOrCreateCategory, mediaPermissionFactory } from './helpers'
 import { MEDIA_INCLUDE_QUERY } from '@/service/config'
 import db, { Media, User } from '@/service/db'
 import { PrettifyPick } from '@/service/utils'
-import { UpdateMediaBody } from './types'
 import ReqErr from '@/service/ReqError'
+import { UpdateMediaBody } from '@/service/types'
 
 export async function updateMedia(
   user: PrettifyPick<User, 'id' | 'status'>,
