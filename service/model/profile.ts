@@ -8,7 +8,7 @@ import ReqErr from '../ReqError'
 export type UpdateProfileBody = PrettifyPick<Profile, never, 'bio' | 'location'>
 export async function updateProfile(userId: string, body: UpdateProfileBody) {
   const profile = await db.profile.update({
-    where: { userId: userId },
+    where: { userId },
     data: { ...pick(body, 'bio', 'location') },
   })
 
@@ -54,7 +54,7 @@ export async function updateSocialLinks(
   body: UpdateSocialLinkBody
 ) {
   const link = await db.profileLink.update({
-    where: { id: linkId, userId: userId },
+    where: { id: linkId, userId },
     data: pick(body, 'type', 'url'),
   })
 
@@ -65,7 +65,7 @@ export async function updateSocialLinks(
 
 export async function removeSocialLink(userId: string, linkId: string) {
   const link = await db.profileLink.delete({
-    where: { id: linkId, userId: userId },
+    where: { id: linkId, userId },
   })
 
   if (!link) throw new ReqErr('Link not found.')
