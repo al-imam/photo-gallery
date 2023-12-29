@@ -4,13 +4,17 @@ import { PrettifyPick } from '../utils'
 import mail from '../mail'
 import ReqErr from '../ReqError'
 
-export function fetchById(id: string) {
-  return db.user.findUnique({ where: { id } })
+export function fetchById<T extends boolean = false>(id: string, profile?: T) {
+  return db.user.findUniqueOrThrow({ where: { id }, include: { profile } })
 }
 
-export function fetchByUsername(username: string) {
+export function fetchByUsername<T extends boolean = false>(
+  username: string,
+  profile?: T
+) {
   return db.user.findUniqueOrThrow({
     where: { username },
+    include: { profile },
   })
 }
 
