@@ -22,7 +22,7 @@ export const PATCH = authRouter(
 export type PostBody = { newEmail: string }
 export type PostData = { message: string }
 export const POST = authRouter(async (req, ctx) => {
-  const { newEmail } = await req.json<PostBody>()
+  const { newEmail } = ctx.body<PostBody>()
   await service.user.requestEmailChange(ctx.user, newEmail)
   return NextResponse.json<PostData>({
     message: 'Check your email',

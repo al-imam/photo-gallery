@@ -19,7 +19,7 @@ export const PATCH = authRouter(
     const media = await service.media.updateMedia(
       ctx.user,
       ctx.media,
-      await req.json<PatchBody>()
+      ctx.body<PatchBody>()
     )
 
     ctx.media = media

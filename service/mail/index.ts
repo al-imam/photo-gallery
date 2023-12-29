@@ -49,6 +49,7 @@ export default {
 
   sendResetToken(to: string, token: string) {
     const url = `${env.VERCEL_URL}/reset-password/complete?token=${token}`
+    console.log(to, token)
 
     return mail(
       to,
@@ -68,6 +69,7 @@ export default {
 
   sendChangeEmailToken(to: string, token: string) {
     const url = `${env.VERCEL_URL}/change-email/complete?token=${token}`
+    console.log(to, token)
 
     return mail(
       to,
@@ -87,6 +89,7 @@ export default {
 
   sendPublicEmailToken(to: string, token: string) {
     const url = `${env.VERCEL_URL}/public-email/complete?token=${token}`
+    console.log(to, token)
 
     return mail(
       to,

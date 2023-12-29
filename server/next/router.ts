@@ -15,10 +15,10 @@ export const router = Router.create<NextHandler>({
 
       try {
         if (contentType?.includes('application/json')) {
-          const body = await req.json()
+          const body = await (req as any).json()
           ctx.body = () => body
         } else {
-          throw new Error('Invalid content')
+          throw void 0
         }
       } catch {
         ctx.body<null> = () => null

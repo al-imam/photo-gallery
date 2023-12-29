@@ -1,5 +1,4 @@
 import { optionalAuthRouter } from '@/server/next/router'
-import service from '@/service'
 import ReqErr from '@/service/ReqError'
 import { USER_PUBLIC_FIELDS } from '@/service/config'
 import db from '@/service/db'
@@ -17,10 +16,16 @@ export const GET = optionalAuthRouter(async (_, ctx) => {
 
   const isMe = ctx.user && (username === ctx.user.username || username === '@')
   const user = !isMe
-    ? await service.user.fetchByUsername(username, true)
+    ? await db.user.findUniqueOrThrow({
+        where: { username },
+        include: { profile: { include: { social_links: true } } },
+      })
     : {
         ...ctx.user!,
-        profile: await db.profile.findUnique({ where: { id: ctx.user!.id } }),
+        profile: await db.profile.findUnique({
+          where: { id: ctx.user!.id },
+          include: { social_links: true },
+        }),
       }
 
   return NextResponse.json<GetBody>({
