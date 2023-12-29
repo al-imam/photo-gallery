@@ -1,4 +1,4 @@
-import { Media, MediaCategory, User } from '@prisma/client'
+import { ContentStatus, Media, MediaCategory, User } from '@prisma/client'
 import { NextRequest } from 'next/server'
 import { NextFunction } from 'router13'
 import { USER_PUBLIC_FIELDS } from './config'
@@ -45,4 +45,47 @@ export type JWTPayload = {
     id: string
     email: string
   }
+}
+
+export type UpdateMediaBody = PrettifyPick<
+  Media,
+  never,
+  | 'title'
+  | 'description'
+  | 'note'
+  | 'media_hasGraphicContent'
+  | 'newCategory'
+  | 'tags'
+  | 'categoryId'
+  | 'status'
+> & { moderatorNote?: string }
+
+export type FeaturedMediaOptions = {
+  cursor?: string
+  limit?: number
+  category?: string
+  authorId?: string
+  status?: ContentStatus
+}
+
+export type DiscordCustomAttachment = {
+  url: string
+  height: number
+  width: number
+  size: number
+}
+
+export type DiscordMediaUploadResult = {
+  id: string
+  channel: string
+  media: DiscordCustomAttachment
+  thumbnail: DiscordCustomAttachment
+}
+
+export type DiscordAvatarUploadResult = {
+  id: string
+  channel: string
+  avatar_sm: DiscordCustomAttachment
+  avatar_md: DiscordCustomAttachment
+  avatar_lg: DiscordCustomAttachment
 }

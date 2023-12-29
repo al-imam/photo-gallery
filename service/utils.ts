@@ -1,3 +1,6 @@
+import { Attachment } from 'discord.js'
+import { DiscordCustomAttachment } from './types'
+
 export type Prettify<T extends object> = {
   [Key in keyof T]: T[Key]
 } & {}
@@ -30,4 +33,15 @@ export function createIncludeQuery<T extends readonly string[]>(args: T) {
   return Object.fromEntries(args.map((a) => [a, true])) as Prettify<
     Record<T[number], true>
   >
+}
+
+export function extractAttachment(
+  attachment: Attachment
+): DiscordCustomAttachment {
+  return {
+    url: `${attachment.id}/${attachment.name}`,
+    height: attachment.height!,
+    width: attachment.width!,
+    size: attachment.size,
+  }
 }

@@ -1,3 +1,8 @@
+import discord, { getDiscordChannel } from "@/service/discord"
+import env from "@/service/env"
+import { DiscordMediaUploadResult } from "@/service/types"
+import { extractAttachment } from "@/service/utils"
+
 export async function getImages(length: number) {
   const promises = new Array(length)
     .fill(0)
@@ -22,4 +27,39 @@ export function getRandomItems<T extends any[], N extends number>(
   }
 
   return copyArray.slice(0, n) as any
+}
+
+export async function fetchMessages(remaining: number) {
+  const messages: DiscordMediaUploadResult[] = []
+  const channel = await getDiscordChannel(env.DISCORD_CHANNEL_MEDIA)
+
+  while (remaining) {
+    const rawMessages = await channel.messages.fetch({
+      limit: remaining < 100 ? remaining : 100,
+    })
+
+    if (!rawMessages.size) break
+    rawMessages.forEach((message) => {
+      const [media, thumbnail] = message.attachments.map(extractAttachment)
+
+      remaining--
+      messages.push({
+        id: message.id,
+        channel: message.channel.id,
+        media: media,
+        thumbnail: thumbnail,
+      })
+    })
+  }
+
+  if (remaining) {
+    const imageBuffers = await getImages(remaining)
+    for (let buffer of imageBuffers) {
+      const message = await discord.uploadMedia(buffer)
+      remaining--
+      messages.push(message)
+    }
+  }
+
+  return messages
 }

@@ -1,64 +1,17 @@
-import { Media, User } from '@prisma/client'
-import { mediaInputSchema } from './config'
-import ReqErr from '@/service/ReqError'
+import r from 'rype'
+import { User } from '@prisma/client'
 import db from '@/service/db'
 import discord from '@/service/discord'
-import { MEDIA_INCLUDE_QUERY, USER_SAFE_FIELDS_QUERY } from '@/service/config'
-import { MediaWithLoves } from '@/service/types'
+import { USER_SAFE_FIELDS_QUERY } from '@/service/config'
+import { createMediaFactory } from '@/service/model/media'
+import { mediaInputSchema } from '@/service/model/media/helpers'
 
 export async function uploadMedia(
   user: Pick<User, 'id' | 'status'>,
   buffer: Buffer,
-  reqBody: Partial<Media>
+  reqBody: r.inferInput<typeof mediaInputSchema>
 ) {
-  const body = mediaInputSchema.parse(reqBody)
-  if (body.newCategory && body.categoryId) {
-    throw new ReqErr('Cannot provide both newCategory and categoryId')
-  }
-
-  if (
-    user.status === 'VERIFIED' ||
-    user.status === 'MODERATOR' ||
-    user.status === 'ADMIN'
-  ) {
-    if (body.newCategory) {
-      const name = body.newCategory.toLowerCase()
-      const category =
-        (await db.mediaCategory.findFirst({ where: { name } })) ??
-        (await db.mediaCategory.create({ data: { name } }))
-
-      body.categoryId = category.id
-    }
-
-    body.status = 'APPROVED'
-    delete body.newCategory
-    delete body.note
-  }
-
-  const result = await discord.uploadMedia(buffer)
-  const media = await db.media.create({
-    data: {
-      ...body,
-
-      authorId: user.id,
-      messageId: result.id,
-
-      media_size: result.media.size,
-      media_width: result.media.width,
-      media_height: result.media.height,
-
-      url_media: result.media.url,
-      url_thumbnail: result.thumbnail.url,
-    },
-    include: MEDIA_INCLUDE_QUERY,
-  })
-
-  return {
-    ...media,
-    isLoved: false,
-    loves: 0,
-    messageId: undefined as never,
-  } as MediaWithLoves
+  return createMediaFactory(reqBody)(user, await discord.uploadMedia(buffer))
 }
 
 export async function putAvatar(
