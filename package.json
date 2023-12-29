@@ -10,6 +10,7 @@
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write .",
     "type-check": "tsc --noEmit",
+    "type-watch": "tsc --noEmit --watch",
     "prisma": "prisma db push",
     "demo": "ts-node -r tsconfig-paths/register ./demo/index.ts",
     "demo:dev": "nodemon -r tsconfig-paths/register ./demo/index.ts",

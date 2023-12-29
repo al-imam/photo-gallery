@@ -18,10 +18,8 @@ export function fetchByUsername<T extends boolean = false>(
   })
 }
 
-export async function create(
-  token: string,
-  data: PrettifyPick<User, 'name' | 'password'>
-) {
+export type UserCreateBody = PrettifyPick<User, 'name' | 'password'>
+export async function create(token: string, data: UserCreateBody) {
   const { payload: email } = await hash.jwt.verify('signup-email', token)
 
   const user = await db.user.create({
@@ -41,13 +39,13 @@ export async function create(
   return user
 }
 
-export function update(
-  userId: string,
-  data: PrettifyPick<User, never, 'name'>
-) {
+export type UserUpdateBody = PrettifyPick<User, never, 'name'>
+export function update(userId: string, data: UserUpdateBody) {
   return db.user.update({
     where: { id: userId },
-    data,
+    data: {
+      name: data.name,
+    },
   })
 }
 

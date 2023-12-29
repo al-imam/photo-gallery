@@ -10,7 +10,7 @@ type ModifiedNextRequest = NextRequest & {
 
 export type NextHandler<T = {}> = (
   req: ModifiedNextRequest,
-  ctx: Record<string, any> & T,
+  ctx: Record<string, any> & { params: Record<string, string | undefined> } & T,
   next: NextFunction
 ) => void
 
