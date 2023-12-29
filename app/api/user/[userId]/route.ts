@@ -3,12 +3,12 @@ import ReqErr from '@/service/ReqError'
 import { USER_PUBLIC_FIELDS } from '@/service/config'
 import db from '@/service/db'
 import { pick } from '@/service/utils'
-import { Profile, User } from '@prisma/client'
+import { Profile, ProfileLink, User } from '@prisma/client'
 import { NextResponse } from 'next/server'
 
 export type GetBody = {
   user: Pick<User, (typeof USER_PUBLIC_FIELDS)[number]>
-  profile: Profile
+  profile: Profile & { links: ProfileLink[] }
 }
 export const GET = optionalAuthRouter(async (_, ctx) => {
   const username = ctx.params.userId
@@ -18,13 +18,13 @@ export const GET = optionalAuthRouter(async (_, ctx) => {
   const user = !isMe
     ? await db.user.findUniqueOrThrow({
         where: { username },
-        include: { profile: { include: { social_links: true } } },
+        include: { profile: { include: { links: true } } },
       })
     : {
         ...ctx.user!,
         profile: await db.profile.findUnique({
-          where: { id: ctx.user!.id },
-          include: { social_links: true },
+          where: { userId: ctx.user!.id },
+          include: { links: true },
         }),
       }
 

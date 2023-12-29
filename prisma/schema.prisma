@@ -27,26 +27,27 @@ model User {
 }
 
 model Profile {
-  id        String   @id @db.Uuid()
+  userId    String   @id @db.Uuid()
   createdAt DateTime @default(now())
 
-  bio          String?              @db.VarChar(200)
-  location     String?              @db.VarChar(48)
-  email String?
-  social_links ProfileSocialLinks[] @relation("ProfileSocialLinks")
+  bio      String?              @db.VarChar(200)
+  location String?              @db.VarChar(48)
+  email    String?
+  links    ProfileLink[] @relation("ProfileLink")
 
-  ZZZ_USER User? @relation(fields: [id], references: [id], onDelete: Cascade)
+  ZZZ_USER User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model ProfileSocialLinks {
+model ProfileLink {
   id        String   @id @default(uuid()) @db.Uuid()
+  userId    String   @db.Uuid()
   createdAt DateTime @default(now())
-  profileId String   @db.Uuid()
 
   type ProfileLinkType @default(OTHER)
   url  String          @db.VarChar(48)
 
-  Profile Profile? @relation("ProfileSocialLinks", fields: [profileId], references: [id], onDelete: Cascade)
+  Z_PROFILE Profile @relation("ProfileLink", fields: [userId], references: [userId], onDelete: Cascade)
+	@@map("ProfileLink")
 }
 
 model Media {
@@ -194,7 +195,7 @@ enum ContentStatus {
 }
 
 enum MediaReportType {
-  NOT_PALESTINIAN
+  IRRELEVANT
   GRAPHIC_CONTENT
   ADULT_CONTENT
   INAPPROPRIATE
