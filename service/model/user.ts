@@ -18,10 +18,8 @@ export function fetchByUsername<T extends boolean = false>(
   })
 }
 
-export async function create(
-  token: string,
-  data: PrettifyPick<User, 'name' | 'password'>
-) {
+export type UserCreateBody = PrettifyPick<User, 'name' | 'password'>
+export async function create(token: string, data: UserCreateBody) {
   const { payload: email } = await hash.jwt.verify('signup-email', token)
 
   const user = await db.user.create({
@@ -41,13 +39,13 @@ export async function create(
   return user
 }
 
-export function update(
-  userId: string,
-  data: PrettifyPick<User, never, 'name'>
-) {
+export type UserUpdateBody = PrettifyPick<User, never, 'name'>
+export function update(userId: string, data: UserUpdateBody) {
   return db.user.update({
     where: { id: userId },
-    data,
+    data: {
+      name: data.name,
+    },
   })
 }
 
@@ -63,7 +61,7 @@ export async function requestEmailChange(
   if (count) throw new ReqErr('Email already exists')
 
   const token = await hash.jwt.sign('change-email', {
-    id: user.id,
+    userId: user.id,
     newEmail,
   })
 
@@ -72,11 +70,13 @@ export async function requestEmailChange(
 
 export async function confirmEmailChange(token: string) {
   const { payload, iatVerify } = await hash.jwt.verify('change-email', token)
-  const user = await db.user.findUniqueOrThrow({ where: { id: payload.id } })
+  const user = await db.user.findUniqueOrThrow({
+    where: { id: payload.userId },
+  })
   iatVerify(user.authModifiedAt)
 
   return db.user.update({
-    where: { id: payload.id, email: payload.newEmail },
+    where: { id: payload.userId, email: payload.newEmail },
     data: { email: payload.newEmail, authModifiedAt: new Date() },
   })
 }
@@ -84,7 +84,7 @@ export async function confirmEmailChange(token: string) {
 export async function requestPasswordReset(email: string) {
   const user = await db.user.findUniqueOrThrow({ where: { email } })
   const token = await hash.jwt.sign('reset-password', {
-    id: user.id,
+    userId: user.id,
     email: user.email,
   })
 
@@ -94,7 +94,7 @@ export async function requestPasswordReset(email: string) {
 export async function confirmPasswordReset(token: string, newPassword: string) {
   const { payload, iatVerify } = await hash.jwt.verify('reset-password', token)
   const user = await db.user.findUniqueOrThrow({
-    where: { id: payload.id, email: payload.email },
+    where: { id: payload.userId, email: payload.email },
   })
   iatVerify(user.authModifiedAt)
 

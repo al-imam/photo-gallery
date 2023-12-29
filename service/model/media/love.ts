@@ -1,4 +1,4 @@
-import db from "@/service/db"
+import db from '@/service/db'
 
 export async function createLove(userId: string, mediaId: string) {
   return db.mediaReaction.create({

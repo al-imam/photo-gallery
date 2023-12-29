@@ -8,7 +8,7 @@ export type GetData = { report: MediaReport }
 export const GET = authRouter(async (_, ctx) => {
   const report = await service.media.getReportForMedia(
     ctx.user.id,
-    ctx.params.mediaId
+    ctx.params.mediaId!
   )
 
   return NextResponse.json<GetData>({ report })
@@ -19,7 +19,7 @@ export type PostData = { report: MediaReport }
 export const POST = authRouter(async (req, ctx) => {
   const report = await service.media.createReport(
     ctx.user.id,
-    ctx.params.mediaId,
+    ctx.params.mediaId!,
     await req.json()
   )
 

@@ -1,38 +1,25 @@
 import {
   sendUserAndToken,
-  SendUserAndToken,
-  setTokenFromQuery,
+  SendUserAndTokenData,
 } from '@/server/next/middlewares/auth'
 import { authRouter, router } from '@/server/next/router'
 import service from '@/service'
+import { UserCreateBody, UserUpdateBody } from '@/service/model/user'
 
-export type GetData = SendUserAndToken
+export type GetData = SendUserAndTokenData
 export const GET = authRouter(sendUserAndToken)
 
-export type PostQuery = { token: string }
-export type PostBody = PostQuery & { name: string; password: string }
-export type PostData = SendUserAndToken
-export const POST = router(
-  setTokenFromQuery,
-  async (req, ctx, next) => {
-    const { name, password, token } = await req.json<PostBody>()
-    ctx.user = await service.user.create(ctx.token ?? token, {
-      name,
-      password,
-    })
+export type PostBody = UserCreateBody & { token: string }
+export type PostData = SendUserAndTokenData
+export const POST = router(async (_, ctx, next) => {
+  const body = ctx.body<PostBody>()
+  ctx.user = await service.user.create(body.token, body)
+  return next()
+}, sendUserAndToken)
 
-    return next()
-  },
-  sendUserAndToken
-)
-
-export type PatchBody = { name?: string }
-export type PatchData = SendUserAndToken
+export type PatchBody = UserUpdateBody
+export type PatchData = SendUserAndTokenData
 export const PATCH = authRouter(async (req, ctx, next) => {
-  const { name } = await req.json<PatchBody>()
-  ctx.user = await service.user.update(ctx.token, {
-    name,
-  })
-
+  ctx.user = await service.user.update(ctx.user.id, await req.json<PatchBody>())
   return next()
 }, sendUserAndToken)

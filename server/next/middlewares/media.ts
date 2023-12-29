@@ -5,7 +5,7 @@ import { MediaWithLoves, NextUserMediaHandler } from '@/service/types'
 import { NextResponse } from 'next/server'
 
 export const setMedia: NextUserMediaHandler = async (_, ctx, next) => {
-  const mediaId = ctx.params.mediaId
+  const { mediaId } = ctx.params
   if (!mediaId) throw new ReqErr('Media id is required')
   ctx.media = await service.media.getMedia(mediaId, ctx.user)
   return next()

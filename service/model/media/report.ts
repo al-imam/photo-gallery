@@ -1,5 +1,5 @@
 import db from '@/service/db'
-import { PrettifyPick } from '@/service/utils'
+import { PrettifyPick, pick } from '@/service/utils'
 import { MediaReport, User } from '@prisma/client'
 import ReqErr from '@/service/ReqError'
 import { userPermissionFactory } from '../helpers'
@@ -36,8 +36,7 @@ export async function createReport(
     data: {
       userId,
       mediaId,
-      type: body.type,
-      message: body.message,
+      ...pick(body, 'type', 'message'),
     },
   })
 }
@@ -59,11 +58,7 @@ export async function updateReport(
       id: reportId,
       userId: typeof user === 'string' ? user : user.id,
     },
-    data: {
-      type: body.type,
-      status: body.status,
-      message: body.message,
-    },
+    data: pick(body, 'type', 'status', 'message'),
   })
 }
 

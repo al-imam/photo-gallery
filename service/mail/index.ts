@@ -84,4 +84,23 @@ export default {
       })
     )
   },
+
+  sendPublicEmailToken(to: string, token: string) {
+    const url = `${env.VERCEL_URL}/public-email/complete?token=${token}`
+
+    return mail(
+      to,
+      'Change your email address',
+      template1({
+        welcome: 'Change Email!',
+        iconUrl: 'https://img.icons8.com/?size=256&id=113805&format=png',
+        hidden: `Please click the link below to change your email address: <a href="${url}">Change email address</a>`,
+        description:
+          'We heard that you want to change your email address. Just press the button below to change your email address.',
+        color: '#F56565',
+        buttonText: 'Change email',
+        buttonLink: url,
+      })
+    )
+  },
 }

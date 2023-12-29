@@ -9,7 +9,7 @@ export type PatchData = { report: MediaReport }
 export const PATCH = authRouter(async (req, ctx) => {
   const report = await service.media.updateReport(
     ctx.user,
-    ctx.params.reportId,
+    ctx.params.reportId!,
     await req.json()
   )
 
@@ -17,6 +17,6 @@ export const PATCH = authRouter(async (req, ctx) => {
 })
 
 export const DELETE = authRouter(async (_, ctx) => {
-  await service.media.deleteReport(ctx.user, ctx.params.reportId)
+  await service.media.deleteReport(ctx.user, ctx.params.reportId!)
   return NextResponse.json(null)
 })

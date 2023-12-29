@@ -1,9 +1,21 @@
-import { findOrCreateCategory, mediaPermissionFactory } from './helpers'
 import { MEDIA_INCLUDE_QUERY } from '@/service/config'
 import db, { Media, User } from '@/service/db'
-import { PrettifyPick } from '@/service/utils'
+import { PrettifyPick, pick } from '@/service/utils'
 import ReqErr from '@/service/ReqError'
-import { UpdateMediaBody } from '@/service/types'
+import { findOrCreateCategory, mediaPermissionFactory } from './helpers'
+
+export type UpdateMediaBody = PrettifyPick<
+  Media,
+  never,
+  | 'title'
+  | 'description'
+  | 'note'
+  | 'media_hasGraphicContent'
+  | 'newCategory'
+  | 'tags'
+  | 'categoryId'
+  | 'status'
+> & { moderatorNote?: string }
 
 export async function updateMedia(
   user: PrettifyPick<User, 'id' | 'status'>,
@@ -44,16 +56,17 @@ export async function updateMedia(
 
   const media = await db.media.update({
     where: { id: oldMedia.id },
-    data: {
-      title: body.title,
-      description: body.description,
-      note: body.note,
-      media_hasGraphicContent: body.media_hasGraphicContent,
-      categoryId: body.categoryId,
-      newCategory: body.newCategory,
-      tags: body.tags,
-      status: body.status,
-    },
+    data: pick(
+      body,
+      'title',
+      'description',
+      'note',
+      'tags',
+      'status',
+      'media_hasGraphicContent',
+      'categoryId',
+      'newCategory'
+    ),
     include: MEDIA_INCLUDE_QUERY,
   })
 
