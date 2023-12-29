@@ -11,18 +11,17 @@ export type GetBody = {
   user: Pick<User, (typeof USER_PUBLIC_FIELDS)[number]>
   profile: Profile
 }
-
 export const GET = optionalAuthRouter(async (_, ctx) => {
   const username = ctx.params.userId
   if (!username) throw new ReqErr('Missing username')
 
-  const user =
-    ctx.user && ctx.user.username === username
-      ? {
-          ...ctx.user,
-          profile: await db.profile.findUnique({ where: { id: ctx.user.id } }),
-        }
-      : await service.user.fetchByUsername(username, true)
+  const isMe = ctx.user && (username === ctx.user.username || username === '@')
+  const user = !isMe
+    ? await service.user.fetchByUsername(username, true)
+    : {
+        ...ctx.user!,
+        profile: await db.profile.findUnique({ where: { id: ctx.user!.id } }),
+      }
 
   return NextResponse.json<GetBody>({
     user: { ...pick(user, ...USER_PUBLIC_FIELDS) },
