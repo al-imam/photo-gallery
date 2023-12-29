@@ -4,7 +4,6 @@ import db, { ContentStatus, User } from '@/service/db'
 import { PrettifyPick } from '@/service/utils'
 import ReqErr from '@/service/ReqError'
 import { userPermissionFactory } from '../helpers'
-import { FeaturedMediaOptions } from '@/service/types'
 
 export async function getMedia(
   id: string,
@@ -19,9 +18,16 @@ export async function getMedia(
   throw new ReqErr('Media not found')
 }
 
+export type MediaListOptions = {
+  cursor?: string
+  limit?: number
+  category?: string
+  authorId?: string
+  status?: ContentStatus
+}
 export async function getLatestMediaList(
   user?: PrettifyPick<User, 'id' | 'status'>,
-  options: FeaturedMediaOptions = {}
+  options: MediaListOptions = {}
 ) {
   if (
     options.status &&

@@ -61,7 +61,7 @@ export async function requestEmailChange(
   if (count) throw new ReqErr('Email already exists')
 
   const token = await hash.jwt.sign('change-email', {
-    id: user.id,
+    userId: user.id,
     newEmail,
   })
 
@@ -70,11 +70,11 @@ export async function requestEmailChange(
 
 export async function confirmEmailChange(token: string) {
   const { payload, iatVerify } = await hash.jwt.verify('change-email', token)
-  const user = await db.user.findUniqueOrThrow({ where: { id: payload.id } })
+  const user = await db.user.findUniqueOrThrow({ where: { id: payload.userId } })
   iatVerify(user.authModifiedAt)
 
   return db.user.update({
-    where: { id: payload.id, email: payload.newEmail },
+    where: { id: payload.userId, email: payload.newEmail },
     data: { email: payload.newEmail, authModifiedAt: new Date() },
   })
 }
@@ -82,7 +82,7 @@ export async function confirmEmailChange(token: string) {
 export async function requestPasswordReset(email: string) {
   const user = await db.user.findUniqueOrThrow({ where: { email } })
   const token = await hash.jwt.sign('reset-password', {
-    id: user.id,
+    userId: user.id,
     email: user.email,
   })
 
@@ -92,7 +92,7 @@ export async function requestPasswordReset(email: string) {
 export async function confirmPasswordReset(token: string, newPassword: string) {
   const { payload, iatVerify } = await hash.jwt.verify('reset-password', token)
   const user = await db.user.findUniqueOrThrow({
-    where: { id: payload.id, email: payload.email },
+    where: { id: payload.userId, email: payload.email },
   })
   iatVerify(user.authModifiedAt)
 

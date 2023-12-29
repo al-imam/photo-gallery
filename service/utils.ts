@@ -23,7 +23,8 @@ export function pick<T extends object, K extends keyof T>(
 ) {
   const newObj: any = {}
   keys.forEach((key) => {
-    newObj[key] = obj[key]
+    const value = obj[key]
+    if (value !== undefined) newObj[key] = value
   })
 
   return newObj as PrettifyPick<T, K>

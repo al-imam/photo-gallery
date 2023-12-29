@@ -8,15 +8,28 @@ type ModifiedNextRequest = NextRequest & {
   json<T = unknown>(): Promise<T>
 }
 
-export type NextHandler<T = {}> = (
-  req: ModifiedNextRequest,
-  ctx: Record<string, any> & { params: Record<string, string | undefined> } & T,
+export type NextHandler<TCtx = {}, TReq = {}> = (
+  req: Omit<ModifiedNextRequest, keyof TReq> & TReq,
+  ctx: Omit<
+    { params: Record<string, string | undefined>; body<B = unknown>(): B },
+    keyof TCtx
+  > &
+    TCtx,
   next: NextFunction
-) => void
+) => any
 
-export type NextUserHandler<T = {}> = NextHandler<{ user: User } & T>
-export type NextOptUserHandler<T = {}> = NextHandler<{ user?: User } & T>
-export type NextUserMediaHandler = NextUserHandler<{ media: MediaPopulated }>
+export type NextUserHandler<T = {}, TReq = {}> = NextHandler<
+  { user: User } & T,
+  TReq
+>
+export type NextOptUserHandler<T = {}, TReq = {}> = NextHandler<
+  { user?: User } & T,
+  TReq
+>
+export type NextUserMediaHandler<T = {}, TReq = {}> = NextUserHandler<
+  { media: MediaPopulated } & T,
+  TReq
+>
 
 export type MediaPopulated = Media & {
   author: PrettifyPick<User, (typeof USER_PUBLIC_FIELDS)[number]>
@@ -34,38 +47,17 @@ export type JWTPayload = {
   cookie: string
   'signup-email': string
   'change-email': {
-    id: string
+    userId: string
     newEmail: string
   }
   'public-email': {
-    id: string
+    userId: string
     publicEmail: string
   }
   'reset-password': {
-    id: string
+    userId: string
     email: string
   }
-}
-
-export type UpdateMediaBody = PrettifyPick<
-  Media,
-  never,
-  | 'title'
-  | 'description'
-  | 'note'
-  | 'media_hasGraphicContent'
-  | 'newCategory'
-  | 'tags'
-  | 'categoryId'
-  | 'status'
-> & { moderatorNote?: string }
-
-export type FeaturedMediaOptions = {
-  cursor?: string
-  limit?: number
-  category?: string
-  authorId?: string
-  status?: ContentStatus
 }
 
 export type DiscordCustomAttachment = {

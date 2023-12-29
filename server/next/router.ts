@@ -9,7 +9,24 @@ import { NextResponse } from 'next/server'
 import errorFormat from '@/service/errorFormat'
 
 export const router = Router.create<NextHandler>({
-  middleware: [],
+  middleware: [
+    async (req, ctx, next) => {
+      const contentType = req.headers.get('content-type')
+
+      try {
+        if (contentType?.includes('application/json')) {
+          const body = await req.json()
+          ctx.body = () => body
+        } else {
+          throw new Error('Invalid content')
+        }
+      } catch {
+        ctx.body<null> = () => null
+      }
+
+      return next()
+    },
+  ],
   errorHandler: async (err: any) => {
     const [message, status] = errorFormat(err)
     return NextResponse.json({ error: message.toString() }, { status })
