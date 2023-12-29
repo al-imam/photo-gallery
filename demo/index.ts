@@ -11,6 +11,7 @@ configDotenv()
 const IMAGE_PER_USER = 10
 const REACTION_PER_USER = 50
 const NAME_LIST = [
+  'Nazmus Sayad',
   'Mohammad Rahman',
   'Fatima Khanam',
   'Abul Hasan Chowdhury',
