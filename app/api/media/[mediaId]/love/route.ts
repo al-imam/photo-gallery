@@ -1,4 +1,8 @@
-import { SendMediaWithLovesData, sendMediaWithLoves, setMedia } from '@/server/next/middlewares/media'
+import {
+  setMedia,
+  sendMediaWithLoves,
+  SendMediaWithLovesData,
+} from '@/server/next/middlewares/media'
 import { authRouter } from '@/server/next/router'
 import service from '@/service'
 

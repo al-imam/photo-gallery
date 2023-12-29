@@ -1,7 +1,7 @@
-import { MAX_MEDIA_FILE_SIZE, MAX_AVATAR_FILE_SIZE_HUMAN } from './config'
-import { UserRequest } from './middleware'
 import ReqErr from '@/service/ReqError'
 import { Response } from 'express'
+import { MAX_MEDIA_FILE_SIZE, MAX_AVATAR_FILE_SIZE_HUMAN } from './config'
+import { UserRequest } from './middleware'
 import { putAvatar, uploadMedia } from './service'
 
 export async function createMedia(req: UserRequest, res: Response) {

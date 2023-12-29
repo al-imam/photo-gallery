@@ -7,7 +7,7 @@ import { authRouter, router } from '@/server/next/router'
 import service from '@/service'
 import { UpdateMediaBody } from '@/service/model/media'
 import { NextResponse } from 'next/server'
- 
+
 export type GetData = SendMediaWithLovesData
 export const GET = router(setMedia, sendMediaWithLoves)
 

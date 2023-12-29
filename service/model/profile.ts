@@ -16,7 +16,7 @@ export async function updateProfile(userId: string, body: UpdateProfileBody) {
 
 export async function requestPublicEmail(userId: string, email: string) {
   const token = await jwt.sign('public-email', {
-    userId: userId,
+    userId,
     publicEmail: email,
   })
 

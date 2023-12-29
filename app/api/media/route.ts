@@ -4,7 +4,7 @@ import { optionalAuthRouter } from '@/server/next/router'
 import { queryToNumber } from '@/server/next/utils'
 import { ContentStatus } from '@prisma/client'
 import { MediaListOptions } from '@/service/model/media'
- 
+
 export type GetQuery = Partial<Record<keyof MediaListOptions, string>>
 export type GetData = {
   mediaList: Awaited<ReturnType<typeof service.media.getLatestMediaList>>

@@ -1,8 +1,8 @@
-import { findOrCreateCategory, mediaPermissionFactory } from './helpers'
 import { MEDIA_INCLUDE_QUERY } from '@/service/config'
 import db, { Media, User } from '@/service/db'
 import { PrettifyPick, pick } from '@/service/utils'
 import ReqErr from '@/service/ReqError'
+import { findOrCreateCategory, mediaPermissionFactory } from './helpers'
 
 export type UpdateMediaBody = PrettifyPick<
   Media,

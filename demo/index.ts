@@ -1,12 +1,12 @@
-console.clear()
-
 import { configDotenv } from 'dotenv'
-configDotenv()
 import service from '@/service'
 import db, { Media, User } from '@/service/db'
 import { jwt } from '@/service/hash'
-import { fetchMessages, getRandomItems } from './utils'
 import { createMediaFactory } from '@/service/model/media'
+import { fetchMessages, getRandomItems } from './utils'
+
+console.clear()
+configDotenv()
 
 const IMAGE_PER_USER = 10
 const REACTION_PER_USER = 50
@@ -42,7 +42,7 @@ const NAME_LIST = [
   let iUser = 0
   let iImage = 0
 
-  for (let name of NAME_LIST) {
+  for (const name of NAME_LIST) {
     const user = await service.user.create(
       await jwt.sign('signup-email', `247sayad+${iUser + 1}@gmail.com`),
       { name, password: '123' }
@@ -70,9 +70,9 @@ const NAME_LIST = [
     }
   }
 
-  for (let user of userList) {
+  for (const user of userList) {
     const randomMedia = getRandomItems(mediaList, REACTION_PER_USER)
-    for (let media of randomMedia) {
+    for (const media of randomMedia) {
       await service.media.createLove(user.id, media.id)
       await service.media.createReport(user.id, media.id, {
         type: 'OTHER',

@@ -1,7 +1,7 @@
-import discord, { getDiscordChannel } from "@/service/discord"
-import env from "@/service/env"
-import { DiscordMediaUploadResult } from "@/service/types"
-import { extractAttachment } from "@/service/utils"
+import discord, { getDiscordChannel } from '@/service/discord'
+import env from '@/service/env'
+import { DiscordMediaUploadResult } from '@/service/types'
+import { extractAttachment } from '@/service/utils'
 
 export async function getImages(length: number) {
   const promises = new Array(length)
@@ -46,15 +46,15 @@ export async function fetchMessages(remaining: number) {
       messages.push({
         id: message.id,
         channel: message.channel.id,
-        media: media,
-        thumbnail: thumbnail,
+        media,
+        thumbnail,
       })
     })
   }
 
   if (remaining) {
     const imageBuffers = await getImages(remaining)
-    for (let buffer of imageBuffers) {
+    for (const buffer of imageBuffers) {
       const message = await discord.uploadMedia(buffer)
       remaining--
       messages.push(message)

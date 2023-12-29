@@ -15,7 +15,7 @@ export const mediaInputSchema = r.object({
   status: r.fixed('PENDING' as ContentStatus),
 })
 
-let a = {} as keyof r.inferOutput<typeof mediaInputSchema>
+const a = {} as keyof r.inferOutput<typeof mediaInputSchema>
 a satisfies keyof Media
 
 export function mediaPermissionFactory(

@@ -70,7 +70,9 @@ export async function requestEmailChange(
 
 export async function confirmEmailChange(token: string) {
   const { payload, iatVerify } = await hash.jwt.verify('change-email', token)
-  const user = await db.user.findUniqueOrThrow({ where: { id: payload.userId } })
+  const user = await db.user.findUniqueOrThrow({
+    where: { id: payload.userId },
+  })
   iatVerify(user.authModifiedAt)
 
   return db.user.update({
