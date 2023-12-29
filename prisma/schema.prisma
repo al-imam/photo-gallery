@@ -32,7 +32,7 @@ model Profile {
 
   bio          String?              @db.VarChar(200)
   location     String?              @db.VarChar(48)
-  public_email String?
+  email String?
   social_links ProfileSocialLinks[] @relation("ProfileSocialLinks")
 
   ZZZ_USER User? @relation(fields: [id], references: [id], onDelete: Cascade)

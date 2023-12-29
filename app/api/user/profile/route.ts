@@ -8,7 +8,7 @@ export type PatchData = { profile: UpdateProfileBody }
 export const PATCH = authRouter(async (req, ctx) => {
   const profile = await service.profile.updateProfile(
     ctx.user.id,
-    await req.json()
+    ctx.body()
   )
 
   return NextResponse.json<PatchData>({ profile })

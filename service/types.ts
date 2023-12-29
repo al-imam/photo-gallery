@@ -1,34 +1,24 @@
-import { ContentStatus, Media, MediaCategory, User } from '@prisma/client'
+import { Media, MediaCategory, User } from '@prisma/client'
 import { NextRequest } from 'next/server'
 import { NextFunction } from 'router13'
 import { USER_PUBLIC_FIELDS } from './config'
-import { PrettifyPick } from './utils'
+import { Prettify, PrettifyPick } from './utils'
 
-type ModifiedNextRequest = NextRequest & {
-  json<T = unknown>(): Promise<T>
+type NextCtx = {
+  params: Record<string, string | undefined>
+  body<B = unknown>(): B
 }
 
-export type NextHandler<TCtx = {}, TReq = {}> = (
-  req: Omit<ModifiedNextRequest, keyof TReq> & TReq,
-  ctx: Omit<
-    { params: Record<string, string | undefined>; body<B = unknown>(): B },
-    keyof TCtx
-  > &
-    TCtx,
+export type NextHandler<TCtx = {}> = (
+  req: Omit<NextRequest, 'json' | 'body'>,
+  ctx: Prettify<Omit<NextCtx, keyof TCtx> & TCtx>,
   next: NextFunction
 ) => any
 
-export type NextUserHandler<T = {}, TReq = {}> = NextHandler<
-  { user: User } & T,
-  TReq
->
-export type NextOptUserHandler<T = {}, TReq = {}> = NextHandler<
-  { user?: User } & T,
-  TReq
->
-export type NextUserMediaHandler<T = {}, TReq = {}> = NextUserHandler<
-  { media: MediaPopulated } & T,
-  TReq
+export type NextUserHandler<T = {}> = NextHandler<{ user: User } & T>
+export type NextOptUserHandler<T = {}> = NextHandler<{ user?: User } & T>
+export type NextUserMediaHandler<T = {}> = NextUserHandler<
+  { media: MediaPopulated } & T
 >
 
 export type MediaPopulated = Media & {
@@ -52,7 +42,7 @@ export type JWTPayload = {
   }
   'public-email': {
     userId: string
-    publicEmail: string
+    profileEmail: string
   }
   'reset-password': {
     userId: string

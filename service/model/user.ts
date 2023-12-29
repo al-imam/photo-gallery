@@ -4,18 +4,8 @@ import { PrettifyPick } from '../utils'
 import mail from '../mail'
 import ReqErr from '../ReqError'
 
-export function fetchById<T extends boolean = false>(id: string, profile?: T) {
-  return db.user.findUniqueOrThrow({ where: { id }, include: { profile } })
-}
-
-export function fetchByUsername<T extends boolean = false>(
-  username: string,
-  profile?: T
-) {
-  return db.user.findUniqueOrThrow({
-    where: { username },
-    include: { profile },
-  })
+export function fetchById(id: string) {
+  return db.user.findUniqueOrThrow({ where: { id } })
 }
 
 export type UserCreateBody = PrettifyPick<User, 'name' | 'password'>
@@ -43,9 +33,7 @@ export type UserUpdateBody = PrettifyPick<User, never, 'name'>
 export function update(userId: string, data: UserUpdateBody) {
   return db.user.update({
     where: { id: userId },
-    data: {
-      name: data.name,
-    },
+    data: { name: data.name },
   })
 }
 

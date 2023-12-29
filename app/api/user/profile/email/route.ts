@@ -1,18 +1,22 @@
 import { authRouter, router } from '@/server/next/router'
 import service from '@/service'
-import { Profile } from '@prisma/client'
+import ReqErr from '@/service/ReqError'
+import { Profile, ProfileSocialLinks } from '@prisma/client'
 import { NextResponse } from 'next/server'
 
-export type PostBody = { email: string }
+export type PostBody = { newEmail: string }
 export type PostData = { message: string }
-export const POST = authRouter(async (req, ctx) => {
-  const { email } = await req.json<PostBody>()
-  await service.profile.requestPublicEmail(ctx.user.id, email)
+export const POST = authRouter(async (_, ctx) => {
+  const { newEmail } = ctx.body<PostBody>()
+  if (!newEmail) throw new ReqErr('Invalid email')
+  await service.profile.requestPublicEmail(ctx.user.id, newEmail)
   return NextResponse.json<PostData>({ message: 'Email sent' })
 })
 
 export type PatchBody = { token: string }
-export type PatchData = { profile: Profile }
+export type PatchData = {
+  profile: Profile & { social_links: ProfileSocialLinks[] }
+}
 export const PATCH = router(async (_, ctx) => {
   const body = ctx.body<PatchBody>()
   const profile = await service.profile.confirmPublicEmail(body.token)

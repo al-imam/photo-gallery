@@ -20,7 +20,7 @@ export const POST = authRouter(async (req, ctx) => {
   const report = await service.media.createReport(
     ctx.user.id,
     ctx.params.mediaId!,
-    await req.json()
+    ctx.body()
   )
 
   return NextResponse.json<PostData>({ report })

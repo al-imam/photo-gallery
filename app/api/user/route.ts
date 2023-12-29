@@ -20,6 +20,6 @@ export const POST = router(async (_, ctx, next) => {
 export type PatchBody = UserUpdateBody
 export type PatchData = SendUserAndTokenData
 export const PATCH = authRouter(async (req, ctx, next) => {
-  ctx.user = await service.user.update(ctx.user.id, await req.json<PatchBody>())
+  ctx.user = await service.user.update(ctx.user.id, ctx.body<PatchBody>())
   return next()
 }, sendUserAndToken)
