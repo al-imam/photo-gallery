@@ -1,7 +1,7 @@
 import { authRouter, router } from '@/server/next/router'
 import service from '@/service'
 import ReqErr from '@/service/ReqError'
-import { Profile, ProfileSocialLinks } from '@prisma/client'
+import { Profile, ProfileLink } from '@prisma/client'
 import { NextResponse } from 'next/server'
 
 export type PostBody = { newEmail: string }
@@ -15,7 +15,7 @@ export const POST = authRouter(async (_, ctx) => {
 
 export type PatchBody = { token: string }
 export type PatchData = {
-  profile: Profile & { social_links: ProfileSocialLinks[] }
+  profile: Profile & { links: ProfileLink[] }
 }
 export const PATCH = router(async (_, ctx) => {
   const body = ctx.body<PatchBody>()

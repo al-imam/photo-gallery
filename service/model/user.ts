@@ -22,7 +22,7 @@ export async function create(token: string, data: UserCreateBody) {
 
   await db.profile.create({
     data: {
-      id: user.id,
+      userId: user.id,
     },
   })
 
