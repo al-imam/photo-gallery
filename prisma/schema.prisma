@@ -122,11 +122,12 @@ model BookMark {
   id        String   @id @default(uuid()) @db.Uuid()
   createdAt DateTime @default(now())
   userId    String   @db.Uuid()
-
-  mediaId String @db.Uuid()
+  mediaId   String   @db.Uuid()
 
   Z_USER  User   @relation("Bookmark", fields: [userId], references: [id], onDelete: Cascade)
   Z_MEDIA Media? @relation("Bookmark", fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, mediaId])
 }
 
 model Notification {
