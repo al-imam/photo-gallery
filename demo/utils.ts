@@ -3,16 +3,6 @@ import env from '@/service/env'
 import { DiscordMediaUploadResult } from '@/service/types'
 import { extractAttachment } from '@/service/utils'
 
-export async function getImages(length: number) {
-  const promises = new Array(length)
-    .fill(0)
-    .map(() => fetch('https://source.unsplash.com/random/?palestine'))
-
-  const responses = await Promise.all(promises)
-  const buffers = await Promise.all(responses.map((res) => res.arrayBuffer()))
-  return buffers.map((buffer) => Buffer.from(buffer))
-}
-
 export function getRandomItems<T extends any[], N extends number>(
   array: T,
   n: N
@@ -52,14 +42,11 @@ export async function fetchMessages(remaining: number) {
     })
   }
 
-  if (remaining) {
-    const imageBuffers = await getImages(remaining)
-    for (const buffer of imageBuffers) {
-      const message = await discord.uploadMedia(buffer)
-      remaining--
-      messages.push(message)
-    }
-  }
-
   return messages
+}
+
+export async function uploadMessage() {
+  const response = await fetch('https://source.unsplash.com/random/?palestine')
+  const buffer = await response.arrayBuffer()
+  return discord.uploadMedia(Buffer.from(buffer))
 }

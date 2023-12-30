@@ -1,4 +1,3 @@
-import Discord, { TextChannel } from 'discord.js'
 import {
   Attachment,
   generateMedia,
@@ -7,8 +6,9 @@ import {
 } from './image'
 import env from './env'
 import ReqErr from './ReqError'
-import { DiscordAvatarUploadResult, DiscordMediaUploadResult } from './types'
 import { extractAttachment } from './utils'
+import Discord, { TextChannel } from 'discord.js'
+import { DiscordAvatarUploadResult, DiscordMediaUploadResult } from './types'
 
 const client = new Discord.Client({ intents: [] })
 client.login(env.DISCORD_TOKEN)

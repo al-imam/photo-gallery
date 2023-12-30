@@ -8,9 +8,9 @@ import Link from 'next/link'
 import Marquee from 'react-fast-marquee'
 
 export default async function Home() {
-  const { data: res } = await GET<GetData>('media', {
-    params: { limit: 50 },
-  })
+  // const { data: res } = await GET<GetData>('media', {
+  //   params: { limit: 50 },
+  // })
 
   return (
     <div className="content relative isolate min-h-[200vh] overflow-hidden bg-background">
@@ -56,8 +56,8 @@ export default async function Home() {
 
       <main className="pb-6">
         <InfiniteScroll
-          initialItems={res.mediaList}
-          cursor={res.mediaList?.at(-1)?.id}
+          initialItems={[]}
+          cursor={undefined}
         />
       </main>
     </div>
