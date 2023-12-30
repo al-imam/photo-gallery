@@ -22,10 +22,10 @@ export default function errorFormat(err: any): [string, number] {
     if ('code' in err)
       switch (err.code) {
         case 'P2002':
-          return ['This already exists!', 409]
+          return [message, 409]
 
         case 'P2025':
-          return ['This does not exist!', 404]
+          return [message, 404]
       }
 
     return [message, 400]

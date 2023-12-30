@@ -34,6 +34,7 @@ const NAME_LIST = [
 
 ;(async () => {
   await db.user.deleteMany({})
+  console.log('Users deleted')
   const images = await fetchMessages(NAME_LIST.length * IMAGE_PER_USER)
   console.log('Uploaded images Loaded')
 
