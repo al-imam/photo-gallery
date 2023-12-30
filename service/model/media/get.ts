@@ -7,7 +7,7 @@ import { userPermissionFactory } from '../helpers'
 
 export async function getMedia(
   id: string,
-  user?: PrettifyPick<User, 'id' | 'status'>
+  user?: PrettifyPick<User, 'id' | 'role'>
 ) {
   const media = await db.media.findUnique({
     where: { id },
@@ -26,7 +26,7 @@ export type MediaListOptions = {
   status?: ContentStatus
 }
 export async function getLatestMediaList(
-  user?: PrettifyPick<User, 'id' | 'status'>,
+  user?: PrettifyPick<User, 'id' | 'role'>,
   options: MediaListOptions = {}
 ) {
   if (

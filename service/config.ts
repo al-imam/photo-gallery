@@ -5,7 +5,7 @@ import { createIncludeQuery } from './utils'
 export const USER_PUBLIC_FIELDS = [
   'id',
   'name',
-  'status',
+  'role',
   'avatar_sm',
   'avatar_md',
   'avatar_lg',

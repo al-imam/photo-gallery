@@ -22,25 +22,25 @@ export function mediaPermissionFactory(
   media: PrettifyPick<Media, 'authorId' | 'status'>
 ) {
   return {
-    view(user?: Pick<User, 'id' | 'status'> | null) {
+    view(user?: Pick<User, 'id' | 'role'> | null) {
       return media.status === 'APPROVED' || this.edit(user)
     },
 
-    edit(user?: Pick<User, 'id' | 'status'> | null) {
+    edit(user?: Pick<User, 'id' | 'role'> | null) {
       return Boolean(
         user && (media.authorId === user.id || this.moderate(user))
       )
     },
 
-    moderate(user?: Pick<User, 'id' | 'status'> | null) {
+    moderate(user?: Pick<User, 'id' | 'role'> | null) {
       return Boolean(
-        user && (user.status === 'ADMIN' || user.status === 'MODERATOR')
+        user && (user.role === 'ADMIN' || user.role === 'MODERATOR')
       )
     },
 
-    delete(user?: Pick<User, 'id' | 'status'> | null) {
+    delete(user?: Pick<User, 'id' | 'role'> | null) {
       return Boolean(
-        user && (user.id === media.authorId || user.status === 'ADMIN')
+        user && (user.id === media.authorId || user.role === 'ADMIN')
       )
     },
   }

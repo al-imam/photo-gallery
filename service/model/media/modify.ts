@@ -18,7 +18,7 @@ export type UpdateMediaBody = PrettifyPick<
 > & { moderatorNote?: string }
 
 export async function updateMedia(
-  user: PrettifyPick<User, 'id' | 'status'>,
+  user: PrettifyPick<User, 'id' | 'role'>,
   oldMedia: Media,
   body: UpdateMediaBody
 ) {

@@ -7,6 +7,8 @@ import Router from 'router13'
 import service from '@/service'
 import { NextResponse } from 'next/server'
 import errorFormat from '@/service/errorFormat'
+import { userPermissionFactory } from '@/service/model/helpers'
+import ReqErr from '@/service/ReqError'
 
 export const router = Router.create<NextHandler>({
   middleware: [
@@ -38,6 +40,18 @@ export const authRouter = router.create<NextUserHandler>({
     async (req, ctx, next) => {
       const token = req.headers.get('authorization')
       ctx.user = await service.auth.checkAuth(token, 'auth')
+      return next()
+    },
+  ],
+})
+
+export const adminRouter = authRouter.create({
+  middleware: [
+    (_, ctx, next) => {
+      if (!userPermissionFactory(ctx.user).isAdmin) {
+        throw new ReqErr('Permission denied', 403)
+      }
+
       return next()
     },
   ],
