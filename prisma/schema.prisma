@@ -47,8 +47,6 @@ model ProfileLink {
   url  String          @db.VarChar(48)
 
   Z_PROFILE Profile @relation("ProfileLink", fields: [userId], references: [userId], onDelete: Cascade)
-
-  @@map("ProfileLink")
 }
 
 model Media {

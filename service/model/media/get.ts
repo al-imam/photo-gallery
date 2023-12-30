@@ -21,9 +21,11 @@ export async function getMedia(
 export type MediaListOptions = {
   cursor?: string
   limit?: number
+  skip?: number
   category?: string
   authorId?: string
   status?: ContentStatus
+  search?: string
 }
 export async function getLatestMediaList(
   user?: PrettifyPick<User, 'id' | 'role'>,
@@ -41,15 +43,33 @@ export async function getLatestMediaList(
   }
 
   const mediaList = await db.media.findMany({
+    skip: options.skip,
+    take: options.limit ?? 20,
     ...(options.cursor
       ? { cursor: { id: options.cursor }, skip: 1 }
       : undefined),
-    take: options.limit ?? 20,
 
     where: {
       status: options.status ?? ContentStatus.APPROVED,
       authorId: options.authorId,
       categoryId: options.category,
+      ...(options.search
+        ? {
+            OR: [
+              {
+                title: { contains: options.search, mode: 'insensitive' },
+              },
+              {
+                description: { contains: options.search, mode: 'insensitive' },
+              },
+              {
+                category: {
+                  name: { contains: options.search, mode: 'insensitive' },
+                },
+              },
+            ],
+          }
+        : undefined),
     },
     orderBy: {
       createdAt: 'desc',

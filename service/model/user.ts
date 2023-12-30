@@ -4,9 +4,48 @@ import { PrettifyPick } from '../utils'
 import mail from '../mail'
 import ReqErr from '../ReqError'
 import { userPermissionFactory } from './helpers'
+import { USER_PUBLIC_FIELDS_QUERY } from '../config'
 
 export function fetchById(id: string) {
   return db.user.findUniqueOrThrow({ where: { id } })
+}
+
+export type GetUserListOptions = Partial<{
+  cursor: string
+  limit: number
+  skip: number
+  role: UserRole
+  search: string
+}>
+export async function getUserList(
+  issuer: PrettifyPick<User, 'id' | 'role'>,
+  options: GetUserListOptions = {}
+) {
+  if (!userPermissionFactory(issuer).isAdmin) {
+    throw new ReqErr('Permission denied', 403)
+  }
+
+  return db.user.findMany({
+    where: {
+      ...(options.role ? { role: options.role } : undefined),
+      ...(options.search
+        ? {
+            OR: [
+              { name: { contains: options.search, mode: 'insensitive' } },
+              { email: { contains: options.search, mode: 'insensitive' } },
+              { username: { contains: options.search, mode: 'insensitive' } },
+            ],
+          }
+        : undefined),
+    },
+    orderBy: { id: 'asc' },
+    take: options.limit ?? 20,
+    select: USER_PUBLIC_FIELDS_QUERY,
+    skip: options.skip,
+    ...(options.cursor
+      ? { cursor: { id: options.cursor }, skip: 1 }
+      : undefined),
+  })
 }
 
 export type UserCreateBody = PrettifyPick<User, 'name' | 'password'>
@@ -15,8 +54,8 @@ export async function create(token: string, data: UserCreateBody) {
 
   const user = await db.user.create({
     data: {
-      email,
       name: data.name,
+      email: email,
       password: await hash.bcrypt.encrypt(data.password),
     },
   })
@@ -147,6 +186,6 @@ export async function changeUsername(userId: string, newUsername: string) {
 
   return db.user.update({
     where: { id: userId },
-    data: { username: newUsername.toLowerCase() },
+    data: { username: newUsername },
   })
 }

@@ -68,16 +68,24 @@ const NAME_LIST = [
     }
   }
 
+  const reactionsToCreate = []
+  const reportsToCreate = []
+
   for (const user of userList) {
     const randomMedia = getRandomItems(mediaList, REACTION_PER_USER)
     for (const media of randomMedia) {
-      await service.media.createLove(user.id, media.id)
-      await service.media.createReport(user.id, media.id, {
-        type: 'OTHER',
+      reactionsToCreate.push({ mediaId: media.id, userId: user.id })
+      reportsToCreate.push({
+        userId: user.id,
+        mediaId: media.id,
+        type: 'OTHER' as const,
         message: 'This is a test report',
       })
     }
   }
+
+  await db.mediaReport.createMany({ data: reportsToCreate })
+  await db.mediaReaction.createMany({ data: reactionsToCreate })
 
   console.log('Done')
   process.exit()
