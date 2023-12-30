@@ -55,10 +55,7 @@ export default async function Home() {
       </div>
 
       <main className="pb-6">
-        <InfiniteScroll
-          initialItems={[]}
-          cursor={undefined}
-        />
+        <InfiniteScroll initialItems={[]} cursor={undefined} />
       </main>
     </div>
   )
