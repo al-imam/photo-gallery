@@ -2,8 +2,7 @@ import { configDotenv } from 'dotenv'
 import service from '@/service'
 import db, { Media, User } from '@/service/db'
 import { jwt } from '@/service/hash'
-import { createMediaFactory } from '@/service/model/media'
-import { fetchMessages, getRandomItems } from './utils'
+import { fetchMessages, getRandomItems, uploadMessage } from './utils'
 
 console.clear()
 configDotenv()
@@ -36,7 +35,7 @@ const NAME_LIST = [
 ;(async () => {
   await db.user.deleteMany({})
   const images = await fetchMessages(NAME_LIST.length * IMAGE_PER_USER)
-  console.log('Images Loaded')
+  console.log('Uploaded images Loaded')
 
   const userList: User[] = []
   const mediaList: Media[] = []
@@ -53,16 +52,14 @@ const NAME_LIST = [
     iUser++
 
     for (let i = 1; i <= IMAGE_PER_USER; i++) {
-      const discordResult = images[iImage]
-
-      const createMedia = createMediaFactory({
-        newCategory: Math.random().toString(36).substring(7),
-        title: `Test Media ${iImage + 1}`,
-      })
-
-      const media = await createMedia(
+      const media = await service.media.createMedia(
         { ...user, role: 'ADMIN' },
-        discordResult
+        {
+          title: `Test Media ${iImage + 1}`,
+          newCategory: Math.random().toString(36).substring(7),
+        },
+        async () => images[iImage] ?? uploadMessage(),
+        async (result) => console.log('Deleting:', result.id)
       )
 
       console.log('Image created:', media.id)

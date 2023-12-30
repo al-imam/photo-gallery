@@ -62,7 +62,7 @@ model Media {
   tags        String[]      @db.VarChar(16)
   status      ContentStatus @default(PENDING)
 
-  newCategory String?
+  newCategory String?        @db.VarChar(16)
   categoryId  String?        @db.Uuid()
   category    MediaCategory? @relation("MediaCategory", fields: [categoryId], references: [id])
 

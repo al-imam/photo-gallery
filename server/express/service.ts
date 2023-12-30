@@ -1,17 +1,21 @@
-import r from 'rype'
 import { User } from '@prisma/client'
 import db from '@/service/db'
 import discord from '@/service/discord'
 import { USER_SAFE_FIELDS_QUERY } from '@/service/config'
-import { createMediaFactory } from '@/service/model/media'
-import { mediaInputSchema } from '@/service/model/media/helpers'
+import { CreateMediaBody } from '@/service/model/media'
+import service from '@/service'
 
 export async function uploadMedia(
   user: Pick<User, 'id' | 'role'>,
   buffer: Buffer,
-  reqBody: r.inferInput<typeof mediaInputSchema>
+  body: CreateMediaBody
 ) {
-  return createMediaFactory(reqBody)(user, await discord.uploadMedia(buffer))
+  return service.media.createMedia(
+    user,
+    body,
+    () => discord.uploadMedia(buffer),
+    (result) => discord.deleteMedia(result.id)
+  )
 }
 
 export async function putAvatar(
