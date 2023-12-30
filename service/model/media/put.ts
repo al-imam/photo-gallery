@@ -21,11 +21,13 @@ const mediaEditableFields = [
   'media_hasGraphicContent',
 ] as const
 
-export type UpdateMediaBody = CreateMediaBody & { moderatorComment?: string }
 export type CreateMediaBody = PrettifyPick<
   Media,
-  never,
+  'title',
   (typeof mediaEditableFields)[number]
+>
+export type UpdateMediaBody = Partial<
+  CreateMediaBody & { moderatorComment: string }
 >
 
 export async function createMedia(
@@ -94,7 +96,7 @@ export async function createMedia(
 
 export async function updateMedia(
   user: PrettifyPick<User, 'id' | 'role'>,
-  oldMedia: Media,
+  oldMedia: PrettifyPick<Media, 'id' | 'authorId' | 'status'>,
   body: UpdateMediaBody
 ) {
   if (body.categoryId && body.newCategory) {
