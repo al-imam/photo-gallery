@@ -45,18 +45,6 @@ export const authRouter = router.create<NextUserHandler>({
   ],
 })
 
-export const adminRouter = authRouter.create({
-  middleware: [
-    (_, ctx, next) => {
-      if (!userPermissionFactory(ctx.user).isAdmin) {
-        throw new ReqErr('Permission denied', 403)
-      }
-
-      return next()
-    },
-  ],
-})
-
 export const optionalAuthRouter = router.create<NextOptUserHandler>({
   middleware: [
     async (req, ctx, next) => {

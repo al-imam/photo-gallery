@@ -1,4 +1,4 @@
-import { adminRouter } from '@/server/next/router'
+import { authRouter } from '@/server/next/router'
 import service from '@/service'
 import { USER_PUBLIC_FIELDS } from '@/service/config'
 import { ChangeStatusBody } from '@/service/model/user'
@@ -11,7 +11,7 @@ export type PatchData = {
   user: PrettifyPick<User, (typeof USER_PUBLIC_FIELDS)[number]>
 }
 
-export const PATCH = adminRouter(async (_, ctx, next) => {
+export const PATCH = authRouter(async (_, ctx, next) => {
   const userId = ctx.params.userId!
   const user = await service.user.changeStatus(ctx.user, userId, ctx.body())
   return NextResponse.json<PatchData>({
