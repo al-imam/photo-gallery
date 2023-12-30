@@ -17,6 +17,7 @@ export const GET = optionalAuthRouter(async (req, ctx) => {
 
   const mediaList = await service.media.getLatestMediaList(ctx.user, {
     ...query,
+    skip: queryToNumber(query.skip),
     limit: queryToNumber(query.limit),
   })
 
