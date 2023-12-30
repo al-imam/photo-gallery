@@ -56,7 +56,7 @@ model Media {
   createdAt DateTime @default(now())
   messageId String
 
-  title       String?       @db.VarChar(48)
+  title       String        @db.VarChar(48)
   description String?       @db.VarChar(300)
   note        String?       @db.VarChar(200)
   tags        String[]      @db.VarChar(16)
