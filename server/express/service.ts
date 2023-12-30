@@ -7,7 +7,7 @@ import { createMediaFactory } from '@/service/model/media'
 import { mediaInputSchema } from '@/service/model/media/helpers'
 
 export async function uploadMedia(
-  user: Pick<User, 'id' | 'status'>,
+  user: Pick<User, 'id' | 'role'>,
   buffer: Buffer,
   reqBody: r.inferInput<typeof mediaInputSchema>
 ) {

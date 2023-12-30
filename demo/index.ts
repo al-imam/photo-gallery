@@ -61,7 +61,7 @@ const NAME_LIST = [
       })
 
       const media = await createMedia(
-        { ...user, status: 'ADMIN' },
+        { ...user, role: 'ADMIN' },
         discordResult
       )
 

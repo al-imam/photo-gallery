@@ -6,6 +6,7 @@ import { MEDIA_INCLUDE_QUERY } from '@/service/config'
 import { DiscordMediaUploadResult, MediaWithLoves } from '@/service/types'
 import r from 'rype'
 import { mediaInputSchema, mediaPermissionFactory } from './helpers'
+import { userPermissionFactory } from '../helpers'
 
 export * from './get'
 export * from './love'
@@ -21,14 +22,10 @@ export function createMediaFactory(
   }
 
   return async function createMedia(
-    user: Pick<User, 'id' | 'status'>,
+    user: Pick<User, 'id' | 'role'>,
     discord: DiscordMediaUploadResult
   ) {
-    if (
-      user.status === 'VERIFIED' ||
-      user.status === 'MODERATOR' ||
-      user.status === 'ADMIN'
-    ) {
+    if (userPermissionFactory(user).isVerifiedLevel) {
       if (body.newCategory) {
         const name = body.newCategory.toLowerCase()
         const category =
@@ -70,7 +67,7 @@ export function createMediaFactory(
 }
 
 export async function deleteMedia(
-  user: PrettifyPick<User, 'id' | 'status'>,
+  user: PrettifyPick<User, 'id' | 'role'>,
   media: PrettifyPick<Media, 'id' | 'status' | 'authorId' | 'messageId'>
 ) {
   const permission = mediaPermissionFactory(media)

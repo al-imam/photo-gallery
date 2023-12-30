@@ -11,7 +11,7 @@ export async function getReportForMedia(userId: string, mediaId: string) {
 }
 
 export async function getReports(
-  user: PrettifyPick<User, 'id' | 'status'>,
+  user: PrettifyPick<User, 'id' | 'role'>,
   mediaId: string
 ) {
   const permission = userPermissionFactory(user)
@@ -45,7 +45,7 @@ export type UpdateReportBody = Partial<
   CreateReportBody & PrettifyPick<MediaReport, 'status'>
 >
 export async function updateReport(
-  user: PrettifyPick<User, 'id' | 'status'>,
+  user: PrettifyPick<User, 'id' | 'role'>,
   reportId: string,
   body: UpdateReportBody
 ) {
@@ -63,7 +63,7 @@ export async function updateReport(
 }
 
 export async function deleteReport(
-  user: PrettifyPick<User, 'id' | 'status'>,
+  user: PrettifyPick<User, 'id' | 'role'>,
   reportId: string
 ) {
   const result = await db.mediaReport.delete({

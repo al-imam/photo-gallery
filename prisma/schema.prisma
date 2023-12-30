@@ -3,7 +3,7 @@ model User {
 
   name     String   @db.VarChar(24)
   profile  Profile?
-  status   UserRole @default(PUBLIC)
+  role     UserRole @default(PUBLIC)
   username String   @unique @default(cuid())
 
   avatar_sm        String?
@@ -30,8 +30,8 @@ model Profile {
   userId    String   @id @db.Uuid()
   createdAt DateTime @default(now())
 
-  bio      String?              @db.VarChar(200)
-  location String?              @db.VarChar(48)
+  bio      String?       @db.VarChar(200)
+  location String?       @db.VarChar(48)
   email    String?
   links    ProfileLink[] @relation("ProfileLink")
 
@@ -47,7 +47,8 @@ model ProfileLink {
   url  String          @db.VarChar(48)
 
   Z_PROFILE Profile @relation("ProfileLink", fields: [userId], references: [userId], onDelete: Cascade)
-	@@map("ProfileLink")
+
+  @@map("ProfileLink")
 }
 
 model Media {
@@ -170,11 +171,11 @@ model LOG_MediaStatusChange {
 
 // Enums
 enum UserRole {
-  BANNED
-  PUBLIC
-  VERIFIED
-  MODERATOR
   ADMIN
+  MODERATOR
+  VERIFIED
+  PUBLIC
+  BANNED
 }
 
 enum ProfileLinkType {

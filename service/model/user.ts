@@ -1,8 +1,9 @@
 import * as hash from '../hash'
-import db, { User } from '../db'
+import db, { User, UserRole } from '../db'
 import { PrettifyPick } from '../utils'
 import mail from '../mail'
 import ReqErr from '../ReqError'
+import { userPermissionFactory } from './helpers'
 
 export function fetchById(id: string) {
   return db.user.findUniqueOrThrow({ where: { id } })
@@ -39,6 +40,35 @@ export function update(userId: string, data: UserUpdateBody) {
 
 export function remove(userId: string) {
   return db.user.delete({ where: { id: userId } })
+}
+
+export type ChangeStatusBody = { role: UserRole; comment?: string }
+export async function changeStatus(
+  by: User,
+  userId: string,
+  body: ChangeStatusBody
+) {
+  if (!userPermissionFactory(by).isAdmin) {
+    throw new ReqErr('Permission denied', 403)
+  }
+
+  const oldUser = await db.user.findUniqueOrThrow({ where: { id: userId } })
+  const newUser = await db.user.update({
+    where: { id: userId },
+    data: { role: body.role },
+  })
+
+  await db.lOG_RoleChange.create({
+    data: {
+      userId: newUser.id,
+      moderatedById: by.id,
+      role_old: oldUser.role,
+      role_new: newUser.role,
+      comment: body.comment,
+    },
+  })
+
+  return newUser
 }
 
 export async function requestEmailChange(
