@@ -26,7 +26,7 @@ function createClient(errorFormat: 'minimal' | 'pretty') {
   return new PrismaClient({ errorFormat }).$extends({
     query: {
       user: {
-        $allOperations: handleOperationToLowerCase<User>('email', 'name'),
+        $allOperations: handleOperationToLowerCase<User>('email', 'username'),
       },
 
       mediaCategory: {
