@@ -3,13 +3,13 @@ import {
   sendMediaWithLoves,
   SendMediaWithLovesData,
 } from '@/server/next/middlewares/media'
-import { authRouter, router } from '@/server/next/router'
+import { authRouter, optionalAuthRouter } from '@/server/next/router'
 import service from '@/service'
 import { UpdateMediaBody } from '@/service/model/media'
 import { NextResponse } from 'next/server'
 
 export type GetData = SendMediaWithLovesData
-export const GET = router(setMedia, sendMediaWithLoves)
+export const GET = optionalAuthRouter(setMedia, sendMediaWithLoves)
 
 export type PatchBody = UpdateMediaBody
 export type PatchData = SendMediaWithLovesData
