@@ -18,18 +18,23 @@ export type NextHandler<TCtx = {}> = (
 export type NextUserHandler<T = {}> = NextHandler<{ user: User } & T>
 export type NextOptUserHandler<T = {}> = NextHandler<{ user?: User } & T>
 export type NextUserMediaHandler<T = {}> = NextUserHandler<
-  { media: MediaPopulated } & T
+  { media: MediaWithReactionCount } & T
 >
 
-export type MediaPopulated = Media & {
+export type MediaWithReactionCount = Media & {
   author: PrettifyPick<User, (typeof USER_PUBLIC_FIELDS)[number]>
   category: MediaCategory | null
+  _count: {
+    Z_REACTIONS: number
+  }
 }
 
-export type MediaWithLoves = MediaPopulated & {
+export type MediaWithLoves = Omit<
+  MediaWithReactionCount,
+  '_count' | 'messageId'
+> & {
   isLoved: boolean
   loves: number
-  messageId: never
 }
 
 export type JWTPayload = {

@@ -22,4 +22,7 @@ keys satisfies keyof User
 export const MEDIA_INCLUDE_QUERY = {
   author: { select: USER_PUBLIC_FIELDS_QUERY },
   category: true,
+  _count: {
+    select: { Z_REACTIONS: true },
+  },
 }

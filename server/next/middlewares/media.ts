@@ -1,6 +1,6 @@
 import service from '@/service'
 import ReqErr from '@/service/ReqError'
-import { addLovesToMediaList } from '@/service/model/media/helpers'
+import { addLovesToMedia } from '@/service/model/media/helpers'
 import { MediaWithLoves, NextUserMediaHandler } from '@/service/types'
 import { NextResponse } from 'next/server'
 
@@ -13,6 +13,6 @@ export const setMedia: NextUserMediaHandler = async (_, ctx, next) => {
 
 export type SendMediaWithLovesData = { media: MediaWithLoves }
 export const sendMediaWithLoves: NextUserMediaHandler = async (_, ctx) => {
-  const [media] = await addLovesToMediaList(ctx.user?.id, ctx.media)
+  const media = await addLovesToMedia( ctx.media,ctx.user?.id,)
   return NextResponse.json<SendMediaWithLovesData>({ media })
 }

@@ -1,7 +1,7 @@
 import { Media, MediaReaction, User } from '@prisma/client'
 import { Prettify } from '@/types'
 import db from '@/service/db'
-import { MediaPopulated, MediaWithLoves } from '@/service/types'
+import { MediaWithReactionCount, MediaWithLoves } from '@/service/types'
 import { PrettifyPick } from '@/service/utils'
 
 export function mediaPermissionFactory(
@@ -40,43 +40,29 @@ export async function findOrCreateCategory(name: string) {
   )
 }
 
-function mapMediaReaction<
-  T extends Pick<MediaReaction, 'mediaId' | 'userId'>[],
->(array: T) {
-  const result: Prettify<Record<string, Set<string>>> = {}
-  array.forEach(({ mediaId, userId }) => {
-    if (!result[mediaId]) {
-      result[mediaId] = new Set()
-    }
-    result[mediaId].add(userId)
-  })
+export async function addLovesToMedia<
+  T extends MediaWithReactionCount[] | MediaWithReactionCount,
+>(
+  media: T,
+  userId?: null | string
+): Promise<T extends any[] ? MediaWithLoves[] : MediaWithLoves> {
+  async function work(...args: MediaWithReactionCount[]) {
+    const userAndMedia = userId
+      ? await db.mediaReaction.findMany({
+          where: { mediaId: { in: args.map((m) => m.id) }, userId },
+          select: { mediaId: true },
+        })
+      : []
 
-  return result
-}
+    const mediaIdSet = new Set(userAndMedia.map((m) => m.mediaId))
 
-export async function addLovesToMediaList(
-  userId?: null | string,
-  ...mediaList: MediaPopulated[]
-) {
-  const result: MediaWithLoves[] = []
-
-  const reactions = mapMediaReaction(
-    await db.mediaReaction.findMany({
-      where: { mediaId: { in: mediaList.map((m) => m.id) } },
-      select: { mediaId: true, userId: true },
-    })
-  )
-
-  for (const media of mediaList) {
-    result.push({
+    return args.map(({ _count, messageId: _, ...media }) => ({
       ...media,
-      url_media: media.url_media,
-      url_thumbnail: media.url_thumbnail,
-      isLoved: Boolean(userId && reactions[media.id]?.has(userId)),
-      loves: reactions[media.id]?.size ?? 0,
-      messageId: undefined as never,
-    })
+      loves: _count.Z_REACTIONS ?? 0,
+      isLoved: mediaIdSet.has(media.id),
+    }))
   }
 
-  return result
+  if (Array.isArray(media)) return work(...media) as any
+  return (await work(media))[0] as any
 }
