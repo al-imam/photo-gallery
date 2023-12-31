@@ -24,9 +24,9 @@ export async function getRelatedMedia(
     Media,
     'id',
     'title' | 'tags' | 'description' | 'categoryId'
-  >
+  >,
+  take = 9
 ) {
-  const MAX_MEDIA = 9
   const related: MediaWithReactionCount[] = []
   const whereQuery: Prisma.MediaWhereInput[] = []
 
@@ -61,7 +61,7 @@ export async function getRelatedMedia(
   }
 
   for (let where of whereQuery) {
-    const remaining = MAX_MEDIA - related.length
+    const remaining = take - related.length
     if (remaining <= 0) break
 
     const matchedMediaList = await db.media.findMany({

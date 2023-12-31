@@ -4,15 +4,20 @@ import {
   SendMediaWithLovesData,
 } from '@/server/next/middlewares/media'
 import { authRouter, optionalAuthRouter } from '@/server/next/router'
+import { queryToNumber } from '@/server/next/utils'
 import service from '@/service'
 import { UpdateMediaBody } from '@/service/model/media'
 import { NextResponse } from 'next/server'
 
+export type GetQuery = { limit: string }
 export type GetData = SendMediaWithLovesData
 export const GET = optionalAuthRouter(
   setMedia,
-  async (_, ctx, next) => {
-    ctx.relatedMedia = await service.media.getRelatedMedia(ctx.media)
+  async (req, ctx, next) => {
+    ctx.relatedMedia = await service.media.getRelatedMedia(
+      ctx.media,
+      queryToNumber(req.nextUrl.searchParams.get('limit'))
+    )
     return next()
   },
   sendMediaWithLoves
