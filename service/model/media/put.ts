@@ -1,6 +1,6 @@
 import {
   MediaWithLoves,
-  MediaPopulated,
+  MediaWithReactionCount,
   DiscordMediaUploadResult,
 } from '@/service/types'
 import { MEDIA_INCLUDE_QUERY } from '@/service/config'
@@ -63,7 +63,7 @@ export async function createMedia(
   }
 
   const discord = await uploadToDiscord()
-  let media: MediaPopulated
+  let media: MediaWithReactionCount
   try {
     media = await db.media.create({
       data: {
@@ -86,12 +86,7 @@ export async function createMedia(
     throw err
   }
 
-  return {
-    ...media,
-    isLoved: false,
-    loves: 0,
-    messageId: undefined as never,
-  } as MediaWithLoves
+  return media
 }
 
 export async function updateMedia(

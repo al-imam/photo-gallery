@@ -4,18 +4,21 @@ import discord from '@/service/discord'
 import { USER_SAFE_FIELDS_QUERY } from '@/service/config'
 import { CreateMediaBody } from '@/service/model/media'
 import service from '@/service'
+import { addLovesToMedia } from '@/service/model/media/helpers'
 
 export async function uploadMedia(
   user: Pick<User, 'id' | 'role'>,
   buffer: Buffer,
   body: CreateMediaBody
 ) {
-  return service.media.createMedia(
+  const mediaList = await service.media.createMedia(
     user,
     body,
     () => discord.uploadMedia(buffer),
     (result) => discord.deleteMedia(result.id)
   )
+
+  return addLovesToMedia(mediaList)
 }
 
 export async function putAvatar(

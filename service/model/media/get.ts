@@ -2,7 +2,7 @@ import { MEDIA_INCLUDE_QUERY } from '@/service/config'
 import db, { ContentStatus, User } from '@/service/db'
 import { PrettifyPick } from '@/service/utils'
 import ReqErr from '@/service/ReqError'
-import { addLovesToMediaList, mediaPermissionFactory } from './helpers'
+import { mediaPermissionFactory } from './helpers'
 import { userPermissionFactory } from '../helpers'
 
 export async function getMedia(
@@ -74,10 +74,11 @@ export async function getLatestMediaList(
     orderBy: {
       createdAt: 'desc',
     },
+
     include: MEDIA_INCLUDE_QUERY,
   })
 
-  return addLovesToMediaList(user?.id, ...mediaList)
+  return mediaList
 }
 
 export async function getBackup(cursor?: string, take = 20000) {
