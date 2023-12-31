@@ -11,7 +11,7 @@ export const POST = authRouter(
   setMedia,
   async (_, ctx, next) => {
     await service.media.createLove(ctx.user.id, ctx.media.id)
-    ctx.media._count.Z_REACTIONS++
+    ctx.media._count.Z_REACTIONS += 1
     return next()
   },
   sendMediaWithLoves
@@ -22,7 +22,7 @@ export const DELETE = authRouter(
   setMedia,
   async (_, ctx, next) => {
     await service.media.removeLove(ctx.user.id, ctx.media.id)
-    ctx.media._count.Z_REACTIONS--
+    ctx.media._count.Z_REACTIONS -= 1
     return next()
   },
   sendMediaWithLoves
