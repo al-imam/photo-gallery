@@ -9,7 +9,14 @@ import { UpdateMediaBody } from '@/service/model/media'
 import { NextResponse } from 'next/server'
 
 export type GetData = SendMediaWithLovesData
-export const GET = optionalAuthRouter(setMedia, sendMediaWithLoves)
+export const GET = optionalAuthRouter(
+  setMedia,
+  async (_, ctx, next) => {
+    ctx.relatedMedia = await service.media.getRelatedMedia(ctx.media)
+    return next()
+  },
+  sendMediaWithLoves
+)
 
 export type PatchBody = UpdateMediaBody
 export type PatchData = SendMediaWithLovesData

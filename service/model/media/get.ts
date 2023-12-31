@@ -1,9 +1,10 @@
 import { MEDIA_INCLUDE_QUERY } from '@/service/config'
-import db, { ContentStatus, User } from '@/service/db'
+import db, { ContentStatus, Media, Prisma, User } from '@/service/db'
 import { PrettifyPick } from '@/service/utils'
 import ReqErr from '@/service/ReqError'
 import { mediaPermissionFactory } from './helpers'
 import { userPermissionFactory } from '../helpers'
+import { MediaWithReactionCount } from '@/service/types'
 
 export async function getMedia(
   id: string,
@@ -16,6 +17,67 @@ export async function getMedia(
 
   if (media && mediaPermissionFactory(media).view(user)) return media
   throw new ReqErr('Media not found')
+}
+
+export async function getRelatedMedia(
+  media: PrettifyPick<
+    Media,
+    'id',
+    'title' | 'tags' | 'description' | 'categoryId'
+  >
+) {
+  const MAX_MEDIA = 9
+  const related: MediaWithReactionCount[] = []
+  const whereQuery: Prisma.MediaWhereInput[] = []
+
+  if (media.tags?.length) {
+    whereQuery.push({ tags: { hasEvery: media.tags } })
+  }
+
+  if (media.title) {
+    whereQuery.push({
+      title: {
+        contains: media.title,
+        mode: 'insensitive' as const,
+      },
+    })
+  }
+
+  if (media.description) {
+    whereQuery.push({
+      description: {
+        contains: media.description,
+        mode: 'insensitive' as const,
+      },
+    })
+  }
+
+  if (media.tags?.length) {
+    whereQuery.push({ tags: { hasSome: media.tags } })
+  }
+
+  if (media.categoryId) {
+    whereQuery.push({ categoryId: media.categoryId })
+  }
+
+  for (let where of whereQuery) {
+    const remaining = MAX_MEDIA - related.length
+    if (remaining <= 0) break
+
+    const matchedMediaList = await db.media.findMany({
+      take: remaining,
+      include: MEDIA_INCLUDE_QUERY,
+      orderBy: { createdAt: 'desc' },
+      where: {
+        ...where,
+        id: { not: { in: [media.id, ...related.map((media) => media.id)] } },
+      },
+    })
+
+    related.push(...matchedMediaList)
+  }
+
+  return related
 }
 
 export type MediaListOptions = {
