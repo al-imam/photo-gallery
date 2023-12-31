@@ -18,7 +18,10 @@ export type NextHandler<TCtx = {}> = (
 export type NextUserHandler<T = {}> = NextHandler<{ user: User } & T>
 export type NextOptUserHandler<T = {}> = NextHandler<{ user?: User } & T>
 export type NextUserMediaHandler<T = {}> = NextUserHandler<
-  { media: MediaWithReactionCount } & T
+  {
+    media: MediaWithReactionCount
+    relatedMedia?: MediaWithReactionCount[]
+  } & T
 >
 
 export type MediaWithReactionCount = Media & {
