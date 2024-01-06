@@ -3,26 +3,31 @@ import { PrettifyPick, pick } from '@/service/utils'
 import { MediaReport, User } from '@prisma/client'
 import ReqErr from '@/service/ReqError'
 import { userPermissionFactory } from '../helpers'
+import { PaginationQueries, paginationQueries } from '../profile'
+
+export type GetReportsOptions = PaginationQueries &
+  PrettifyPick<MediaReport, never, 'mediaId' | 'userId' | 'status' | 'type'>
+
+export async function getReports(options: GetReportsOptions) {
+  return db.mediaReport.findMany({
+    ...paginationQueries({
+      orderByKey: 'createdAt',
+      orderBy: 'desc',
+      ...options,
+    }),
+
+    where: {
+      mediaId: options.mediaId,
+      userId: options.userId,
+      status: options.status,
+      type: options.type,
+    },
+  })
+}
 
 export async function getReportForMedia(userId: string, mediaId: string) {
   return db.mediaReport.findFirstOrThrow({
     where: { mediaId, userId },
-  })
-}
-
-export async function getReports(
-  user: PrettifyPick<User, 'id' | 'role'>,
-  mediaId: string
-) {
-  const permission = userPermissionFactory(user)
-  if (!permission.isModeratorLevel) {
-    throw new ReqErr('You are not allowed to view reports')
-  }
-
-  return db.mediaReport.findMany({
-    where: {
-      mediaId,
-    },
   })
 }
 

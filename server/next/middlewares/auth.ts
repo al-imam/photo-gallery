@@ -6,6 +6,7 @@ import { NextUserHandler } from '@/service/types'
 import { pick } from '@/service/utils'
 import ReqErr from '@/service/ReqError'
 import { User } from '@prisma/client'
+import { userPermissionFactory } from '@/service/model/helpers'
 
 export type SendUserAndTokenData = {
   user: Pick<User, (typeof USER_SAFE_FIELDS)[number]> & {}
@@ -46,4 +47,12 @@ export const checkPassword: NextUserHandler<{}> = async (req, ctx, next) => {
   }
 
   throw new ReqErr('Password is incorrect')
+}
+
+export const onlyAdmin: NextUserHandler<{}> = async (req, ctx, next) => {
+  if (userPermissionFactory(ctx.user).isAdmin) {
+    return next()
+  }
+
+  throw new ReqErr('You are not allowed to do this')
 }
