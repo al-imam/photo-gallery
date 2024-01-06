@@ -13,10 +13,10 @@ export type GetQuery = { limit: string }
 export type GetData = SendMediaWithLovesData
 export const GET = optionalAuthRouter(
   setMedia,
-  async (req, ctx, next) => {
+  async (_, ctx, next) => {
     ctx.relatedMedia = await service.media.getRelatedMedia(
       ctx.media,
-      queryToNumber(req.nextUrl.searchParams.get('limit'))
+      queryToNumber(ctx.query<GetQuery>().limit)
     )
     return next()
   },
@@ -27,7 +27,7 @@ export type PatchBody = UpdateMediaBody
 export type PatchData = SendMediaWithLovesData
 export const PATCH = authRouter(
   setMedia,
-  async (req, ctx, next) => {
+  async (_, ctx, next) => {
     const media = await service.media.updateMedia(
       ctx.user,
       ctx.media,

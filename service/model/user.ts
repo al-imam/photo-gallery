@@ -5,27 +5,26 @@ import mail from '../mail'
 import ReqErr from '../ReqError'
 import { userPermissionFactory } from './helpers'
 import { USER_PUBLIC_FIELDS_QUERY } from '../config'
+import { PaginationQueries, paginationQueries } from './profile'
 
 export function fetchById(id: string) {
   return db.user.findUniqueOrThrow({ where: { id } })
 }
 
-export type GetUserListOptions = Partial<{
-  cursor: string
-  limit: number
-  skip: number
-  role: UserRole
-  search: string
-}>
-export async function getUserList(
-  issuer: PrettifyPick<User, 'id' | 'role'>,
-  options: GetUserListOptions = {}
-) {
-  if (!userPermissionFactory(issuer).isAdmin) {
-    throw new ReqErr('Permission denied', 403)
-  }
+export type GetUserListOptions = PaginationQueries &
+  Partial<{
+    role: UserRole
+    search: string
+  }>
 
+export async function getUserList(options: GetUserListOptions = {}) {
   return db.user.findMany({
+    ...paginationQueries<User>({
+      orderByKey: 'id',
+      orderBy: 'asc',
+      ...options,
+    }),
+
     where: {
       ...(options.role ? { role: options.role } : undefined),
       ...(options.search
@@ -38,13 +37,8 @@ export async function getUserList(
           }
         : undefined),
     },
-    orderBy: { id: 'asc' },
-    take: options.limit ?? 20,
+
     select: USER_PUBLIC_FIELDS_QUERY,
-    skip: options.skip,
-    ...(options.cursor
-      ? { cursor: { id: options.cursor }, skip: 1 }
-      : undefined),
   })
 }
 
@@ -87,10 +81,6 @@ export async function changeStatus(
   userId: string,
   body: ChangeStatusBody
 ) {
-  if (!userPermissionFactory(by).isAdmin) {
-    throw new ReqErr('Permission denied', 403)
-  }
-
   const oldUser = await db.user.findUniqueOrThrow({ where: { id: userId } })
   const newUser = await db.user.update({
     where: { id: userId },

@@ -5,6 +5,7 @@ import ReqErr from '@/service/ReqError'
 import { mediaPermissionFactory } from './helpers'
 import { userPermissionFactory } from '../helpers'
 import { MediaWithReactionCount } from '@/service/types'
+import { PaginationQueries, paginationQueries } from '../profile'
 
 export async function getMedia(
   id: string,
@@ -80,15 +81,13 @@ export async function getRelatedMedia(
   return related
 }
 
-export type MediaListOptions = {
-  cursor?: string
-  limit?: number
-  skip?: number
+export type MediaListOptions = PaginationQueries & {
   category?: string
   authorId?: string
   status?: ContentStatus
   search?: string
 }
+
 export async function getLatestMediaList(
   user?: PrettifyPick<User, 'id' | 'role'>,
   options: MediaListOptions = {}
@@ -105,11 +104,11 @@ export async function getLatestMediaList(
   }
 
   const mediaList = await db.media.findMany({
-    skip: options.skip,
-    take: options.limit ?? 20,
-    ...(options.cursor
-      ? { cursor: { id: options.cursor }, skip: 1 }
-      : undefined),
+    ...paginationQueries({
+      orderByKey: 'createdAt',
+      orderBy: 'desc',
+      ...options,
+    }),
 
     where: {
       status: options.status ?? ContentStatus.APPROVED,
@@ -132,9 +131,6 @@ export async function getLatestMediaList(
             ],
           }
         : undefined),
-    },
-    orderBy: {
-      createdAt: 'desc',
     },
 
     include: MEDIA_INCLUDE_QUERY,

@@ -7,6 +7,7 @@ import { Prettify, PrettifyPick } from './utils'
 type NextCtx = {
   params: Record<string, string | undefined>
   body<B = unknown>(): B
+  query<Q = unknown>(): Prettify<Partial<Q>>
 }
 
 export type NextHandler<TCtx = {}> = (

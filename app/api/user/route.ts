@@ -1,15 +1,15 @@
 import {
+  UserCreateBody,
+  UserUpdateBody,
+  GetUserListOptions,
+} from '@/service/model/user'
+import {
+  onlyAdmin,
   sendUserAndToken,
   SendUserAndTokenData,
 } from '@/server/next/middlewares/auth'
 import { authRouter, router } from '@/server/next/router'
-import { queryToNumber } from '@/server/next/utils'
 import service from '@/service'
-import {
-  GetUserListOptions,
-  UserCreateBody,
-  UserUpdateBody,
-} from '@/service/model/user'
 import { NextResponse } from 'next/server'
 
 export type GetQuery = Partial<
@@ -18,17 +18,8 @@ export type GetQuery = Partial<
 export type GetData = {
   users: Awaited<ReturnType<typeof service.user.getUserList>>
 }
-export const GET = authRouter(async (req, ctx, next) => {
-  const query = Object.fromEntries(
-    req.nextUrl.searchParams.entries()
-  ) as GetQuery
-
-  const users = await service.user.getUserList(ctx.user, {
-    ...query,
-    skip: queryToNumber(query.skip),
-    limit: queryToNumber(query.limit),
-  })
-
+export const GET = authRouter(onlyAdmin, async (req, ctx, next) => {
+  const users = await service.user.getUserList(ctx.query<GetQuery>())
   return NextResponse.json<GetData>({ users })
 })
 
