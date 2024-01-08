@@ -7,12 +7,14 @@ import Router from 'router13'
 import service from '@/service'
 import { NextResponse } from 'next/server'
 import errorFormat from '@/service/errorFormat'
-import { userPermissionFactory } from '@/service/model/helpers'
-import ReqErr from '@/service/ReqError'
 
 export const router = Router.create<NextHandler>({
   middleware: [
     async (req, ctx, next) => {
+      ctx.query = function () {
+        return Object.fromEntries(req.nextUrl.searchParams.entries())
+      } as any
+
       const contentType = req.headers.get('content-type')
 
       try {
