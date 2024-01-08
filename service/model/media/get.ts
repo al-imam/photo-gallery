@@ -2,7 +2,7 @@ import { MEDIA_INCLUDE_QUERY } from '@/service/config'
 import db, { ContentStatus, Media, Prisma, User } from '@/service/db'
 import { PrettifyPick } from '@/service/utils'
 import ReqErr from '@/service/ReqError'
-import { mediaPermissionFactory } from './helpers'
+import { mediaPermissionFactory, mediaSearchQueryOR } from './helpers'
 import { userPermissionFactory } from '../helpers'
 import { MediaWithReactionCount } from '@/service/types'
 import { PaginationQueries, paginationQueries } from '../profile'
@@ -114,23 +114,7 @@ export async function getLatestMediaList(
       status: options.status ?? ContentStatus.APPROVED,
       authorId: options.authorId,
       categoryId: options.category,
-      ...(options.search
-        ? {
-            OR: [
-              {
-                title: { contains: options.search, mode: 'insensitive' },
-              },
-              {
-                description: { contains: options.search, mode: 'insensitive' },
-              },
-              {
-                category: {
-                  name: { contains: options.search, mode: 'insensitive' },
-                },
-              },
-            ],
-          }
-        : undefined),
+      OR: mediaSearchQueryOR(options.search),
     },
 
     include: MEDIA_INCLUDE_QUERY,

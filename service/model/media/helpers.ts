@@ -1,8 +1,9 @@
-import { Media, MediaReaction, User } from '@prisma/client'
+import { Media, MediaReaction, Prisma, User } from '@prisma/client'
 import { Prettify } from '@/types'
 import db from '@/service/db'
 import { MediaWithReactionCount, MediaWithLoves } from '@/service/types'
 import { PrettifyPick } from '@/service/utils'
+const INSENSITIVE = 'insensitive' as const
 
 export function mediaPermissionFactory(
   media: PrettifyPick<Media, 'authorId' | 'status'>
@@ -65,4 +66,54 @@ export async function addLovesToMedia<
 
   if (Array.isArray(media)) return work(...media) as any
   return (await work(media))[0] as any
+}
+
+function isUUID(uuidString: string) {
+  const uuidRegex =
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
+  return uuidRegex.test(uuidString)
+}
+
+export function mediaSearchQueryOR(query?: string): Prisma.MediaWhereInput[] {
+  if (!query) return []
+  const keywords = query.trim().split(' ').filter(Boolean)
+
+  const idQueryList = isUUID(query) && [
+    { id: query },
+    { authorId: query },
+    { categoryId: query },
+  ]
+
+  const queryList = keywords.map((keyword) => [
+    {
+      title: { contains: keyword, mode: INSENSITIVE },
+    },
+    {
+      description: { contains: keyword, mode: INSENSITIVE },
+    },
+    {
+      category: {
+        name: { contains: keyword, mode: INSENSITIVE },
+      },
+    },
+    {
+      author: {
+        name: { contains: keyword, mode: INSENSITIVE },
+      },
+    },
+    {
+      author: {
+        profile: {
+          email: { contains: keyword, mode: INSENSITIVE },
+        },
+      },
+    },
+  ])
+
+  const otherQueryList = [
+    { tags: { hasEvery: keywords } },
+    { tags: { hasSome: keywords } },
+  ]
+
+  return [...(idQueryList || []), ...queryList.flat(1), ...otherQueryList]
 }
