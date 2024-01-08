@@ -77,6 +77,7 @@ function isUUID(uuidString: string) {
 export function mediaSearchQueryOR(query?: string): Prisma.MediaWhereInput[] {
   if (!query) return []
   const keywords = query.trim().split(' ').filter(Boolean)
+  if (!keywords.length) return []
 
   const idQueryList = isUUID(query) && [
     { id: query },
