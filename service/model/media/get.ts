@@ -103,6 +103,8 @@ export async function getLatestMediaList(
     delete options.status
   }
 
+  const orQueries = mediaSearchQueryOR(options.search)
+
   const mediaList = await db.media.findMany({
     ...paginationQueries({
       orderByKey: 'createdAt',
@@ -114,7 +116,7 @@ export async function getLatestMediaList(
       status: options.status ?? ContentStatus.APPROVED,
       authorId: options.authorId,
       categoryId: options.category,
-      OR: mediaSearchQueryOR(options.search),
+      ...(orQueries.length ? { OR: orQueries } : undefined),
     },
 
     include: MEDIA_INCLUDE_QUERY,
