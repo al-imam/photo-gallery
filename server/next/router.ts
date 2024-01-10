@@ -22,7 +22,7 @@ export const router = Router.create<NextHandler>({
           const body = await (req as any).json()
           ctx.body = () => body
         } else {
-          throw void 0
+          throw Error('Content-Type must be application/json')
         }
       } catch {
         ctx.body<null> = () => null
@@ -53,7 +53,10 @@ export const optionalAuthRouter = router.create<NextOptUserHandler>({
       try {
         const token = req.headers.get('authorization')
         ctx.user = await service.auth.checkAuth(token, 'auth')
-      } catch {}
+      } catch {
+        ctx.user = undefined
+      }
+
       return next()
     },
   ],
