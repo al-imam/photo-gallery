@@ -5,7 +5,7 @@ import ReqErr from '@/service/ReqError'
 import { mediaPermissionFactory, mediaSearchQueryOR } from './helpers'
 import { userPermissionFactory } from '../helpers'
 import { MediaWithReactionCount } from '@/service/types'
-import { PaginationQueries, paginationQueries } from '../profile'
+import { PaginationQueries, paginationQueries } from '@/service/helpers'
 
 export async function getMedia(
   id: string,

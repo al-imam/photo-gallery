@@ -8,12 +8,12 @@ function handleOperationToLowerCase<Obj>(...keys: (keyof Obj)[]) {
     const newArgs = { ...args }
     keys.forEach((key) => {
       const where = newArgs.where
-      if (where?.[key]) {
+      if (typeof where?.[key] === 'string') {
         where[key] = where[key].toLowerCase()
       }
 
       const data = newArgs.data
-      if (data?.[key]) {
+      if (typeof data?.[key] === 'string') {
         data[key] = data[key].toLowerCase()
       }
     })
