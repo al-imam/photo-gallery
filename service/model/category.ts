@@ -23,9 +23,24 @@ export async function getCategoryList(options: GetCategoryOptions) {
 }
 
 export async function findOrCreateCategory(name: string) {
-  const lowerName = name.toLowerCase()
+  const lowerName = formatCategoryName(name)
   return (
     (await db.mediaCategory.findFirst({ where: { name: lowerName } })) ??
     (await db.mediaCategory.create({ data: { name: lowerName } }))
   )
+}
+
+export async function editCategory(id: string, name: string) {
+  return await db.mediaCategory.update({
+    where: { id },
+    data: { name: formatCategoryName(name) },
+  })
+}
+
+export async function deleteCategory(id: string) {
+  return await db.mediaCategory.delete({ where: { id } })
+}
+
+function formatCategoryName(name: string) {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, '')
 }
