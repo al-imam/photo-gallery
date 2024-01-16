@@ -2,10 +2,10 @@ import { MEDIA_INCLUDE_QUERY } from '@/service/config'
 import db, { ContentStatus, Media, Prisma, User } from '@/service/db'
 import { PrettifyPick } from '@/service/utils'
 import ReqErr from '@/service/ReqError'
-import { mediaPermissionFactory, mediaSearchQueryOR } from './helpers'
-import { userPermissionFactory } from '../helpers'
 import { MediaWithReactionCount } from '@/service/types'
 import { PaginationQueries, paginationQueries } from '@/service/helpers'
+import { mediaPermissionFactory, mediaSearchQueryOR } from './helpers'
+import { userPermissionFactory } from '../helpers'
 
 export async function getMedia(
   id: string,
@@ -61,7 +61,7 @@ export async function getRelatedMedia(
     whereQuery.push({ categoryId: media.categoryId })
   }
 
-  for (let where of whereQuery) {
+  for (const where of whereQuery) {
     const remaining = take - related.length
     if (remaining <= 0) break
 

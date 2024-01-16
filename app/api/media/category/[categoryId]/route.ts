@@ -5,13 +5,11 @@ import { NextResponse } from 'next/server'
 
 export type PatchBody = { name: string }
 export const PATCH = authRouter(onlyAdmin, async (_, ctx) => {
-  console.log(ctx.params.categoryId)
-  
   const category = await service.category.editCategory(
     ctx.params.categoryId!,
     ctx.body<PatchBody>().name
   )
-    
+
   return NextResponse.json({ category })
 })
 
