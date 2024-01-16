@@ -3,6 +3,7 @@ import { Prettify } from '@/types'
 import db from '@/service/db'
 import { MediaWithReactionCount, MediaWithLoves } from '@/service/types'
 import { PrettifyPick } from '@/service/utils'
+
 const INSENSITIVE = 'insensitive' as const
 
 export function mediaPermissionFactory(

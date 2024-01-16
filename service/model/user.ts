@@ -48,7 +48,7 @@ export async function create(token: string, data: UserCreateBody) {
   const user = await db.user.create({
     data: {
       name: data.name,
-      email: email,
+      email,
       password: await hash.bcrypt.encrypt(data.password),
     },
   })
