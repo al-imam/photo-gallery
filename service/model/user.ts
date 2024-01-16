@@ -3,9 +3,8 @@ import db, { User, UserRole } from '../db'
 import { PrettifyPick } from '../utils'
 import mail from '../mail'
 import ReqErr from '../ReqError'
-import { userPermissionFactory } from './helpers'
 import { USER_PUBLIC_FIELDS_QUERY } from '../config'
-import { PaginationQueries, paginationQueries } from './profile'
+import { PaginationQueries, paginationQueries } from '../helpers'
 
 export function fetchById(id: string) {
   return db.user.findUniqueOrThrow({ where: { id } })

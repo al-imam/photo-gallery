@@ -3,7 +3,7 @@ import { PrettifyPick, pick } from '@/service/utils'
 import { MediaReport, User } from '@prisma/client'
 import ReqErr from '@/service/ReqError'
 import { userPermissionFactory } from '../helpers'
-import { PaginationQueries, paginationQueries } from '../profile'
+import { PaginationQueries, paginationQueries } from '@/service/helpers'
 
 export type GetReportsOptions = PaginationQueries &
   PrettifyPick<MediaReport, never, 'mediaId' | 'userId' | 'status' | 'type'>
