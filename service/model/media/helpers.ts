@@ -33,14 +33,6 @@ export function mediaPermissionFactory(
   }
 }
 
-export async function findOrCreateCategory(name: string) {
-  const lowerName = name.toLowerCase()
-  return (
-    (await db.mediaCategory.findFirst({ where: { name: lowerName } })) ??
-    (await db.mediaCategory.create({ data: { name: lowerName } }))
-  )
-}
-
 export async function addLovesToMedia<
   T extends MediaWithReactionCount[] | MediaWithReactionCount,
 >(

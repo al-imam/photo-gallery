@@ -7,8 +7,9 @@ import { MEDIA_INCLUDE_QUERY } from '@/service/config'
 import db, { Media, User } from '@/service/db'
 import { PrettifyPick, pick } from '@/service/utils'
 import ReqErr from '@/service/ReqError'
-import { findOrCreateCategory, mediaPermissionFactory } from './helpers'
+import { mediaPermissionFactory } from './helpers'
 import { userPermissionFactory } from '../helpers'
+import { findOrCreateCategory } from '../category'
 
 const mediaEditableFields = [
   'title',
