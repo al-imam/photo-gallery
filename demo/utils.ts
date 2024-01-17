@@ -26,7 +26,10 @@ export async function fetchMessages(remaining: number) {
   while (remaining) {
     const rawMessages = await channel.messages.fetch({
       limit: remaining < 100 ? remaining : 100,
+      before: messages.at(-1)?.id,
     })
+
+    console.log(rawMessages)
 
     if (!rawMessages.size) break
     rawMessages.forEach((message) => {
