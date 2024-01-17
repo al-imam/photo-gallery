@@ -1,7 +1,6 @@
 import db, { Media, User } from '@/service/db'
 import { PrettifyPick } from '@/service/utils'
 import ReqErr from '@/service/ReqError'
-import discordNext from '@/service/discord-next'
 import { mediaPermissionFactory } from './helpers'
 
 export async function deleteMedia(
@@ -14,5 +13,4 @@ export async function deleteMedia(
   }
 
   await db.media.delete({ where: { id: media.id } })
-  await discordNext.deleteMedia(media.messageId)
 }

@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import multer from 'multer'
-import { createMedia, postAvatar } from './controller'
+import { createMedia, deleteMedia, postAvatar } from './controller'
 import { catchError, checkAuthMiddleware } from './middleware'
 
 const router = Router()
@@ -8,16 +8,16 @@ const upload = multer({ storage: multer.memoryStorage() })
 
 router.use(catchError(checkAuthMiddleware))
 
+router.delete('/media/:id', catchError(deleteMedia))
 router.post(
-  '/upload',
+  '/media',
   catchError(upload.single('media')),
   catchError(createMedia)
 )
 
-router.put(
-  '/avatar',
-  catchError(upload.single('avatar')),
-  catchError(postAvatar)
-)
+router
+  .route('/avatar')
+  .post(catchError(upload.single('avatar')), catchError(postAvatar))
+  .delete(catchError(deleteMedia))
 
 export default router

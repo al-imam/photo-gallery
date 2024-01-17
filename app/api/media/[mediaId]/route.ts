@@ -7,7 +7,6 @@ import { authRouter, optionalAuthRouter } from '@/server/next/router'
 import { queryToNumber } from '@/server/next/utils'
 import service from '@/service'
 import { UpdateMediaBody } from '@/service/model/media'
-import { NextResponse } from 'next/server'
 
 export type GetQuery = { limit: string }
 export type GetData = SendMediaWithLovesData
@@ -39,8 +38,3 @@ export const PATCH = authRouter(
   },
   sendMediaWithLoves
 )
-
-export const DELETE = authRouter(setMedia, async (_, ctx) => {
-  await service.media.deleteMedia(ctx.user, ctx.media)
-  return NextResponse.json(null)
-})
