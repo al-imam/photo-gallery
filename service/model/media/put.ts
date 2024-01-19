@@ -137,8 +137,8 @@ export async function moderateMedia(
         mediaId: oldMedia.id,
         status_old: oldMedia.status,
         status_new: updatedMedia.status,
-        moderatedById: moderatorId,
-        comment: data.moderatorComment,
+        userId: moderatorId,
+        message: data.moderatorComment,
       },
     })
   }
