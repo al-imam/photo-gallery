@@ -1,4 +1,4 @@
-import { Media, MediaCategory, User } from '@prisma/client'
+import { Collection, Media, MediaCategory, User } from '@prisma/client'
 import { NextRequest } from 'next/server'
 import { NextFunction } from 'router13'
 import { USER_PUBLIC_FIELDS } from './config'
@@ -20,25 +20,38 @@ export type NextUserHandler<T = {}> = NextHandler<{ user: User } & T>
 export type NextOptUserHandler<T = {}> = NextHandler<{ user?: User } & T>
 export type NextUserMediaHandler<T = {}> = NextUserHandler<
   {
-    media: MediaWithReactionCount
-    relatedMedia?: MediaWithReactionCount[]
+    media: MediaWithReactionCountRaw
+    relatedMedia?: MediaWithReactionCountRaw[]
   } & T
 >
 
-export type MediaWithReactionCount = Media & {
+export type MediaWithReactionCountRaw = Media & {
   author: PrettifyPick<User, (typeof USER_PUBLIC_FIELDS)[number]>
   category: MediaCategory | null
   _count: {
-    Z_REACTIONS: number
+    reactions: number
   }
 }
 
-export type MediaWithLoves = Omit<
-  MediaWithReactionCount,
-  '_count' | 'messageId'
-> & {
+export type MediaWithReactionCount = Omit<
+  MediaWithReactionCountRaw,
+  'messageId'
+>
+
+export type MediaWithLoves = MediaWithReactionCount & {
   isLoved: boolean
-  loves: number
+}
+
+export type CollectionWithMediaCount = Collection & {
+  _count: { media: number }
+}
+
+export type CollectionWithRawMedia = Collection & {
+  media: MediaWithReactionCountRaw[]
+}
+
+export type CollectionWithMedia = Collection & {
+  media: (MediaWithReactionCount | null)[]
 }
 
 export type JWTPayload = {

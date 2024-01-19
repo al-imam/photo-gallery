@@ -27,8 +27,8 @@ async function mail(to: string, subject: string, body: string) {
 
 export default {
   sendSignupToken(to: string, token: string) {
-    const url = `${env.VERCEL_URL}/signup/complete?token=${token}`
-    console.log(to, token)
+    const url = `${env.NEXT_PUBLIC_URL}/signup/complete?token=${token}`
+    console.log(to, url, token)
 
     return mail(
       to,
@@ -48,8 +48,8 @@ export default {
   },
 
   sendResetToken(to: string, token: string) {
-    const url = `${env.VERCEL_URL}/reset-password/complete?token=${token}`
-    console.log(to, token)
+    const url = `${env.NEXT_PUBLIC_URL}/reset-password/complete?token=${token}`
+    console.log(to, url, token)
 
     return mail(
       to,
@@ -68,8 +68,8 @@ export default {
   },
 
   sendChangeEmailToken(to: string, token: string) {
-    const url = `${env.VERCEL_URL}/change-email/complete?token=${token}`
-    console.log(to, token)
+    const url = `${env.NEXT_PUBLIC_URL}/change-email/complete?token=${token}`
+    console.log(to, url, token)
 
     return mail(
       to,
@@ -88,8 +88,8 @@ export default {
   },
 
   sendPublicEmailToken(to: string, token: string) {
-    const url = `${env.VERCEL_URL}/public-email/complete?token=${token}`
-    console.log(to, token)
+    const url = `${env.NEXT_PUBLIC_URL}/public-email/complete?token=${token}`
+    console.log(to, url, token)
 
     return mail(
       to,

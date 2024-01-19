@@ -46,7 +46,7 @@ const NAME_LIST = [
   for (const name of NAME_LIST) {
     const user = await service.user.create(
       await jwt.sign('signup-email', `247sayad+${iUser + 1}@gmail.com`),
-      { name, password: '123' }
+      { name, password: '123456' }
     )
     console.log('created:', user.email)
     userList.push(user)

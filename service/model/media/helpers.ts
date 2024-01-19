@@ -1,8 +1,7 @@
-import { Media, MediaReaction, Prisma, User } from '@prisma/client'
-import { Prettify } from '@/types'
+import { Media, Prisma, User } from '@prisma/client'
 import db from '@/service/db'
-import { MediaWithReactionCount, MediaWithLoves } from '@/service/types'
-import { PrettifyPick } from '@/service/utils'
+import { MediaWithReactionCountRaw, MediaWithLoves } from '@/service/types'
+import { PrettifyPick, isUUID } from '@/service/utils'
 
 const INSENSITIVE = 'insensitive' as const
 
@@ -15,9 +14,7 @@ export function mediaPermissionFactory(
     },
 
     edit(user?: Pick<User, 'id' | 'role'> | null) {
-      return Boolean(
-        user && (media.authorId === user.id || this.moderate(user))
-      )
+      return Boolean(user && media.authorId === user.id)
     },
 
     moderate(user?: Pick<User, 'id' | 'role'> | null) {
@@ -34,37 +31,36 @@ export function mediaPermissionFactory(
   }
 }
 
-export async function addLovesToMedia<
-  T extends MediaWithReactionCount[] | MediaWithReactionCount,
->(
-  media: T,
-  userId?: null | string
-): Promise<T extends any[] ? MediaWithLoves[] : MediaWithLoves> {
-  async function work(...args: MediaWithReactionCount[]) {
-    const userAndMedia = userId
-      ? await db.mediaReaction.findMany({
-          where: { mediaId: { in: args.map((m) => m.id) }, userId },
-          select: { mediaId: true },
-        })
-      : []
+export async function AddLoveToMediaCore(
+  media: MediaWithReactionCountRaw[],
+  userId?: string
+) {
+  const userAndMedia = userId
+    ? await db.mediaReaction.findMany({
+        where: { mediaId: { in: media.map((m) => m.id) }, userId },
+        select: { mediaId: true },
+      })
+    : []
 
-    const mediaIdSet = new Set(userAndMedia.map((m) => m.mediaId))
+  const mediaIdSet = new Set(userAndMedia.map((m) => m.mediaId))
 
-    return args.map(({ _count, messageId: _, ...media }) => ({
+  return function (...args: MediaWithReactionCountRaw[]) {
+    return args.map<MediaWithLoves>(({ messageId: _, ...media }) => ({
       ...media,
-      loves: _count.Z_REACTIONS ?? 0,
       isLoved: mediaIdSet.has(media.id),
     }))
   }
-
-  if (Array.isArray(media)) return work(...media) as any
-  return (await work(media))[0] as any
 }
 
-function isUUID(uuidString: string) {
-  const uuidRegex =
-    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
-  return uuidRegex.test(uuidString)
+export async function addLovesToMedia<
+  T extends MediaWithReactionCountRaw[] | MediaWithReactionCountRaw,
+>(media: T, userId?: string) {
+  const isArrayMode = Array.isArray(media)
+  const add = await AddLoveToMediaCore(isArrayMode ? media : [media], userId)
+
+  return (isArrayMode ? add(...media) : add(media)[0]) as T extends any[]
+    ? MediaWithLoves[]
+    : MediaWithLoves
 }
 
 export function mediaSearchQueryOR(query?: string): Prisma.MediaWhereInput[] {
@@ -110,4 +106,20 @@ export function mediaSearchQueryOR(query?: string): Prisma.MediaWhereInput[] {
   ]
 
   return [...(idQueryList || []), ...queryList.flat(1), ...otherQueryList]
+}
+
+export function validateAndFormatTags(tags?: string[]) {
+  if (!Array.isArray(tags) || !tags.length) return undefined
+
+  const formattedTags = tags
+    .filter(Boolean)
+    .map((s) => s.toLowerCase().replace(/[^a-z0-9]+/g, ''))
+
+  const finalTags = Array.from(new Set(formattedTags))
+
+  if (finalTags.length > 7) {
+    throw new Error('Cannot provide more than 7 tags')
+  }
+
+  return finalTags
 }

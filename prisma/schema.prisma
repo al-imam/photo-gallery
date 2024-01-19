@@ -15,12 +15,12 @@ model User {
   email          String   @unique
   authModifiedAt DateTime @default(now())
 
-  media         Media[]        @relation("User")
-  bookmarks     BookMark[]     @relation("Bookmark")
-  notifications Notification[] @relation("Notification")
+  media         Media[]         @relation("User")
+  reactions     MediaReaction[] @relation("MediaReaction")
+  collections   Collection[]    @relation("Collection")
+  notifications Notification[]  @relation("Notification")
 
   Z_REPORTS                           MediaReport[]           @relation("MediaReport")
-  Z_REACTIONS                         MediaReaction[]         @relation("MediaReaction")
   Z_LOG_ROLE                          LOG_RoleChange[]        @relation("LogRoleChange")
   Z_LOG_ROLE_MODERATED                LOG_RoleChange[]        @relation("LogRoleChangeModerated")
   Z_LOG_MEDIA_STATUS_CHANGE_MODERATED LOG_MediaStatusChange[] @relation("LogMediaStatusChangeModerated")
@@ -55,7 +55,7 @@ model Media {
   messageId String
 
   title       String        @db.VarChar(48)
-  description String?       @db.VarChar(300)
+  description String?       @db.VarChar(200)
   note        String?       @db.VarChar(200)
   tags        String[]      @db.VarChar(16)
   status      ContentStatus @default(PENDING)
@@ -72,13 +72,13 @@ model Media {
   url_media     String
   url_thumbnail String
 
-  authorId String @db.Uuid()
-  author   User   @relation("User", fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String          @db.Uuid()
+  author    User            @relation("User", fields: [authorId], references: [id], onDelete: Cascade)
+  reactions MediaReaction[] @relation("MediaReaction")
 
-  Z_BOOKMARK  BookMark[]              @relation("Bookmark")
-  Z_REACTIONS MediaReaction[]         @relation("MediaReaction")
-  Z_LOG_MEDIA LOG_MediaStatusChange[] @relation("LogMediaStatusChange")
-  Z_REPORTS   MediaReport[]           @relation("MediaReport")
+  Z_COLLECTIONS Collection[]            @relation("Collection")
+  Z_LOG_MEDIA   LOG_MediaStatusChange[] @relation("LogMediaStatusChange")
+  Z_REPORTS     MediaReport[]           @relation("MediaReport")
 }
 
 model MediaCategory {
@@ -116,16 +116,19 @@ model MediaReport {
   @@unique([mediaId, userId])
 }
 
-model BookMark {
+model Collection {
   id        String   @id @default(uuid()) @db.Uuid()
   createdAt DateTime @default(now())
   userId    String   @db.Uuid()
-  mediaId   String   @db.Uuid()
 
-  Z_USER  User   @relation("Bookmark", fields: [userId], references: [id], onDelete: Cascade)
-  Z_MEDIA Media? @relation("Bookmark", fields: [mediaId], references: [id], onDelete: Cascade)
+  name        String               @db.VarChar(48)
+  description String?              @db.VarChar(300)
+  visibility  CollectionVisibility @default(PUBLIC)
 
-  @@unique([userId, mediaId])
+  media  Media[] @relation("Collection")
+  Z_USER User    @relation("Collection", fields: [userId], references: [id])
+
+  @@index([userId])
 }
 
 model Notification {
@@ -156,16 +159,16 @@ model LOG_RoleChange {
 model LOG_MediaStatusChange {
   id        String   @id @default(uuid()) @db.Uuid()
   createdAt DateTime @default(now())
-  comment   String?  @db.VarChar(128)
+  message   String?  @db.VarChar(128)
 
-  status_old ContentStatus
-  status_new ContentStatus
+  status_old ContentStatus?
+  status_new ContentStatus?
 
-  mediaId       String @db.Uuid()
-  moderatedById String @db.Uuid()
+  mediaId String @db.Uuid()
+  userId  String @db.Uuid()
+  user    User   @relation("LogMediaStatusChangeModerated", fields: [userId], references: [id])
 
-  Z_MEDIA       Media @relation("LogMediaStatusChange", fields: [mediaId], references: [id], onDelete: Cascade)
-  Z_MODERATEDBY User  @relation("LogMediaStatusChangeModerated", fields: [moderatedById], references: [id])
+  Z_MEDIA Media @relation("LogMediaStatusChange", fields: [mediaId], references: [id], onDelete: Cascade)
 }
 
 // Enums
@@ -192,6 +195,11 @@ enum ContentStatus {
   APPROVED
   REJECTED
   PASSED_TO_ADMIN
+}
+
+enum CollectionVisibility {
+  PUBLIC
+  PRIVATE
 }
 
 enum MediaReportType {

@@ -1,20 +1,18 @@
 import {
-  MediaWithLoves,
-  MediaWithReactionCount,
   DiscordMediaUploadResult,
+  MediaWithReactionCountRaw,
 } from '@/service/types'
 import { MEDIA_INCLUDE_QUERY } from '@/service/config'
 import db, { Media, User } from '@/service/db'
-import { PrettifyPick, pick } from '@/service/utils'
+import { Prettify, PrettifyPick, pick } from '@/service/utils'
 import ReqErr from '@/service/ReqError'
-import { mediaPermissionFactory } from './helpers'
+import { validateAndFormatTags, mediaPermissionFactory } from './helpers'
 import { userPermissionFactory } from '../helpers'
 import { findOrCreateCategory } from '../category'
 
 const mediaEditableFields = [
   'title',
   'description',
-  'note',
   'tags',
   'status',
   'newCategory',
@@ -22,13 +20,27 @@ const mediaEditableFields = [
   'media_hasGraphicContent',
 ] as const
 
+const mediaModerateFields = [
+  'status',
+  'newCategory',
+  'categoryId',
+  'tags',
+] as const
+
 export type CreateMediaBody = PrettifyPick<
   Media,
   'title',
   (typeof mediaEditableFields)[number]
 >
-export type UpdateMediaBody = Partial<
-  CreateMediaBody & { moderatorComment: string }
+
+export type ModerateMediaBody = Partial<
+  Pick<Media, (typeof mediaModerateFields)[number]> & {
+    moderatorComment: string
+  }
+>
+
+export type UpdateMediaBody = Prettify<
+  Partial<CreateMediaBody> & ModerateMediaBody
 >
 
 export async function createMedia(
@@ -37,34 +49,15 @@ export async function createMedia(
   uploadToDiscord: () => Promise<DiscordMediaUploadResult>,
   onFailure: (result: DiscordMediaUploadResult) => Promise<any>
 ) {
-  if (body.newCategory && body.categoryId) {
-    throw new ReqErr('Cannot provide both newCategory and categoryId')
-  }
-
-  if (body.tags && body.tags.length > 10) {
-    throw new ReqErr('Cannot provide more than 5 tags')
-  }
-
-  const hasPermissionToApprove = userPermissionFactory(user).isVerifiedLevel
-
-  if (hasPermissionToApprove) {
+  body.tags = validateAndFormatTags(body.tags)
+  if (userPermissionFactory(user).isVerifiedLevel) {
     body.status ??= 'APPROVED'
   } else {
     body.status = undefined
   }
 
-  if (body.status === 'APPROVED') {
-    if (body.newCategory) {
-      const category = await findOrCreateCategory(body.newCategory)
-      body.categoryId = category.id
-    }
-
-    body.note = null
-    body.newCategory = null
-  }
-
   const discord = await uploadToDiscord()
-  let media: MediaWithReactionCount
+  let media: MediaWithReactionCountRaw
   try {
     media = await db.media.create({
       data: {
@@ -95,58 +88,60 @@ export async function updateMedia(
   oldMedia: PrettifyPick<Media, 'id' | 'authorId' | 'status'>,
   body: UpdateMediaBody
 ) {
-  if (body.categoryId && body.newCategory) {
-    throw new ReqErr('Cannot provide both categoryId and newCategory')
+  body.tags = validateAndFormatTags(body.tags)
+  if (oldMedia.status === 'APPROVED' && (body.categoryId || body.newCategory)) {
+    throw new ReqErr('Cannot edit category of approved media')
   }
 
-  if (body.tags && body.tags.length > 10) {
-    throw new ReqErr('Cannot provide more than 5 tags')
+  const isAuthor = oldMedia.authorId === user.id
+  const isModerator = userPermissionFactory(user).isModeratorLevel
+
+  if (isAuthor && isModerator) {
+    // TODO: check if moderator is changing status
+    return moderateMedia(user.id, oldMedia, body, body)
   }
 
-  const permission = mediaPermissionFactory(oldMedia)
-
-  if (!permission.edit(user)) {
-    throw new ReqErr('You do not have permission to edit this media')
+  if (isModerator) {
+    return moderateMedia(user.id, oldMedia, body)
   }
 
-  if (body.status && !permission.moderate(user)) {
-    throw new ReqErr(
-      'You do not have permission to change the status of this media'
-    )
+  if (isAuthor) {
+    return db.media.update({
+      where: { id: oldMedia.id },
+      data: pick(body, ...mediaEditableFields),
+      include: MEDIA_INCLUDE_QUERY,
+    })
   }
 
-  if (body.newCategory) {
-    if (
-      permission.moderate(user) &&
-      oldMedia.status === 'APPROVED' &&
-      (!body.status || body.status === 'APPROVED')
-    ) {
-      const category = await findOrCreateCategory(body.newCategory)
-      body.note = null
-      body.newCategory = null
-      body.categoryId = category.id
-    } else {
-      body.categoryId = null
-    }
-  }
+  throw new ReqErr('You do not have permission to update this media')
+}
 
-  const media = await db.media.update({
+export async function moderateMedia(
+  moderatorId: string,
+  oldMedia: Pick<Media, 'id' | 'authorId' | 'status'>,
+  data: ModerateMediaBody,
+  extraData?: UpdateMediaBody
+) {
+  const updatedMedia = await db.media.update({
     where: { id: oldMedia.id },
-    data: pick(body, ...mediaEditableFields),
     include: MEDIA_INCLUDE_QUERY,
+    data: {
+      ...(extraData && pick(extraData, ...mediaEditableFields)),
+      ...pick(data, ...mediaModerateFields),
+    },
   })
 
-  if (oldMedia.status !== media.status) {
+  if (oldMedia.status !== updatedMedia.status) {
     await db.lOG_MediaStatusChange.create({
       data: {
-        mediaId: media.id,
-        status_new: media.status,
+        mediaId: oldMedia.id,
         status_old: oldMedia.status,
-        moderatedById: user.id,
-        comment: body.moderatorComment,
+        status_new: updatedMedia.status,
+        moderatedById: moderatorId,
+        comment: data.moderatorComment,
       },
     })
   }
 
-  return media
+  return updatedMedia
 }
