@@ -41,14 +41,14 @@ export async function getUserList(options: GetUserListOptions = {}) {
   })
 }
 
-export type UserCreateBody = PrettifyPick<User, 'name' | 'password'>
+export type UserCreateBody = PrettifyPick<User, 'password', 'name'>
 export async function create(token: string, data: UserCreateBody) {
   const { payload: email } = await hash.jwt.verify('signup-email', token)
 
   const user = await db.user.create({
     data: {
-      name: data.name,
       email,
+      name: data.name || email.split('@')[0],
       password: await hash.bcrypt.encrypt(data.password),
     },
   })
@@ -64,6 +64,10 @@ export async function create(token: string, data: UserCreateBody) {
 
 export type UserUpdateBody = PrettifyPick<User, never, 'name'>
 export function update(userId: string, data: UserUpdateBody) {
+  if (data.name === '') {
+    throw new ReqErr('Name cannot be empty')
+  }
+
   return db.user.update({
     where: { id: userId },
     data: { name: data.name },
