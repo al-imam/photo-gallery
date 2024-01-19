@@ -1,72 +1,92 @@
-console.clear()
-
 import { configDotenv } from 'dotenv'
-configDotenv()
 import service from '@/service'
 import db, { Media, User } from '@/service/db'
 import { jwt } from '@/service/hash'
-import { getImages, getRandomItems } from './utils'
-import { uploadMedia } from '@/server/express/service'
+import { fetchMessages, getRandomItems, uploadMessage } from './utils'
+
+console.clear()
+configDotenv()
+
+const IMAGE_PER_USER = 10
+const REACTION_PER_USER = 50
+const NAME_LIST = [
+  'Nazmus Sayad',
+  'Mohammad Rahman',
+  'Fatima Khanam',
+  'Abul Hasan Chowdhury',
+  'Shabnam Akhtar Chowdhury',
+  'Aminul Islam Miah',
+  'Taslima Begum',
+  'Rafiqul Haque Siddique',
+  'Farida Yasmin Khan',
+  'Nurul Islam Mia',
+  'Rukhsar Ahmed Chowdhury',
+  'Sadia Rahman',
+  'Shahidul Islam',
+  'Nasrin Akhtar',
+  'Mizanur Rahman',
+  'Sultana Ahmed',
+  'Kamrul Hasan',
+  'Ayesha Begum',
+  'Zahidul Haque',
+  'Maliha Khan',
+]
+
 ;(async () => {
   await db.user.deleteMany({})
-  const fullNameList = [
-    'Mohammad Rahman',
-    'Fatima Khanam',
-    'Abul Hasan Chowdhury',
-    'Shabnam Akhtar Chowdhury',
-    'Aminul Islam Miah',
-    'Taslima Begum',
-    'Rafiqul Haque Siddique',
-    'Farida Yasmin Khan',
-    'Nurul Islam Mia',
-    'Rukhsar Ahmed Chowdhury',
-    'Sadia Rahman',
-    'Shahidul Islam',
-    'Nasrin Akhtar',
-    'Mizanur Rahman',
-    'Sultana Ahmed',
-    'Kamrul Hasan',
-    'Ayesha Begum',
-    'Zahidul Haque',
-    'Maliha Khan',
-  ]
+  console.log('Users deleted')
+  const images = await fetchMessages(NAME_LIST.length * IMAGE_PER_USER)
+  console.log('Uploaded images Loaded')
 
   const userList: User[] = []
   const mediaList: Media[] = []
-  let userN = 0
-  let imageN = 0
+  let iUser = 0
+  let iImage = 0
 
-  for (let name of fullNameList) {
+  for (const name of NAME_LIST) {
     const user = await service.user.create(
-      await jwt.sign('signup-email', `247sayad+dev-${++userN}@gmail.com`),
-      { name, password: '123' }
+      await jwt.sign('signup-email', `247sayad+${iUser + 1}@gmail.com`),
+      { name, password: '123456' }
     )
     console.log('created:', user.email)
     userList.push(user)
+    iUser++
 
-    const images = await getImages(10)
-    console.log('Images Loaded for user:', user.email)
+    for (let i = 1; i <= IMAGE_PER_USER; i++) {
+      const media = await service.media.createMedia(
+        { ...user, role: 'ADMIN' },
+        {
+          title: `Test Media ${iImage + 1}`,
+          newCategory: Math.random().toString(36).substring(7),
+        },
+        async () => images[iImage] ?? uploadMessage(),
+        async (result) => console.log('Deleting:', result.id)
+      )
 
-    for (let element of images) {
-      const media = await uploadMedia({ ...user, status: 'ADMIN' }, element, {
-        newCategory: Math.random().toString(36).substring(7),
-        title: `Test Media ${++imageN}`,
-      })
-      console.log('created:', media.id)
+      console.log('Image created:', media.id)
       mediaList.push(media)
+      iImage++
     }
   }
 
-  for (let user of userList) {
-    const randomMedia = getRandomItems(mediaList, 50)
-    for (let media of randomMedia) {
-      await service.media.createLove(user.id, media.id)
-      await service.media.createReport(user.id, media.id, {
-        type: 'OTHER',
+  const reactionsToCreate = []
+  const reportsToCreate = []
+
+  for (const user of userList) {
+    const randomMedia = getRandomItems(mediaList, REACTION_PER_USER)
+    for (const media of randomMedia) {
+      reactionsToCreate.push({ mediaId: media.id, userId: user.id })
+      reportsToCreate.push({
+        userId: user.id,
+        mediaId: media.id,
+        type: 'OTHER' as const,
         message: 'This is a test report',
       })
     }
   }
+
+  await db.mediaReport.createMany({ data: reportsToCreate })
+  await db.mediaReaction.createMany({ data: reactionsToCreate })
 
   console.log('Done')
   process.exit()

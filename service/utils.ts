@@ -1,3 +1,6 @@
+import { Attachment } from 'discord.js'
+import { DiscordCustomAttachment } from './types'
+
 export type Prettify<T extends object> = {
   [Key in keyof T]: T[Key]
 } & {}
@@ -20,7 +23,8 @@ export function pick<T extends object, K extends keyof T>(
 ) {
   const newObj: any = {}
   keys.forEach((key) => {
-    newObj[key] = obj[key]
+    const value = obj[key]
+    if (value !== undefined) newObj[key] = value
   })
 
   return newObj as PrettifyPick<T, K>
@@ -30,4 +34,21 @@ export function createIncludeQuery<T extends readonly string[]>(args: T) {
   return Object.fromEntries(args.map((a) => [a, true])) as Prettify<
     Record<T[number], true>
   >
+}
+
+export function extractAttachment(
+  attachment: Attachment
+): DiscordCustomAttachment {
+  return {
+    url: `${attachment.id}/${attachment.name}`,
+    height: attachment.height!,
+    width: attachment.width!,
+    size: attachment.size,
+  }
+}
+
+export function isUUID(uuidString: string) {
+  const uuidRegex =
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
+  return uuidRegex.test(uuidString)
 }

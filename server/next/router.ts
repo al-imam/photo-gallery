@@ -9,7 +9,28 @@ import { NextResponse } from 'next/server'
 import errorFormat from '@/service/errorFormat'
 
 export const router = Router.create<NextHandler>({
-  middleware: [],
+  middleware: [
+    async (req, ctx, next) => {
+      ctx.query = function () {
+        return Object.fromEntries(req.nextUrl.searchParams.entries())
+      } as any
+
+      const contentType = req.headers.get('content-type')
+
+      try {
+        if (contentType?.includes('application/json')) {
+          const body = await (req as any).json()
+          ctx.body = () => body
+        } else {
+          throw Error('Content-Type must be application/json')
+        }
+      } catch {
+        ctx.body<null> = () => null
+      }
+
+      return next()
+    },
+  ],
   errorHandler: async (err: any) => {
     const [message, status] = errorFormat(err)
     return NextResponse.json({ error: message.toString() }, { status })
@@ -32,7 +53,10 @@ export const optionalAuthRouter = router.create<NextOptUserHandler>({
       try {
         const token = req.headers.get('authorization')
         ctx.user = await service.auth.checkAuth(token, 'auth')
-      } catch {}
+      } catch {
+        ctx.user = undefined
+      }
+
       return next()
     },
   ],

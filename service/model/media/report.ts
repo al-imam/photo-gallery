@@ -1,28 +1,33 @@
 import db from '@/service/db'
-import { PrettifyPick } from '@/service/utils'
+import { PrettifyPick, pick } from '@/service/utils'
 import { MediaReport, User } from '@prisma/client'
 import ReqErr from '@/service/ReqError'
+import { PaginationQueries, paginationQueries } from '@/service/helpers'
 import { userPermissionFactory } from '../helpers'
+
+export type GetReportsOptions = PaginationQueries &
+  PrettifyPick<MediaReport, never, 'mediaId' | 'userId' | 'status' | 'type'>
+
+export async function getReports(options: GetReportsOptions) {
+  return db.mediaReport.findMany({
+    ...paginationQueries({
+      orderByKey: 'createdAt',
+      orderBy: 'desc',
+      ...options,
+    }),
+
+    where: {
+      mediaId: options.mediaId,
+      userId: options.userId,
+      status: options.status,
+      type: options.type,
+    },
+  })
+}
 
 export async function getReportForMedia(userId: string, mediaId: string) {
   return db.mediaReport.findFirstOrThrow({
     where: { mediaId, userId },
-  })
-}
-
-export async function getReports(
-  user: PrettifyPick<User, 'id' | 'status'>,
-  mediaId: string
-) {
-  const permission = userPermissionFactory(user)
-  if (!permission.isModeratorLevel) {
-    throw new ReqErr('You are not allowed to view reports')
-  }
-
-  return db.mediaReport.findMany({
-    where: {
-      mediaId,
-    },
   })
 }
 
@@ -36,8 +41,7 @@ export async function createReport(
     data: {
       userId,
       mediaId,
-      type: body.type,
-      message: body.message,
+      ...pick(body, 'type', 'message'),
     },
   })
 }
@@ -46,7 +50,7 @@ export type UpdateReportBody = Partial<
   CreateReportBody & PrettifyPick<MediaReport, 'status'>
 >
 export async function updateReport(
-  user: PrettifyPick<User, 'id' | 'status'>,
+  user: PrettifyPick<User, 'id' | 'role'>,
   reportId: string,
   body: UpdateReportBody
 ) {
@@ -59,16 +63,12 @@ export async function updateReport(
       id: reportId,
       userId: typeof user === 'string' ? user : user.id,
     },
-    data: {
-      type: body.type,
-      status: body.status,
-      message: body.message,
-    },
+    data: pick(body, 'type', 'status', 'message'),
   })
 }
 
 export async function deleteReport(
-  user: PrettifyPick<User, 'id' | 'status'>,
+  user: PrettifyPick<User, 'id' | 'role'>,
   reportId: string
 ) {
   const result = await db.mediaReport.delete({

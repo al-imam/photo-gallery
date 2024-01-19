@@ -7,18 +7,20 @@ import {
 } from './image'
 import env from './env'
 import ReqErr from './ReqError'
+import { extractAttachment } from './utils'
+import { DiscordAvatarUploadResult, DiscordMediaUploadResult } from './types'
 
 const client = new Discord.Client({ intents: [] })
 client.login(env.DISCORD_TOKEN)
 
-function getDiscordClient(): Promise<Discord.Client<true>> {
+export function getDiscordClient(): Promise<Discord.Client<true>> {
   return new Promise((resolve) => {
     if (client.isReady()) return resolve(client)
     client.once('ready', resolve)
   })
 }
 
-async function getDiscordChannel(channelId: string) {
+export async function getDiscordChannel(channelId: string) {
   const client = await getDiscordClient()
   const channel =
     client.channels.cache.get(channelId) ??
@@ -31,18 +33,13 @@ async function getDiscordChannel(channelId: string) {
   return channel
 }
 
-async function sendAttachments<T extends Attachment[]>(
+export async function sendAttachments<T extends Attachment[]>(
   channelId: string,
   ...args: T
 ) {
   const channel = await getDiscordChannel(channelId)
   const data = await channel.send({ files: args })
-  const normalized = data.attachments.map((attachment) => ({
-    url: `${attachment.id}/${attachment.name}`,
-    height: attachment.height!,
-    width: attachment.width!,
-    size: attachment.size,
-  }))
+  const normalized = data.attachments.map(extractAttachment)
 
   return {
     id: data.id,
@@ -53,14 +50,14 @@ async function sendAttachments<T extends Attachment[]>(
   }
 }
 
-async function removeMessage(channelId: string, id: string) {
+export async function removeMessage(channelId: string, id: string) {
   const channel = await getDiscordChannel(channelId)
   const message = await channel.messages.fetch(id)
   return message.delete()
 }
 
 export default {
-  async uploadMedia(buffer: Buffer) {
+  async uploadMedia(buffer: Buffer): Promise<DiscordMediaUploadResult> {
     const media = await generateMedia(buffer)
     const thumbnail = await generateThumbnail(buffer)
     const { attachments, ...data } = await sendAttachments(
@@ -76,7 +73,7 @@ export default {
     }
   },
 
-  async uploadAvatar(buffer: Buffer) {
+  async uploadAvatar(buffer: Buffer): Promise<DiscordAvatarUploadResult> {
     const { attachments, ...data } = await sendAttachments(
       env.DISCORD_CHANNEL_AVATAR,
       await generateAvatar(buffer, 64),

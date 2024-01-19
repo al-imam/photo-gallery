@@ -1,28 +1,23 @@
 import { NextResponse } from 'next/server'
 import service from '@/service'
 import { optionalAuthRouter } from '@/server/next/router'
-import { queryToNumber } from '@/server/next/utils'
-import { FeaturedMediaOptions } from '@/service/model/media/types'
-import { ContentStatus } from '@prisma/client'
+import { MediaListOptions } from '@/service/model/media'
+import { addLovesToMedia } from '@/service/model/media/helpers'
+import { MediaWithLoves } from '@/service/types'
 
-export type GetQuery = Partial<Record<keyof FeaturedMediaOptions, string>>
+export type GetQuery = Partial<
+  Record<keyof MediaListOptions, string> & Pick<MediaListOptions, 'status'>
+>
 export type GetData = {
-  mediaList: Awaited<ReturnType<typeof service.media.getLatestMediaList>>
+  mediaList: MediaWithLoves[]
 }
-
-export const dynamic = 'force-dynamic'
 export const GET = optionalAuthRouter(async (req, ctx) => {
-  const query = Object.fromEntries(
-    req.nextUrl.searchParams.entries()
-  ) as GetQuery
+  const mediaList = await service.media.getLatestMediaList(
+    ctx.user,
+    ctx.query<GetQuery>()
+  )
 
-  const mediaList = await service.media.getLatestMediaList(ctx.user, {
-    cursor: query.cursor,
-    category: query.category,
-    authorId: query.authorId,
-    status: query.status as ContentStatus,
-    limit: queryToNumber(query.limit),
+  return NextResponse.json<GetData>({
+    mediaList: await addLovesToMedia(mediaList, ctx.user?.id),
   })
-
-  return NextResponse.json<GetData>({ mediaList })
 })

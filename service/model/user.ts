@@ -1,54 +1,102 @@
 import * as hash from '../hash'
-import db, { User } from '../db'
+import db, { User, UserRole } from '../db'
 import { PrettifyPick } from '../utils'
 import mail from '../mail'
 import ReqErr from '../ReqError'
+import { USER_PUBLIC_FIELDS_QUERY } from '../config'
+import { PaginationQueries, paginationQueries } from '../helpers'
 
 export function fetchById(id: string) {
-  return db.user.findUnique({ where: { id } })
+  return db.user.findUniqueOrThrow({ where: { id } })
 }
 
-export function fetchByUsername(username: string) {
-  return db.user.findUniqueOrThrow({
-    where: { username },
+export type GetUserListOptions = PaginationQueries &
+  Partial<{
+    role: UserRole
+    search: string
+  }>
+
+export async function getUserList(options: GetUserListOptions = {}) {
+  return db.user.findMany({
+    ...paginationQueries<User>({
+      orderByKey: 'id',
+      orderBy: 'asc',
+      ...options,
+    }),
+
+    where: {
+      ...(options.role ? { role: options.role } : undefined),
+      ...(options.search
+        ? {
+            OR: [
+              { name: { contains: options.search, mode: 'insensitive' } },
+              { email: { contains: options.search, mode: 'insensitive' } },
+              { username: { contains: options.search, mode: 'insensitive' } },
+            ],
+          }
+        : undefined),
+    },
+
+    select: USER_PUBLIC_FIELDS_QUERY,
   })
 }
 
-export async function create(
-  token: string,
-  data: PrettifyPick<User, 'name' | 'password'>
-) {
+export type UserCreateBody = PrettifyPick<User, 'name' | 'password'>
+export async function create(token: string, data: UserCreateBody) {
   const { payload: email } = await hash.jwt.verify('signup-email', token)
 
   const user = await db.user.create({
     data: {
-      email,
       name: data.name,
+      email,
       password: await hash.bcrypt.encrypt(data.password),
     },
   })
 
   await db.profile.create({
     data: {
-      id: user.id,
+      userId: user.id,
     },
   })
 
   return user
 }
 
-export function update(
-  userId: string,
-  data: PrettifyPick<User, never, 'name'>
-) {
+export type UserUpdateBody = PrettifyPick<User, never, 'name'>
+export function update(userId: string, data: UserUpdateBody) {
   return db.user.update({
     where: { id: userId },
-    data,
+    data: { name: data.name },
   })
 }
 
 export function remove(userId: string) {
   return db.user.delete({ where: { id: userId } })
+}
+
+export type ChangeStatusBody = { role: UserRole; comment?: string }
+export async function changeStatus(
+  by: User,
+  userId: string,
+  body: ChangeStatusBody
+) {
+  const oldUser = await db.user.findUniqueOrThrow({ where: { id: userId } })
+  const newUser = await db.user.update({
+    where: { id: userId },
+    data: { role: body.role },
+  })
+
+  await db.lOG_RoleChange.create({
+    data: {
+      userId: newUser.id,
+      moderatedById: by.id,
+      role_old: oldUser.role,
+      role_new: newUser.role,
+      comment: body.comment,
+    },
+  })
+
+  return newUser
 }
 
 export async function requestEmailChange(
@@ -59,7 +107,7 @@ export async function requestEmailChange(
   if (count) throw new ReqErr('Email already exists')
 
   const token = await hash.jwt.sign('change-email', {
-    id: user.id,
+    userId: user.id,
     newEmail,
   })
 
@@ -68,11 +116,13 @@ export async function requestEmailChange(
 
 export async function confirmEmailChange(token: string) {
   const { payload, iatVerify } = await hash.jwt.verify('change-email', token)
-  const user = await db.user.findUniqueOrThrow({ where: { id: payload.id } })
+  const user = await db.user.findUniqueOrThrow({
+    where: { id: payload.userId },
+  })
   iatVerify(user.authModifiedAt)
 
   return db.user.update({
-    where: { id: payload.id, email: payload.newEmail },
+    where: { id: payload.userId, email: payload.newEmail },
     data: { email: payload.newEmail, authModifiedAt: new Date() },
   })
 }
@@ -80,7 +130,7 @@ export async function confirmEmailChange(token: string) {
 export async function requestPasswordReset(email: string) {
   const user = await db.user.findUniqueOrThrow({ where: { email } })
   const token = await hash.jwt.sign('reset-password', {
-    id: user.id,
+    userId: user.id,
     email: user.email,
   })
 
@@ -90,7 +140,7 @@ export async function requestPasswordReset(email: string) {
 export async function confirmPasswordReset(token: string, newPassword: string) {
   const { payload, iatVerify } = await hash.jwt.verify('reset-password', token)
   const user = await db.user.findUniqueOrThrow({
-    where: { id: payload.id, email: payload.email },
+    where: { id: payload.userId, email: payload.email },
   })
   iatVerify(user.authModifiedAt)
 
@@ -125,6 +175,6 @@ export async function changeUsername(userId: string, newUsername: string) {
 
   return db.user.update({
     where: { id: userId },
-    data: { username: newUsername.toLowerCase() },
+    data: { username: newUsername },
   })
 }

@@ -27,8 +27,8 @@ async function mail(to: string, subject: string, body: string) {
 
 export default {
   sendSignupToken(to: string, token: string) {
-    const url = `${env.VERCEL_URL}/signup/complete?token=${token}`
-    console.log(to, token)
+    const url = `${env.NEXT_PUBLIC_URL}/signup/complete?token=${token}`
+    console.log(to, url, token)
 
     return mail(
       to,
@@ -48,7 +48,8 @@ export default {
   },
 
   sendResetToken(to: string, token: string) {
-    const url = `${env.VERCEL_URL}/reset-password/complete?token=${token}`
+    const url = `${env.NEXT_PUBLIC_URL}/reset-password/complete?token=${token}`
+    console.log(to, url, token)
 
     return mail(
       to,
@@ -67,7 +68,28 @@ export default {
   },
 
   sendChangeEmailToken(to: string, token: string) {
-    const url = `${env.VERCEL_URL}/change-email/complete?token=${token}`
+    const url = `${env.NEXT_PUBLIC_URL}/change-email/complete?token=${token}`
+    console.log(to, url, token)
+
+    return mail(
+      to,
+      'Change your email address',
+      template1({
+        welcome: 'Change Email!',
+        iconUrl: 'https://img.icons8.com/?size=256&id=113805&format=png',
+        hidden: `Please click the link below to change your email address: <a href="${url}">Change email address</a>`,
+        description:
+          'We heard that you want to change your email address. Just press the button below to change your email address.',
+        color: '#F56565',
+        buttonText: 'Change email',
+        buttonLink: url,
+      })
+    )
+  },
+
+  sendPublicEmailToken(to: string, token: string) {
+    const url = `${env.NEXT_PUBLIC_URL}/public-email/complete?token=${token}`
+    console.log(to, url, token)
 
     return mail(
       to,

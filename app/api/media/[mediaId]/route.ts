@@ -1,23 +1,36 @@
-import { Media } from '@prisma/client'
-import { authRouter, router } from '@/server/next/router'
+import {
+  setMedia,
+  sendMediaWithLoves,
+  SendMediaWithLovesData,
+} from '@/server/next/middlewares/media'
+import { authRouter, optionalAuthRouter } from '@/server/next/router'
+import { queryToNumber } from '@/server/next/utils'
 import service from '@/service'
-import { NextResponse } from 'next/server'
-import { UpdateMediaBody } from '@/service/model/media/types'
-import { sendMediaWithLoves, setMedia } from '@/server/next/middlewares/media'
-import { MediaWithLoves } from '@/service/types'
+import { UpdateMediaBody } from '@/service/model/media'
 
-export type GetData = { media: MediaWithLoves }
-export const GET = router(setMedia, sendMediaWithLoves)
+export type GetQuery = { limit: string }
+export type GetData = SendMediaWithLovesData
+export const GET = optionalAuthRouter(
+  setMedia,
+  async (_, ctx, next) => {
+    ctx.relatedMedia = await service.media.getRelatedMedia(
+      ctx.media,
+      queryToNumber(ctx.query<GetQuery>().limit)
+    )
+    return next()
+  },
+  sendMediaWithLoves
+)
 
 export type PatchBody = UpdateMediaBody
-export type PatchData = { media: Media }
+export type PatchData = SendMediaWithLovesData
 export const PATCH = authRouter(
   setMedia,
-  async (req, ctx, next) => {
+  async (_, ctx, next) => {
     const media = await service.media.updateMedia(
       ctx.user,
       ctx.media,
-      await req.json<PatchBody>()
+      ctx.body<PatchBody>()
     )
 
     ctx.media = media
@@ -25,8 +38,3 @@ export const PATCH = authRouter(
   },
   sendMediaWithLoves
 )
-
-export const DELETE = authRouter(setMedia, async (_, ctx) => {
-  await service.media.deleteMedia(ctx.user, ctx.media)
-  return NextResponse.json(null)
-})

@@ -1,12 +1,7 @@
-export async function getImages(length: number) {
-  const promises = new Array(length)
-    .fill(0)
-    .map(() => fetch('https://source.unsplash.com/random/?palestine'))
-
-  const responses = await Promise.all(promises)
-  const buffers = await Promise.all(responses.map((res) => res.arrayBuffer()))
-  return buffers.map((buffer) => Buffer.from(buffer))
-}
+import discord, { getDiscordChannel } from '@/service/discord'
+import env from '@/service/env'
+import { DiscordMediaUploadResult } from '@/service/types'
+import { extractAttachment } from '@/service/utils'
 
 export function getRandomItems<T extends any[], N extends number>(
   array: T,
@@ -22,4 +17,39 @@ export function getRandomItems<T extends any[], N extends number>(
   }
 
   return copyArray.slice(0, n) as any
+}
+
+export async function fetchMessages(remaining: number) {
+  const messages: DiscordMediaUploadResult[] = []
+  const channel = await getDiscordChannel(env.DISCORD_CHANNEL_MEDIA)
+
+  while (remaining) {
+    const rawMessages = await channel.messages.fetch({
+      limit: remaining < 100 ? remaining : 100,
+      before: messages.at(-1)?.id,
+    })
+
+    console.log(rawMessages)
+
+    if (!rawMessages.size) break
+    rawMessages.forEach((message) => {
+      const [media, thumbnail] = message.attachments.map(extractAttachment)
+
+      remaining--
+      messages.push({
+        id: message.id,
+        channel: message.channel.id,
+        media,
+        thumbnail,
+      })
+    })
+  }
+
+  return messages
+}
+
+export async function uploadMessage() {
+  const response = await fetch('https://source.unsplash.com/random/?palestine')
+  const buffer = await response.arrayBuffer()
+  return discord.uploadMedia(Buffer.from(buffer))
 }

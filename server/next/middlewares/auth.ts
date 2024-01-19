@@ -6,14 +6,16 @@ import { NextUserHandler } from '@/service/types'
 import { pick } from '@/service/utils'
 import ReqErr from '@/service/ReqError'
 import { User } from '@prisma/client'
+import { userPermissionFactory } from '@/service/model/helpers'
 
-export type SendUserAndToken = {
+export type SendUserAndTokenData = {
   user: Pick<User, (typeof USER_SAFE_FIELDS)[number]> & {}
-
   jwt_token: string
 }
 
-export const sendUserAndToken: NextUserHandler = async (_, ctx) => {
+export const sendUserAndToken: NextUserHandler<{
+  response?: Record<string, any>
+}> = async (_, ctx) => {
   const cookieToken = await hash.jwt.sign('cookie', ctx.user.id)
   const authToken = await hash.jwt.sign('auth', ctx.user.id)
 
@@ -25,7 +27,7 @@ export const sendUserAndToken: NextUserHandler = async (_, ctx) => {
     maxAge: Date.now() + 86400000 * 30,
   })
 
-  return NextResponse.json<SendUserAndToken>({
+  return NextResponse.json<SendUserAndTokenData>({
     ...ctx.response,
     user: {
       ...pick(ctx.user, ...USER_SAFE_FIELDS),
@@ -34,10 +36,8 @@ export const sendUserAndToken: NextUserHandler = async (_, ctx) => {
   })
 }
 
-export const checkPassword: NextUserHandler = async (req, ctx, next) => {
-  const body = await req.json()
-  ctx.data = body
-
+export const checkPassword: NextUserHandler<{}> = async (req, ctx, next) => {
+  const body = ctx.body<{ password: string }>()
   if (!body.password) {
     throw new ReqErr('Password is required')
   }
@@ -49,9 +49,10 @@ export const checkPassword: NextUserHandler = async (req, ctx, next) => {
   throw new ReqErr('Password is incorrect')
 }
 
-export const setTokenFromQuery: NextUserHandler = async (req, ctx, next) => {
-  const token = req.nextUrl.searchParams.get('token')
-  if (!token) throw new ReqErr('Token is required!', 400)
-  ctx.token = token
-  return next()
+export const onlyAdmin: NextUserHandler<{}> = async (req, ctx, next) => {
+  if (userPermissionFactory(ctx.user).isAdmin) {
+    return next()
+  }
+
+  throw new ReqErr('You are not allowed to do this')
 }

@@ -5,7 +5,7 @@ import { createIncludeQuery } from './utils'
 export const USER_PUBLIC_FIELDS = [
   'id',
   'name',
-  'status',
+  'role',
   'avatar_sm',
   'avatar_md',
   'avatar_lg',
@@ -22,4 +22,7 @@ keys satisfies keyof User
 export const MEDIA_INCLUDE_QUERY = {
   author: { select: USER_PUBLIC_FIELDS_QUERY },
   category: true,
+  _count: {
+    select: { reactions: true },
+  },
 }
