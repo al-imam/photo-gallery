@@ -100,10 +100,12 @@ export function NavBar({ takeHeight = true }) {
                   <button className="[all:unset] group cursor-pointer">
                     <Avatar className="group-focus:ring-4 ring-foreground ml-1 cursor-pointer">
                       <AvatarImage
-                        src="https://github.com/shadcn.png"
-                        alt="profile picture"
+                        src={currentUser.avatar_sm ?? ''}
+                        alt={currentUser.name}
                       />
-                      <AvatarFallback>CN</AvatarFallback>
+                      <AvatarFallback>
+                        {currentUser.name.substring(0, 2)}
+                      </AvatarFallback>
                     </Avatar>
                   </button>
                 ) : (
