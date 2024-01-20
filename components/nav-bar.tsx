@@ -19,6 +19,7 @@ import { ChevronDown, Moon, MoreHorizontal, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { Fragment, useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
 
 const ghostFocus =
   'focus-visible:bg-accent focus-visible:text-accent-foreground focus-visible:ring-0 focus-visible:ring-offset-0'
@@ -27,7 +28,7 @@ export function NavBar({ takeHeight = true }) {
   const ref = useRef<HTMLElement>(null)
   const [isIntersecting, setIntersecting] = useState(true)
   const { setTheme } = useTheme()
-  const { currentUser } = useAuth()
+  const { currentUser, signOut } = useAuth()
   const isAuthenticated = !!currentUser
 
   useEffect(() => {
@@ -177,13 +178,6 @@ export function NavBar({ takeHeight = true }) {
                   <DropdownMenuSeparator />
                 </div>
 
-                {isAuthenticated && (
-                  <DropdownMenuItem asChild>
-                    <Link href="/settings" className="hover:cursor-pointer">
-                      Settings
-                    </Link>
-                  </DropdownMenuItem>
-                )}
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>
                     <p className="flex items-center gap-2">
@@ -215,6 +209,13 @@ export function NavBar({ takeHeight = true }) {
                     </DropdownMenuSubContent>
                   </DropdownMenuPortal>
                 </DropdownMenuSub>
+                {isAuthenticated && (
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings" className="hover:cursor-pointer">
+                      Settings
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/support" className="hover:cursor-pointer">
@@ -244,6 +245,24 @@ export function NavBar({ takeHeight = true }) {
                     Learn more
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                {isAuthenticated && (
+                  <DropdownMenuItem
+                    onClick={() =>
+                      signOut({
+                        onError() {
+                          toast.error('Unable to sign out at the moment.')
+                        },
+                        onSuccess() {
+                          toast.success('You have been securely signed out.')
+                        },
+                      })
+                    }
+                    className="cursor-pointer"
+                  >
+                    Signout
+                  </DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
 
