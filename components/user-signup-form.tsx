@@ -83,7 +83,7 @@ export function UserSignupForm({ className, ...props }: UserSignupFormProps) {
           </span>
         </div>
       </div>
-      <Button variant="outline" onClick={googleAuth}>
+      <Button variant="outline" onClick={() => googleAuth()}>
         <GoogleIcon className="mr-2 h-4 w-4" /> Google
       </Button>
     </div>

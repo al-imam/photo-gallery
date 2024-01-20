@@ -2,6 +2,7 @@ import r, { env } from 'rype'
 
 export default env({
   GOOGLE_EMAIL: r.string(),
+  GOOGLE_OAUTH_SECRET: r.string(),
   GOOGLE_PASSWORD: r.string(),
   DISCORD_CHANNEL_MEDIA: r.string(),
   DISCORD_CHANNEL_AVATAR: r.string(),
