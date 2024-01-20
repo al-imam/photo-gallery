@@ -2,6 +2,7 @@ import { UserCompleteForm } from '@/components/user-complete-form'
 import sdk from '@/sdk'
 import { buttonVariants } from '@/shadcn/ui/button'
 import { cn } from '@/shadcn/utils'
+import { ArrowLeftIcon } from 'lucide-react'
 import { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -35,7 +36,7 @@ export default async function Complete({
             className="w-full h-full object-cover select-none dragging-none"
           />
         </div>
-        <div className="min-h-full p-4">
+        <div className="relative min-h-full p-4">
           <Link
             href="/signup"
             className={cn(
@@ -44,6 +45,16 @@ export default async function Complete({
             )}
           >
             Signup
+          </Link>
+
+          <Link
+            href="/"
+            className={cn(
+              buttonVariants({ variant: 'ghost' }),
+              'absolute left-4 top-4 md:left-8 md:top-8'
+            )}
+          >
+            <ArrowLeftIcon className="w-6 h-6" />
           </Link>
           <div className="flex items-center justify-center max-w-lg mx-auto h-full">
             <div className="flex w-full flex-col justify-center space-y-6 ">
