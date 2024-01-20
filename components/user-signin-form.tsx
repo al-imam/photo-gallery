@@ -1,5 +1,7 @@
 'use client'
 
+import { useAuth } from '@/hooks'
+import { GoogleIcon, SpinnerIcon } from '@/icons'
 import { Button } from '@/shadcn/ui/button'
 import {
   Form,
@@ -10,12 +12,11 @@ import {
 } from '@/shadcn/ui/form'
 import { Input } from '@/shadcn/ui/input'
 import { cn } from '@/shadcn/utils'
+import { emailRegex } from '@/util'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { useAuth } from '@/hooks'
-import { GoogleIcon, SpinnerIcon } from '@/icons'
-import { emailRegex } from '@/util'
+import { Password } from './form/password'
 
 interface UserSigninFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -81,7 +82,7 @@ export function UserSigninForm({ className, ...props }: UserSigninFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Password" {...field} />
+                    <Password placeholder="Password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
