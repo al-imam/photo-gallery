@@ -50,15 +50,13 @@ export async function createCore(data: UserCreateCoreBody) {
   const user = await db.user.create({
     data: {
       email: data.email,
+      password: data.password,
       name: data.name || data.email.split('@')[0],
-      password: await hash.bcrypt.encrypt(data.password),
     },
   })
 
   await db.profile.create({
-    data: {
-      userId: user.id,
-    },
+    data: { userId: user.id },
   })
 
   return user
@@ -67,7 +65,13 @@ export async function createCore(data: UserCreateCoreBody) {
 export type UserCreateBody = PrettifyPick<User, 'password', 'name'>
 export async function create(token: string, data: UserCreateBody) {
   const { payload: email } = await hash.jwt.verify('signup-email', token)
-  return createCore({ ...data, email })
+  const password = await hash.bcrypt.encrypt(data.password)
+
+  return createCore({
+    ...data,
+    email,
+    password,
+  })
 }
 
 export type UserUpdateBody = PrettifyPick<User, never, 'name'>

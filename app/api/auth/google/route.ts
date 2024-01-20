@@ -25,7 +25,7 @@ export const GET = router(async (req, ctx) => {
     user = await service.user.createCore({
       email: googleUser.email,
       name: googleUser.name,
-      password: '123456',
+      password: 'NONE',
     })
   }
 
