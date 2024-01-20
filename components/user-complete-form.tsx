@@ -64,14 +64,14 @@ export function UserCompleteForm({
     if (error) return toast.error('Something went wrong!')
     toast.success("Welcome you're in!")
 
-    router.replace(qp.get('callbackURL') ?? '/')
+    return router.replace(qp.get('callbackURL') ?? '/')
   }
 
   return (
     <div className={cn('grid gap-6', className)} {...props}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="grid gap-2">
+          <div className="grid gap-3">
             <FormField
               control={form.control}
               name="email"
@@ -129,7 +129,7 @@ export function UserCompleteForm({
                 </FormItem>
               )}
             />
-            <Button disabled={form.formState.isSubmitting} className="mt-1">
+            <Button disabled={form.formState.isSubmitting}>
               {form.formState.isSubmitting && (
                 <SpinnerIcon className="mr-2 h-4 w-4 animate-spin" />
               )}

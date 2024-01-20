@@ -39,7 +39,7 @@ export const Password = React.forwardRef<HTMLInputElement, InputProps>(
         <button
           type="button"
           onClick={() => setIsPasswordVisible((previous) => !previous)}
-          className="border-none outline-none text-muted-foreground my-1.5 opacity-50 rounded-full bg-opacity-50 transition-colors bg-transparent p-1 aspect-square -mr-[2px] flex justify-center items-center focus-visible:bg-muted hover:bg-muted"
+          className="border-none outline-none text-muted-foreground my-1.5 opacity-20 rounded-full bg-opacity-20 transition-all bg-transparent p-1 aspect-square -mr-[2px] flex justify-center items-center focus-visible:bg-muted hover:bg-muted hover:opacity-50"
         >
           {isPasswordVisible ? (
             <EyeOffIcon className="w-5 h-5" />

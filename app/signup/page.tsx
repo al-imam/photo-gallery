@@ -62,6 +62,23 @@ export default async function Signin({
                 </p>
               </div>
               <UserSignupForm />
+              <p className="text-center text-sm text-muted-foreground">
+                By clicking signup, you agree to our{' '}
+                <Link
+                  href="/terms-of-service"
+                  className="underline underline-offset-4 hover:text-primary"
+                >
+                  Terms of Service
+                </Link>{' '}
+                and{' '}
+                <Link
+                  href="/privacy-policy"
+                  className="underline underline-offset-4 hover:text-primary"
+                >
+                  Privacy Policy
+                </Link>
+                .
+              </p>
             </div>
           </div>
         </div>
