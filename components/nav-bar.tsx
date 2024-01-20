@@ -175,6 +175,13 @@ export function NavBar({ takeHeight = true }) {
                   <DropdownMenuSeparator />
                 </div>
 
+                {isAuthenticated && (
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings" className="hover:cursor-pointer">
+                      Settings
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>
                     <p className="flex items-center gap-2">
