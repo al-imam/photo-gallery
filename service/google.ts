@@ -2,23 +2,18 @@ import axios, { AxiosError } from 'axios'
 import env from './env'
 
 export type GoogleData = { email: string; name: string; avatar: string }
-export type GoogleState = {
-  client_id: string
-  redirect_uri: string
-}
 
 export default async function (
-  authCode: string,
-  state: GoogleState
+  authCode: string
 ): Promise<[GoogleData, null] | [null, string]> {
   try {
     const tokenResponse = await axios.post(
       'https://oauth2.googleapis.com/token',
       {
         code: authCode,
-        client_id: state.client_id,
-        redirect_uri: state.redirect_uri,
         client_secret: env.GOOGLE_OAUTH_SECRET,
+        client_id: env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID,
+        redirect_uri: env.NEXT_PUBLIC_GOOGLE_OAUTH_REDIRECT,
         grant_type: 'authorization_code',
       }
     )
