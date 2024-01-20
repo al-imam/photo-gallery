@@ -33,6 +33,7 @@ const USER_TO_CREATE = 20
       const media = await service.media.createMedia(
         { ...user, role: 'ADMIN' },
         {
+          status: 'APPROVED',
           title: `Test Media ${iImage + 1}`,
           newCategory: Math.random().toString(36).substring(7),
         },

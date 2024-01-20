@@ -7,7 +7,7 @@ export const POST = authRouter(async (_, ctx) => {
   const collection = await service.collection.addMediaToCollection(
     ctx.params.collectionId!,
     ctx.user.id,
-    ctx.body<PostBody>().mediaId
+    ctx.params.mediaId!
   )
 
   return NextResponse.json({ collection })
@@ -18,7 +18,7 @@ export const DELETE = authRouter(async (_, ctx) => {
   const collection = await service.collection.removeMediaFromCollection(
     ctx.params.collectionId!,
     ctx.user.id,
-    ctx.body<DeleteBody>().mediaId
+    ctx.params.mediaId!
   )
 
   return NextResponse.json({ collection })

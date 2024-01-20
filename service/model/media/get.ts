@@ -71,6 +71,7 @@ export async function getRelatedMedia(
       orderBy: { createdAt: 'desc' },
       where: {
         ...where,
+        status: 'APPROVED',
         id: { not: { in: [media.id, ...related.map((media) => media.id)] } },
       },
     })
