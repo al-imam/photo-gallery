@@ -184,12 +184,23 @@
     animation: loading 1500ms ease infinite;
   }
 
-  @keyframes loading {
+  .scroll-progress {
+    transform-origin: left;
+    animation: scale-progress auto linear;
+    animation-timeline: scroll(root);
+  }
+
+  @keyframes scale-progress {
     0% {
-      background-position: 100%;
+      transform: scaleX(0);
+      background-color: red;
+    }
+    50% {
+      background-color: yellow;
     }
     100% {
-      background-position: 0%;
+      transform: scaleX(1);
+      background-color: lime;
     }
   }
 }

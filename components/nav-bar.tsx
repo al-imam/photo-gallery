@@ -1,5 +1,7 @@
 'use client'
 
+import { useAuth } from '@/hooks'
+import { Avatar, AvatarFallback, AvatarImage } from '@/shadcn/ui/avatar'
 import { Button, buttonVariants } from '@/shadcn/ui/button'
 import {
   DropdownMenu,
@@ -16,7 +18,7 @@ import { cn } from '@/shadcn/utils'
 import { ChevronDown, Moon, MoreHorizontal, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 
 const ghostFocus =
   'focus-visible:bg-accent focus-visible:text-accent-foreground focus-visible:ring-0 focus-visible:ring-offset-0'
@@ -25,6 +27,8 @@ export function NavBar({ takeHeight = true }) {
   const ref = useRef<HTMLElement>(null)
   const [isIntersecting, setIntersecting] = useState(true)
   const { setTheme } = useTheme()
+  const { currentUser } = useAuth()
+  const isAuthenticated = !!currentUser
 
   useEffect(() => {
     if (!ref.current) return
@@ -57,7 +61,7 @@ export function NavBar({ takeHeight = true }) {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="focus-visible:bg-accent focus-visible:text-accent-foreground focus-visible:ring-0 focus-visible:ring-offset-0 gap-1"
+                  className={cn(ghostFocus, 'hidden sm:inline-flex')}
                 >
                   Explore
                   <ChevronDown className="w-4 h-4" />
@@ -66,57 +70,24 @@ export function NavBar({ takeHeight = true }) {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end">
                 <DropdownMenuItem asChild>
-                  <Link href="/explore-1" className="hover:cursor-pointer">
-                    Explore-1
+                  <Link href="/top-rated" className="hover:cursor-pointer">
+                    Top rated
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/explore-2" className="hover:cursor-pointer">
-                    Explore-2
+                  <Link href="/category" className="hover:cursor-pointer">
+                    Category
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/explore-3" className="hover:cursor-pointer">
-                    Explore-3
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/explore-4" className="hover:cursor-pointer">
-                    Explore-4
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>Sub Menu</DropdownMenuSubTrigger>
-                  <DropdownMenuPortal>
-                    <DropdownMenuSubContent>
-                      <DropdownMenuItem>Sub-1</DropdownMenuItem>
-                      <DropdownMenuItem>Sub-2</DropdownMenuItem>
-                      <DropdownMenuItem>Sub-3</DropdownMenuItem>
-                    </DropdownMenuSubContent>
-                  </DropdownMenuPortal>
-                </DropdownMenuSub>
               </DropdownMenuContent>
             </DropdownMenu>
 
             <Link
-              href="/join"
+              href="/upload"
               className={cn(
                 buttonVariants({
                   variant: 'ghost',
-                  className: ghostFocus,
-                })
-              )}
-            >
-              License
-            </Link>
-
-            <Link
-              href="/join"
-              className={cn(
-                buttonVariants({
-                  variant: 'ghost',
-                  className: ghostFocus,
+                  className: cn(ghostFocus),
                 })
               )}
             >
@@ -125,32 +96,92 @@ export function NavBar({ takeHeight = true }) {
 
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="focus-visible:bg-accent focus-visible:text-accent-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
-                >
-                  <MoreHorizontal className="h-[1.2rem] w-[1.2rem]" />
-                  <span className="sr-only">dropdown</span>
-                </Button>
+                {isAuthenticated ? (
+                  <button className="[all:unset] group cursor-pointer">
+                    <Avatar className="group-focus:ring-4 ring-foreground ml-1 cursor-pointer">
+                      <AvatarImage
+                        src="https://github.com/shadcn.png"
+                        alt="profile picture"
+                      />
+                      <AvatarFallback>CN</AvatarFallback>
+                    </Avatar>
+                  </button>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className={cn(ghostFocus, 'rotate-90 sm:rotate-0')}
+                  >
+                    <MoreHorizontal className="h-[1.2rem] w-[1.2rem]" />
+                    <span className="sr-only">dropdown</span>
+                  </Button>
+                )}
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end">
-                <DropdownMenuItem asChild>
-                  <Link href="/Link-1" className="hover:cursor-pointer">
-                    Link-1
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/link-2" className="hover:cursor-pointer">
-                    Link-2
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/link-3" className="hover:cursor-pointer">
-                    Link-3
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
+                {isAuthenticated && (
+                  <Fragment>
+                    <DropdownMenuItem asChild>
+                      <Link href="/profile" className="hover:cursor-pointer">
+                        Profile
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/photos" className="hover:cursor-pointer">
+                        Photos
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href="/collections"
+                        className="hover:cursor-pointer"
+                      >
+                        Collections
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href="/loved-photos"
+                        className="hover:cursor-pointer"
+                      >
+                        Loved Photos
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </Fragment>
+                )}
+
+                <div className="sm:hidden">
+                  {isAuthenticated || (
+                    <Fragment>
+                      <DropdownMenuItem asChild>
+                        <Link href="/signup" className="hover:cursor-pointer">
+                          Signup
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </Fragment>
+                  )}
+                  <DropdownMenuItem asChild>
+                    <Link href="/top-rated" className="hover:cursor-pointer">
+                      Top rated
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/category" className="hover:cursor-pointer">
+                      Category
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </div>
+
+                {isAuthenticated && (
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings" className="hover:cursor-pointer">
+                      Settings
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>
                     <p className="flex items-center gap-2">
@@ -161,32 +192,72 @@ export function NavBar({ takeHeight = true }) {
                   </DropdownMenuSubTrigger>
                   <DropdownMenuPortal>
                     <DropdownMenuSubContent>
-                      <DropdownMenuItem onClick={() => setTheme('light')}>
+                      <DropdownMenuItem
+                        onClick={() => setTheme('light')}
+                        className="cursor-pointer"
+                      >
                         Light
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setTheme('dark')}>
+                      <DropdownMenuItem
+                        onClick={() => setTheme('dark')}
+                        className="cursor-pointer"
+                      >
                         Dark
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setTheme('system')}>
+                      <DropdownMenuItem
+                        onClick={() => setTheme('system')}
+                        className="cursor-pointer"
+                      >
                         System
                       </DropdownMenuItem>
                     </DropdownMenuSubContent>
                   </DropdownMenuPortal>
                 </DropdownMenuSub>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/support" className="hover:cursor-pointer">
+                    Support
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/about-us" className="hover:cursor-pointer">
+                    About Us
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link
+                    href="/terms-of-service"
+                    className="hover:cursor-pointer"
+                  >
+                    Terms of service
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/privacy-policy" className="hover:cursor-pointer">
+                    Privacy policy
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/learn-more" className="hover:cursor-pointer">
+                    Learn more
+                  </Link>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Link
-              href="/join"
-              className={cn(
-                buttonVariants({
-                  variant: 'ghost',
-                  className: ghostFocus,
-                })
-              )}
-            >
-              Join
-            </Link>
+            {isAuthenticated || (
+              <Link
+                href="/signup"
+                className={cn(
+                  buttonVariants({
+                    variant: 'ghost',
+                    className: cn(ghostFocus, 'hidden sm:inline-flex'),
+                  })
+                )}
+              >
+                Signup
+              </Link>
+            )}
           </div>
 
           <div className="order-0">
