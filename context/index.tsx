@@ -5,10 +5,13 @@ import { AuthProvider } from './auth-provider'
 import { ThemeProvider } from './theme-provider'
 
 export async function Provider({ children }: React.PropsWithChildren) {
-  const [currentUser, auth] = (await sdk.auth.checkAuth()) as any
+  const [response] = await sdk.auth.checkAuth()
+
+  const _currentUser = response?.user ?? null
+  const _auth = response?.token ?? null
 
   return (
-    <AuthProvider currentUser={currentUser} auth={auth}>
+    <AuthProvider currentUser={_currentUser} auth={_auth}>
       <ThemeProvider
         attribute="class"
         defaultTheme="system"

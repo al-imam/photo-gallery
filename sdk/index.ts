@@ -36,12 +36,14 @@ const sdk = _sdk as {
   }
 }
 
+type BullShitUnion<T, U> = [T, null] | [null, U]
+
 interface SDKMethod<Fn extends (...args: any) => any> {
   (
     ...args: Parameters<Fn>
   ): ReturnType<Fn> extends Promise<any>
-    ? Promise<[Awaited<ReturnType<Fn>> | null, string | null]>
-    : [ReturnType<Fn> | null, string | null]
+    ? Promise<BullShitUnion<Awaited<ReturnType<Fn>>, string>>
+    : BullShitUnion<ReturnType<Fn>, string>
 }
 
 export default sdk
