@@ -1,11 +1,12 @@
+import { UserCompleteForm } from '@/components/user-complete-form'
+import sdk from '@/sdk'
 import { buttonVariants } from '@/shadcn/ui/button'
 import { cn } from '@/shadcn/utils'
+import { ArrowLeftIcon } from 'lucide-react'
 import { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { UserCompleteForm } from '@/components/user-complete-form'
-import sdk from '@/sdk'
 
 export const metadata: Metadata = {
   title: 'complete signup',
@@ -16,15 +17,17 @@ export default async function Complete({
 }: {
   searchParams: Record<string, string>
 }) {
-  // NOTE: -- USE Like this
-  // const [response, error] = await sdk.auth.checkAuth()
-  const [currentUser, auth] = await sdk.auth.checkAuth()
-  if (currentUser && auth) redirect(searchParams.callbackURL ?? '/')
+  const [response] = await sdk.auth.checkAuth()
+
+  const _currentUser = response?.user ?? null
+  const _auth = response?.token ?? null
+
+  if (_currentUser && _auth) redirect(searchParams.callbackURL ?? '/')
 
   return (
     <div className="bg-background">
       <div className="flex min-h-screen [&>*]:flex-1 ">
-        <div className="stack-content min-h-full max-lg:hidden border-r w-full rounded-r-lg overflow-hidden">
+        <div className="stack-content min-h-full hidden lg:grid border-r w-full rounded-r-lg overflow-hidden">
           <Image
             src="https://source.unsplash.com/random/1280x843"
             width={843}
@@ -33,7 +36,7 @@ export default async function Complete({
             className="w-full h-full object-cover select-none dragging-none"
           />
         </div>
-        <div className="min-h-full p-4">
+        <div className="relative min-h-full p-4">
           <Link
             href="/signup"
             className={cn(
@@ -42,6 +45,16 @@ export default async function Complete({
             )}
           >
             Signup
+          </Link>
+
+          <Link
+            href="/"
+            className={cn(
+              buttonVariants({ variant: 'ghost', size: 'icon' }),
+              'absolute left-4 top-4 md:left-8 md:top-8'
+            )}
+          >
+            <ArrowLeftIcon className="w-6 h-6" />
           </Link>
           <div className="flex items-center justify-center max-w-lg mx-auto h-full">
             <div className="flex w-full flex-col justify-center space-y-6 ">

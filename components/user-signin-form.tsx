@@ -1,6 +1,9 @@
 'use client'
 
-import { Button } from '@/shadcn/ui/button'
+import { Password } from '@/components/form/password'
+import { useAuth } from '@/hooks'
+import { GoogleIcon, SpinnerIcon } from '@/icons'
+import { Button, buttonVariants } from '@/shadcn/ui/button'
 import {
   Form,
   FormControl,
@@ -10,12 +13,10 @@ import {
 } from '@/shadcn/ui/form'
 import { Input } from '@/shadcn/ui/input'
 import { cn } from '@/shadcn/utils'
+import { emailRegex } from '@/util'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { useAuth } from '@/hooks'
-import { GoogleIcon, SpinnerIcon } from '@/icons'
-import { emailRegex } from '@/util'
 
 interface UserSigninFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -41,14 +42,14 @@ export function UserSigninForm({ className, ...props }: UserSigninFormProps) {
     if (error) return toast.error('Invalid email and password!')
     toast.success('Welcome back, nice to see you again!')
 
-    router.replace(qp.get('callbackURL') ?? '/')
+    return router.replace(qp.get('callbackURL') ?? '/')
   }
 
   return (
     <div className={cn('grid gap-6', className)} {...props}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="grid gap-2">
+          <div className="grid gap-3">
             <FormField
               control={form.control}
               name="email"
@@ -81,13 +82,13 @@ export function UserSigninForm({ className, ...props }: UserSigninFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Password" {...field} />
+                    <Password placeholder="Password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button disabled={form.formState.isSubmitting} className="mt-2">
+            <Button disabled={form.formState.isSubmitting}>
               {form.formState.isSubmitting && (
                 <SpinnerIcon className="mr-2 h-4 w-4 animate-spin" />
               )}
@@ -106,18 +107,9 @@ export function UserSigninForm({ className, ...props }: UserSigninFormProps) {
           </span>
         </div>
       </div>
-      <Button
-        variant="outline"
-        type="button"
-        disabled={form.formState.isSubmitting}
-      >
-        {form.formState.isSubmitting ? (
-          <SpinnerIcon className="mr-2 h-4 w-4 animate-spin" />
-        ) : (
-          <GoogleIcon className="mr-2 h-4 w-4" />
-        )}{' '}
-        Google
-      </Button>
+      <a href="#" className={buttonVariants({ variant: 'outline' })}>
+        <GoogleIcon className="mr-2 h-4 w-4" /> Google
+      </a>
     </div>
   )
 }
