@@ -9,19 +9,16 @@ for (const key in service) {
   _sdk[key] = {}
 
   for (const method in (service as any)[key]) {
-    _sdk[key][method] = (...args: any[]) => {
+    _sdk[key][method] = async (...args: any[]) => {
       try {
         const rv = (service as any)[key][method](...args)
-        return [
-          rv instanceof Promise
-            ? new Promise((res) =>
-                rv
-                  .then((v: any) => res([v, null]))
-                  .catch((e: any) => res([null, e.message]))
-              )
-            : rv,
-          null,
-        ]
+
+        if (rv instanceof Promise) {
+          const result = await rv
+          return [result, null]
+        }
+
+        return [rv, null]
       } catch (e: any) {
         return [null, e.message]
       }

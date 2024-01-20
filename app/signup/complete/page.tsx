@@ -16,6 +16,8 @@ export default async function Complete({
 }: {
   searchParams: Record<string, string>
 }) {
+  // NOTE: -- USE Like this
+  // const [response, error] = await sdk.auth.checkAuth()
   const [currentUser, auth] = await sdk.auth.checkAuth()
   if (currentUser && auth) redirect(searchParams.callbackURL ?? '/')
 

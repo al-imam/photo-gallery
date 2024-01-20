@@ -6,9 +6,12 @@ import service from '@/service'
 export async function checkAuth() {
   const token = cookies().get('authorization')?.value
   if (!token) throw new ReqErr('Token is required')
+
   const user = await service.auth.checkAuth(token, 'cookie')
+  const newToken = await hash.jwt.sign('auth', user.id)
+
   return {
     user,
-    token: await hash.jwt.sign('auth', user.id),
+    token: newToken,
   }
 }
