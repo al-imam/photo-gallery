@@ -31,8 +31,17 @@ export async function signup(email: string) {
 
 export async function login(email: string, password: string) {
   const user = await db.user.findUnique({ where: { email } })
-  if (!user || !(await hash.bcrypt.compare(password, user.password))) {
-    throw new ReqErr('Invalid email or password')
+
+  if (!user) {
+    throw new ReqErr('No user found with this email')
+  }
+
+  if (user?.password === 'NONE') {
+    throw new ReqErr('Please login with social account or reset password')
+  }
+
+  if (!(await hash.bcrypt.compare(password, user.password))) {
+    throw new ReqErr('Password is wrong')
   }
 
   return user
