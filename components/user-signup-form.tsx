@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/hooks'
 import { GoogleIcon, SpinnerIcon } from '@/icons'
-import { Button, buttonVariants } from '@/shadcn/ui/button'
+import { Button } from '@/shadcn/ui/button'
 import {
   Form,
   FormControl,
@@ -13,6 +13,7 @@ import {
 import { Input } from '@/shadcn/ui/input'
 import { cn } from '@/shadcn/utils'
 import { emailRegex } from '@/util'
+import googleAuth from '@/util/google'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -82,9 +83,9 @@ export function UserSignupForm({ className, ...props }: UserSignupFormProps) {
           </span>
         </div>
       </div>
-      <a href="#" className={buttonVariants({ variant: 'outline' })}>
+      <Button variant="outline" onClick={googleAuth}>
         <GoogleIcon className="mr-2 h-4 w-4" /> Google
-      </a>
+      </Button>
     </div>
   )
 }
