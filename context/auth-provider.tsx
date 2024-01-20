@@ -2,7 +2,6 @@
 
 /* eslint-disable no-async-promise-executor */
 
-import { FunctionComponent, ReactNode, createContext, useState } from 'react'
 import {
   PostBody as SignInBody,
   PostData as SignInRes,
@@ -15,8 +14,9 @@ import {
   PostBody as SignUpCompleteBody,
   PostData as SignUpCompleteRes,
 } from '@/app/api/user/route'
-import { POST, PUT } from '@/lib'
+import { DELETE, POST, PUT } from '@/lib'
 import { Prettify, SafeUser } from '@/types'
+import { FunctionComponent, ReactNode, createContext, useState } from 'react'
 
 type User = SafeUser
 
@@ -68,12 +68,15 @@ const AuthProvider: FunctionComponent<AuthProviderProps> = ({
   const [auth, _setAuth] = useState<string | null>(_auth)
 
   const signOut: signOutFun = ({ onError = cb, onSuccess = cb }) => {
-    return new Promise((resolve) => {
+    return new Promise(async (resolve) => {
       try {
-        resolve([{ success: true }, null])
-        onSuccess({ success: true })
+        await DELETE('auth/signout')
 
         _setCurrentUser(null)
+        _setAuth(null)
+
+        resolve([{ success: true }, null])
+        onSuccess({ success: true })
       } catch (error) {
         onError(error)
         resolve([null, error])
