@@ -41,14 +41,14 @@ export async function getUserList(options: GetUserListOptions = {}) {
   })
 }
 
-export type UserCreateBody = PrettifyPick<User, 'password', 'name'>
+export type UserCreateBody = PrettifyPick<User, 'password'>
 export async function create(token: string, data: UserCreateBody) {
   const { payload: email } = await hash.jwt.verify('signup-email', token)
 
   const user = await db.user.create({
     data: {
       email,
-      name: data.name || email.split('@')[0],
+      name: email.split('@')[0],
       password: await hash.bcrypt.encrypt(data.password),
     },
   })

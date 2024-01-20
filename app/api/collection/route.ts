@@ -9,11 +9,11 @@ import { authRouter } from '@/server/next/router'
 export type GetQuery = GetCollectionsQuery
 export const GET = authRouter(async (_, ctx) => {
   const { userId: userIdFromQuery, ...query } = ctx.query<GetQuery>()
-
   const userId = userIdFromQuery ?? ctx.user.id
+
   const collections = await service.collection.getCollections(userId, {
     ...query,
-    ...(userIdFromQuery === userId ? {} : { visibility: 'PUBLIC' }),
+    ...(ctx.user.id === userId ? {} : { visibility: 'PUBLIC' }),
   })
 
   return NextResponse.json({ collections })

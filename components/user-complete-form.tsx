@@ -24,7 +24,6 @@ interface FormValues {
   email: string
   password: string
   confirmPassword: string
-  name: string
 }
 
 export function UserCompleteForm({
@@ -40,7 +39,6 @@ export function UserCompleteForm({
       email: '',
       password: '',
       confirmPassword: '',
-      name: '',
     },
   })
 
@@ -58,9 +56,9 @@ export function UserCompleteForm({
     router.replace('/signup')
   }, [])
 
-  async function onSubmit({ name, password }: FormValues) {
+  async function onSubmit({ password }: FormValues) {
     if (!token) return router.replace('/signup')
-    const [_, error] = await signUpComplete({ name, password, token })
+    const [_, error] = await signUpComplete({ password, token })
 
     if (error) return toast.error('Something went wrong!')
     toast.success("Welcome you're in!")

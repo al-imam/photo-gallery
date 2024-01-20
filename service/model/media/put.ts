@@ -6,9 +6,8 @@ import { MEDIA_INCLUDE_QUERY } from '@/service/config'
 import db, { Media, User } from '@/service/db'
 import { Prettify, PrettifyPick, pick } from '@/service/utils'
 import ReqErr from '@/service/ReqError'
-import { validateAndFormatTags, mediaPermissionFactory } from './helpers'
+import { validateAndFormatTags } from './helpers'
 import { userPermissionFactory } from '../helpers'
-import { findOrCreateCategory } from '../category'
 
 const mediaEditableFields = [
   'title',
@@ -34,9 +33,7 @@ export type CreateMediaBody = PrettifyPick<
 >
 
 export type ModerateMediaBody = Partial<
-  Pick<Media, (typeof mediaModerateFields)[number]> & {
-    moderatorComment: string
-  }
+  Pick<Media, (typeof mediaModerateFields)[number]>
 >
 
 export type UpdateMediaBody = Prettify<
@@ -50,9 +47,7 @@ export async function createMedia(
   onFailure: (result: DiscordMediaUploadResult) => Promise<any>
 ) {
   body.tags = validateAndFormatTags(body.tags)
-  if (userPermissionFactory(user).isVerifiedLevel) {
-    body.status ??= 'APPROVED'
-  } else {
+  if (!userPermissionFactory(user).isVerifiedLevel) {
     body.status = undefined
   }
 
@@ -96,9 +91,8 @@ export async function updateMedia(
   const isAuthor = oldMedia.authorId === user.id
   const isModerator = userPermissionFactory(user).isModeratorLevel
 
-  if (isAuthor && isModerator) {
-    // TODO: check if moderator is changing status
-    return moderateMedia(user.id, oldMedia, body, body)
+  if (isAuthor && isModerator && body.status) {
+    return moderateMedia(user.id, oldMedia, { status: body.status }, body)
   }
 
   if (isModerator) {
@@ -138,7 +132,6 @@ export async function moderateMedia(
         status_old: oldMedia.status,
         status_new: updatedMedia.status,
         userId: moderatorId,
-        message: data.moderatorComment,
       },
     })
   }

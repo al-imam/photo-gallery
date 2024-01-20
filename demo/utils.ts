@@ -29,8 +29,6 @@ export async function fetchMessages(remaining: number) {
       before: messages.at(-1)?.id,
     })
 
-    console.log(rawMessages)
-
     if (!rawMessages.size) break
     rawMessages.forEach((message) => {
       const [media, thumbnail] = message.attachments.map(extractAttachment)

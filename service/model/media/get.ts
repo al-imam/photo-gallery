@@ -71,6 +71,7 @@ export async function getRelatedMedia(
       orderBy: { createdAt: 'desc' },
       where: {
         ...where,
+        status: 'APPROVED',
         id: { not: { in: [media.id, ...related.map((media) => media.id)] } },
       },
     })
@@ -93,18 +94,18 @@ export async function getLatestMediaList(
   options: MediaListOptions = {}
 ) {
   if (
-    options.status &&
+    !user ||
     !(
-      user &&
-      ((options.authorId && user.id === options.authorId) ||
-        userPermissionFactory(user).isModeratorLevel)
+      (options.authorId && user.id === options.authorId) ||
+      userPermissionFactory(user).isModeratorLevel
     )
   ) {
-    delete options.status
+    options.status = 'APPROVED'
   }
 
-  const orQueries = mediaSearchQueryOR(options.search)
+  if (!options.authorId) options.status ??= 'APPROVED'
 
+  const orQueries = mediaSearchQueryOR(options.search)
   const mediaList = await db.media.findMany({
     ...paginationQueries({
       orderByKey: 'createdAt',
@@ -113,7 +114,7 @@ export async function getLatestMediaList(
     }),
 
     where: {
-      status: options.status ?? ContentStatus.APPROVED,
+      status: options.status,
       authorId: options.authorId,
       categoryId: options.category,
       ...(orQueries.length ? { OR: orQueries } : undefined),

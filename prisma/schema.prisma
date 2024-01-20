@@ -126,7 +126,7 @@ model Collection {
   visibility  CollectionVisibility @default(PUBLIC)
 
   media  Media[] @relation("Collection")
-  Z_USER User    @relation("Collection", fields: [userId], references: [id])
+  Z_USER User    @relation("Collection", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -166,7 +166,7 @@ model LOG_MediaStatusChange {
 
   mediaId String @db.Uuid()
   userId  String @db.Uuid()
-  user    User   @relation("LogMediaStatusChangeModerated", fields: [userId], references: [id])
+  user    User   @relation("LogMediaStatusChangeModerated", fields: [userId], references: [id], onDelete: Cascade)
 
   Z_MEDIA Media @relation("LogMediaStatusChange", fields: [mediaId], references: [id], onDelete: Cascade)
 }
