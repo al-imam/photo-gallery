@@ -1,5 +1,6 @@
 'use client'
 
+import { Password } from '@/components/form/password'
 import { useAuth } from '@/hooks'
 import { GoogleIcon, SpinnerIcon } from '@/icons'
 import { Button } from '@/shadcn/ui/button'
@@ -16,7 +17,6 @@ import { emailRegex } from '@/util'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Password } from './form/password'
 
 interface UserSigninFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 

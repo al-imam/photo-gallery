@@ -23,7 +23,7 @@ export default async function Signin({
   return (
     <div className="bg-background">
       <div className="flex min-h-screen [&>*]:flex-1 ">
-        <div className="stack-content min-h-full max-lg:hidden border-r w-full rounded-r-lg overflow-hidden">
+        <div className="stack-content min-h-full hidden lg:grid border-r w-full rounded-r-lg overflow-hidden">
           <Image
             src="https://source.unsplash.com/random/1280x843"
             width={843}
@@ -45,7 +45,7 @@ export default async function Signin({
           <Link
             href="/"
             className={cn(
-              buttonVariants({ variant: 'ghost' }),
+              buttonVariants({ variant: 'ghost', size: 'icon' }),
               'absolute left-4 top-4 md:left-8 md:top-8'
             )}
           >

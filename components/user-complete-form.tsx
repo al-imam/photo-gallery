@@ -1,5 +1,8 @@
 'use client'
 
+import { Password } from '@/components/form/password'
+import { useAuth } from '@/hooks'
+import { SpinnerIcon } from '@/icons'
 import { Button } from '@/shadcn/ui/button'
 import {
   Form,
@@ -10,13 +13,11 @@ import {
 } from '@/shadcn/ui/form'
 import { Input } from '@/shadcn/ui/input'
 import { cn } from '@/shadcn/utils'
+import { decode, emailRegex } from '@/util'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { useAuth } from '@/hooks'
-import { SpinnerIcon } from '@/icons'
-import { decode, emailRegex } from '@/util'
 
 interface UserCompleteFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -103,7 +104,7 @@ export function UserCompleteForm({
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Password" {...field} />
+                    <Password placeholder="Password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -122,7 +123,7 @@ export function UserCompleteForm({
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Confirm Password" {...field} />
+                    <Password placeholder="Confirm Password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
