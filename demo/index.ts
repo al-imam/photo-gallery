@@ -9,48 +9,25 @@ configDotenv()
 
 const IMAGE_PER_USER = 10
 const REACTION_PER_USER = 50
-const NAME_LIST = [
-  'Nazmus Sayad',
-  'Mohammad Rahman',
-  'Fatima Khanam',
-  'Abul Hasan Chowdhury',
-  'Shabnam Akhtar Chowdhury',
-  'Aminul Islam Miah',
-  'Taslima Begum',
-  'Rafiqul Haque Siddique',
-  'Farida Yasmin Khan',
-  'Nurul Islam Mia',
-  'Rukhsar Ahmed Chowdhury',
-  'Sadia Rahman',
-  'Shahidul Islam',
-  'Nasrin Akhtar',
-  'Mizanur Rahman',
-  'Sultana Ahmed',
-  'Kamrul Hasan',
-  'Ayesha Begum',
-  'Zahidul Haque',
-  'Maliha Khan',
-]
+const USER_TO_CREATE = 20
 
 ;(async () => {
   await db.user.deleteMany({})
   console.log('Users deleted')
-  const images = await fetchMessages(NAME_LIST.length * IMAGE_PER_USER)
+  const images = await fetchMessages(USER_TO_CREATE * IMAGE_PER_USER)
   console.log('Uploaded images Loaded')
 
   const userList: User[] = []
   const mediaList: Media[] = []
-  let iUser = 0
   let iImage = 0
 
-  for (const name of NAME_LIST) {
+  for (let i = 0; i < USER_TO_CREATE; i++) {
     const user = await service.user.create(
-      await jwt.sign('signup-email', `247sayad+${iUser + 1}@gmail.com`),
-      { name, password: '123456' }
+      await jwt.sign('signup-email', `247sayad+${i + 1}@gmail.com`),
+      { password: '123456' }
     )
     console.log('created:', user.email)
     userList.push(user)
-    iUser++
 
     for (let i = 1; i <= IMAGE_PER_USER; i++) {
       const media = await service.media.createMedia(

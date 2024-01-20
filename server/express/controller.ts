@@ -22,8 +22,8 @@ export async function createMedia(req: UserRequest, res: Response) {
     (result) => discord.deleteMedia(result.id)
   )
 
-  const data = await addLovesToMedia(mediaList)
-  res.json({ data })
+  const media = await addLovesToMedia(mediaList)
+  res.json({ media })
 }
 
 export async function deleteMedia(req: UserRequest, res: Response) {
