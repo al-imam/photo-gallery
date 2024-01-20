@@ -50,15 +50,13 @@ export async function createCore(data: UserCreateCoreBody) {
   const user = await db.user.create({
     data: {
       email: data.email,
-      name: data.name || data.email.split('@')[0],
       password: data.password,
+      name: data.name || data.email.split('@')[0],
     },
   })
 
   await db.profile.create({
-    data: {
-      userId: user.id,
-    },
+    data: { userId: user.id },
   })
 
   return user
