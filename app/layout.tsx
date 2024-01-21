@@ -26,7 +26,11 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={[inter.variable, mark.variable].join(' ')}>
+    <html
+      lang="en"
+      className={[inter.variable, mark.variable].join(' ')}
+      suppressHydrationWarning
+    >
       <body
         className={`bg-background ${
           process.env.NODE_ENV === 'development' ? 'debug-screens' : undefined

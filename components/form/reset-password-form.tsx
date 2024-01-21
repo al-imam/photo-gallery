@@ -92,7 +92,11 @@ export function ResetPasswordForm({
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Password placeholder="New password" {...field} />
+                    <Password
+                      disabled={form.formState.isSubmitting}
+                      placeholder="New password"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -111,7 +115,11 @@ export function ResetPasswordForm({
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Password placeholder="Confirm Password" {...field} />
+                    <Password
+                      disabled={form.formState.isSubmitting}
+                      placeholder="Confirm Password"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

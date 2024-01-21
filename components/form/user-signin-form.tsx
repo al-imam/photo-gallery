@@ -19,6 +19,20 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
+import { POST } from '@/lib'
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/shadcn/ui/alert-dialog'
+import axios from 'axios'
+import { useState } from 'react'
+
 interface UserSigninFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 interface FormValues {
@@ -27,6 +41,8 @@ interface FormValues {
 }
 
 export function UserSigninForm({ className, ...props }: UserSigninFormProps) {
+  const [isResetPasswordOpen, setIsResetPasswordOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const { signIn } = useAuth()
   const router = useRouter()
   const qp = useSearchParams()
@@ -44,6 +60,32 @@ export function UserSigninForm({ className, ...props }: UserSigninFormProps) {
     toast.success('Welcome back, nice to see you again!')
 
     return router.replace(qp.get('callbackURL') ?? '/')
+  }
+
+  async function resetPasswordOpen(value: boolean) {
+    if (!value) setIsResetPasswordOpen(true)
+    if (await form.trigger('email')) return setIsResetPasswordOpen(value)
+    form.setFocus('email')
+  }
+
+  async function resetPassword() {
+    setIsLoading(true)
+    try {
+      await POST('auth/reset-password', { email: form.getValues('email') })
+      toast.success('Password reset email sent!')
+    } catch (error) {
+      if (
+        axios.isAxiosError(error) &&
+        error.response?.data?.error === 'No User found'
+      ) {
+        toast.error('No user found with that email!')
+      } else {
+        toast.error('Something went wrong!')
+      }
+    } finally {
+      setIsLoading(false)
+      setIsResetPasswordOpen(false)
+    }
   }
 
   return (
@@ -64,7 +106,11 @@ export function UserSigninForm({ className, ...props }: UserSigninFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Email" {...field} />
+                    <Input
+                      disabled={form.formState.isSubmitting}
+                      placeholder="Email"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -83,12 +129,54 @@ export function UserSigninForm({ className, ...props }: UserSigninFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Password placeholder="Password" {...field} />
+                    <Password
+                      disabled={form.formState.isSubmitting}
+                      placeholder="Password"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
+            <AlertDialog
+              onOpenChange={resetPasswordOpen}
+              open={isResetPasswordOpen}
+            >
+              <AlertDialogTrigger asChild>
+                <button
+                  type="button"
+                  className="text-xs underline underline-offset-4 text-muted-foreground hover:text-foreground -mt-1 py-[2px] ml-auto font-medium text-right"
+                >
+                  Having trouble remembering your password?
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="w-[calc(100%-2rem)] sm:max-w-xl">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Reset Password?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Click <span className="font-semibold">Continue</span> to
+                    initiate the password reset for{' '}
+                    <span className="font-semibold">
+                      {form.getValues('email')}
+                    </span>
+                    . You will receive an email containing instructions on the
+                    next steps to complete the process.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel type="button">Cancel</AlertDialogCancel>
+                  <Button type="button" onClick={resetPassword}>
+                    {isLoading && (
+                      <SpinnerIcon className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    Continue
+                  </Button>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
             <Button disabled={form.formState.isSubmitting}>
               {form.formState.isSubmitting && (
                 <SpinnerIcon className="mr-2 h-4 w-4 animate-spin" />
