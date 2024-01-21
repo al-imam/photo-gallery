@@ -1,15 +1,15 @@
-import { UserCompleteForm } from '@/components/form/user-complete-form'
+import { ResetPasswordForm } from '@/components/form/reset-password-form'
 import { NavBar } from '@/components/nav-bar'
-import { SignupCompleteIllustration } from '@/icons/illustrations'
+import { ResetPasswordIllustration } from '@/icons/illustrations'
 import { decode, emailRegex } from '@/util'
 import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {
-  title: 'Complete Signup',
+  title: 'Reset Password',
 }
 
-export default async function Complete({
+export default async function ResetPassword({
   searchParams,
 }: {
   searchParams: Record<string, string>
@@ -17,6 +17,7 @@ export default async function Complete({
   const auth = searchParams.token
   if (!auth) return redirect('/signup')
   const decoded = decode(auth)
+
   if (!decoded.payload || !emailRegex.test(decoded.payload.toString())) {
     return redirect('/signup')
   }
@@ -27,21 +28,22 @@ export default async function Complete({
       <div className="content">
         <div className="flex min-h-screen [&>*]:flex-1 gap-8">
           <div className="stack-content hidden lg:grid w-full overflow-hidden place-items-center">
-            <SignupCompleteIllustration className="w-[min(30rem,100%)]" />
+            <ResetPasswordIllustration className="w-[min(30rem,100%)]" />
           </div>
           <div className="relative my-auto">
             <div className="flex w-full flex-col justify-center space-y-6 ">
               <div className="flex flex-col space-y-2 text-center">
                 <h1 className="text-2xl font-semibold tracking-tight">
-                  Complete your account
+                  Account Recovery
                 </h1>
-                <p className="text-sm text-muted-foreground">
-                  Enter your password below to create your account
+                <p className="text-sm text-muted-foreground [text-wrap:balance]">
+                  Enter your new password below to complete the password reset
+                  process.
                 </p>
               </div>
-              <UserCompleteForm
-                email={decoded.payload.toString()}
+              <ResetPasswordForm
                 auth={auth}
+                email={decoded.payload.toString()}
               />
             </div>
           </div>

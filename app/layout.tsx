@@ -5,10 +5,7 @@ import { Inter } from 'next/font/google'
 import LocalFont from 'next/font/local'
 
 export const metadata: Metadata = {
-  title: {
-    default: 'Palestine',
-    template: '%s | palestine',
-  },
+  title: 'Palestine',
 }
 
 const mark = LocalFont({
