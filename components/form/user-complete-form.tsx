@@ -13,13 +13,15 @@ import {
 } from '@/shadcn/ui/form'
 import { Input } from '@/shadcn/ui/input'
 import { cn } from '@/shadcn/utils'
-import { decode, emailRegex } from '@/util'
+import { emailRegex } from '@/util'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
-interface UserCompleteFormProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface UserCompleteFormProps extends React.HTMLAttributes<HTMLDivElement> {
+  email: string
+  auth: string
+}
 
 interface FormValues {
   email: string
@@ -29,37 +31,23 @@ interface FormValues {
 
 export function UserCompleteForm({
   className,
+  auth,
+  email,
   ...props
 }: UserCompleteFormProps) {
   const { signUpComplete } = useAuth()
   const qp = useSearchParams()
   const router = useRouter()
-  const [token, setToken] = useState<string | null>(null)
   const form = useForm<FormValues>({
     defaultValues: {
-      email: '',
+      email,
       password: '',
       confirmPassword: '',
     },
   })
 
-  useEffect(() => {
-    const _token = qp.get('token')
-    if (!_token) return router.replace('/signup')
-
-    const decoded = decode(_token)
-
-    if (decoded.payload && emailRegex.test(decoded.payload.toString())) {
-      setToken(_token)
-      return form.setValue('email', decoded.payload.toString())
-    }
-
-    return router.replace('/signup')
-  }, [])
-
   async function onSubmit({ password }: FormValues) {
-    if (!token) return router.replace('/signup')
-    const [_, error] = await signUpComplete({ password, token })
+    const [_, error] = await signUpComplete({ password, token: auth })
 
     if (error) return toast.error('Something went wrong!')
     toast.success("Welcome you're in!")

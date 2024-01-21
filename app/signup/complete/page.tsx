@@ -1,11 +1,9 @@
 import { UserCompleteForm } from '@/components/form/user-complete-form'
+import { NavBar } from '@/components/nav-bar'
+import { SignupCompleteIllustration } from '@/icons/illustrations'
 import sdk from '@/sdk'
-import { buttonVariants } from '@/shadcn/ui/button'
-import { cn } from '@/shadcn/utils'
-import { ArrowLeftIcon } from 'lucide-react'
+import { decode, emailRegex } from '@/util'
 import { Metadata } from 'next'
-import Image from 'next/image'
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {
@@ -18,45 +16,26 @@ export default async function Complete({
   searchParams: Record<string, string>
 }) {
   const [response] = await sdk.auth.checkAuth()
+  if (response?.user && response?.token) {
+    redirect(searchParams.callbackURL ?? '/')
+  }
 
-  const _currentUser = response?.user ?? null
-  const _auth = response?.token ?? null
-
-  if (_currentUser && _auth) redirect(searchParams.callbackURL ?? '/')
+  const auth = searchParams.token
+  if (!auth) return redirect('/signup')
+  const decoded = decode(auth)
+  if (!decoded.payload || !emailRegex.test(decoded.payload.toString())) {
+    return redirect('/signup')
+  }
 
   return (
     <div className="bg-background">
-      <div className="flex min-h-screen [&>*]:flex-1 ">
-        <div className="stack-content min-h-full hidden lg:grid border-r w-full rounded-r-lg overflow-hidden">
-          <Image
-            src="https://source.unsplash.com/random/1280x843"
-            width={843}
-            height={1280}
-            alt="random"
-            className="w-full h-full object-cover select-none dragging-none"
-          />
-        </div>
-        <div className="relative min-h-full p-4">
-          <Link
-            href="/signup"
-            className={cn(
-              buttonVariants({ variant: 'ghost' }),
-              'absolute right-4 top-4 md:right-8 md:top-8'
-            )}
-          >
-            Signup
-          </Link>
-
-          <Link
-            href="/"
-            className={cn(
-              buttonVariants({ variant: 'ghost', size: 'icon' }),
-              'absolute left-4 top-4 md:left-8 md:top-8'
-            )}
-          >
-            <ArrowLeftIcon className="w-6 h-6" />
-          </Link>
-          <div className="flex items-center justify-center max-w-lg mx-auto h-full">
+      <NavBar takeHeight={false} />
+      <div className="content">
+        <div className="flex min-h-screen [&>*]:flex-1 gap-8">
+          <div className="stack-content hidden lg:grid w-full overflow-hidden place-items-center">
+            <SignupCompleteIllustration className="w-[min(30rem,100%)]" />
+          </div>
+          <div className="relative my-auto">
             <div className="flex w-full flex-col justify-center space-y-6 ">
               <div className="flex flex-col space-y-2 text-center">
                 <h1 className="text-2xl font-semibold tracking-tight">
@@ -66,7 +45,10 @@ export default async function Complete({
                   Enter your password below to create your account
                 </p>
               </div>
-              <UserCompleteForm />
+              <UserCompleteForm
+                email={decoded.payload.toString()}
+                auth={auth}
+              />
             </div>
           </div>
         </div>

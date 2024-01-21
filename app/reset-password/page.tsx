@@ -1,8 +1,7 @@
 import { ResetPasswordForm } from '@/components/form/reset-password-form'
 import { NavBar } from '@/components/nav-bar'
 import { ResetPasswordIllustration } from '@/icons/illustrations'
-import { decode } from '@/util/jwt'
-import { emailRegex } from '@/util/regex'
+import { decode, emailRegex } from '@/util'
 import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 

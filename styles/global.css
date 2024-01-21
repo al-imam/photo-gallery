@@ -141,6 +141,11 @@
     text-orientation: mixed;
   }
 
+  input::-ms-reveal,
+  input::-ms-clear {
+    display: none;
+  }
+
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus,
