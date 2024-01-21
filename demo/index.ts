@@ -40,7 +40,7 @@ const REACTION_PER_USER = 50
 
     for (let i = 1; i <= IMAGE_PER_USER; i++) {
       const media = await service.media.createMedia(
-        { ...user, role: 'ADMIN' },
+        { ...user, role: 'VERIFIED' },
         {
           status: 'APPROVED',
           title: `Test Media ${iImage + 1}`,

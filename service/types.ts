@@ -46,7 +46,6 @@ export type MediaWithReactionCount = Omit<
 
 export type MediaWithLoves = MediaWithReactionCount & {
   isLoved: boolean
-  updateRequest?: MediaUpdateRequest | null
 }
 
 export type CollectionWithMediaCount = Collection & {
