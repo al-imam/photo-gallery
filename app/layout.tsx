@@ -36,7 +36,7 @@ export default function RootLayout({
         }`}
       >
         <div className="fixed bottom-0 right-0 left-0 z-50 w-full h-[0.1rem] scroll-progress rounded-full opacity-50 backdrop-blur-md" />
-        {/* <Provider>{children}</Provider> */}
+        <Provider>{children}</Provider>
       </body>
     </html>
   )
