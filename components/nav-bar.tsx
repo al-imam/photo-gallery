@@ -18,6 +18,7 @@ import { cn } from '@/shadcn/utils'
 import { ChevronDown, Moon, MoreHorizontal, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -28,6 +29,7 @@ export function NavBar({ takeHeight = true }) {
   const ref = useRef<HTMLElement>(null)
   const [isIntersecting, setIntersecting] = useState(true)
   const { setTheme } = useTheme()
+  const path = usePathname()
   const { currentUser, signOut } = useAuth()
   const isAuthenticated = !!currentUser
 
@@ -41,6 +43,8 @@ export function NavBar({ takeHeight = true }) {
     observer.observe(ref.current)
     return () => observer.disconnect()
   }, [])
+
+  const signupPage = path.endsWith('/signup')
 
   return (
     <nav
@@ -158,8 +162,11 @@ export function NavBar({ takeHeight = true }) {
                   {isAuthenticated || (
                     <Fragment>
                       <DropdownMenuItem asChild>
-                        <Link href="/signup" className="hover:cursor-pointer">
-                          Signup
+                        <Link
+                          href={signupPage ? '/signin' : '/signup'}
+                          className="hover:cursor-pointer"
+                        >
+                          {signupPage ? 'Signin' : 'Signup'}
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
@@ -268,7 +275,7 @@ export function NavBar({ takeHeight = true }) {
 
             {isAuthenticated || (
               <Link
-                href="/signup"
+                href={signupPage ? '/signin' : '/signup'}
                 className={cn(
                   buttonVariants({
                     variant: 'ghost',
@@ -276,13 +283,15 @@ export function NavBar({ takeHeight = true }) {
                   })
                 )}
               >
-                Signup
+                {signupPage ? 'Signin' : 'Signup'}
               </Link>
             )}
           </div>
 
           <div className="order-0">
-            <div className="h-10 w-10 bg-amber-500 rounded" />
+            <Link href="/" className="cursor-pointer">
+              <div className="h-10 w-10 bg-amber-500 rounded" />
+            </Link>
           </div>
         </div>
       </div>
