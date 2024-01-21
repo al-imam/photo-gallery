@@ -6,7 +6,7 @@ import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {
-  title: 'account recovery',
+  title: 'Reset Password',
 }
 
 export default async function ResetPassword({

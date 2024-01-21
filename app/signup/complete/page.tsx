@@ -1,13 +1,12 @@
 import { UserCompleteForm } from '@/components/form/user-complete-form'
 import { NavBar } from '@/components/nav-bar'
 import { SignupCompleteIllustration } from '@/icons/illustrations'
-import sdk from '@/sdk'
 import { decode, emailRegex } from '@/util'
 import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {
-  title: 'complete signup',
+  title: 'Complete Signup',
 }
 
 export default async function Complete({
@@ -15,11 +14,6 @@ export default async function Complete({
 }: {
   searchParams: Record<string, string>
 }) {
-  const [response] = await sdk.auth.checkAuth()
-  if (response?.user && response?.token) {
-    redirect(searchParams.callbackURL ?? '/')
-  }
-
   const auth = searchParams.token
   if (!auth) return redirect('/signup')
   const decoded = decode(auth)
