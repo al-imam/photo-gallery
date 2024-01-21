@@ -9,7 +9,7 @@ export default function googleAuth(state?: string) {
     state: state,
     response_type: 'code',
     client_id: process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID,
-    redirect_uri: process.env.NEXT_PUBLIC_GOOGLE_OAUTH_REDIRECT,
+    redirect_uri: process.env.NEXT_PUBLIC_URL + '/api/auth/google',
     scope:
       'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
   }
