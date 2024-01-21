@@ -3,8 +3,6 @@ import axios from 'axios'
 
 console.log(process.env)
 
-
-
 const api = axios.create({
   baseURL: joinUrl(
     // process.env.NEXT_PUBLIC_URL,
