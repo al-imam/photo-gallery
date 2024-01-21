@@ -7,19 +7,26 @@ import { authRouter } from '@/server/next/router'
 export const GET = authRouter(
   onlyModerator,
   async (_, ctx, next) => {
-    ctx.media
+    const mediaId = ctx.params.mediaId
+    return next(mediaId)
   },
   sendMediaWithLoves
 )
 
 export const POST = authRouter(
   onlyModerator,
-  async (_, ctx, next) => {},
+  async (_, ctx, next) => {
+    const mediaId = ctx.params.mediaId
+    return next(mediaId)
+  },
   sendMediaWithLoves
 )
 
 export const DELETE = authRouter(
   onlyModerator,
-  async (_, ctx, next) => {},
+  async (_, ctx, next) => {
+    const mediaId = ctx.params.mediaId
+    return next(mediaId)
+  },
   sendMediaWithLoves
 )
