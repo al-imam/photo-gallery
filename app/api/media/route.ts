@@ -5,6 +5,10 @@ import { MediaListOptions } from '@/service/model/media'
 import { addLovesToMedia } from '@/service/model/media/helpers'
 import { MediaWithLoves } from '@/service/types'
 
+for (let key in process.env) {
+  console.log(key, ':', process.env[key])
+}
+
 export type GetQuery = Partial<
   Record<keyof MediaListOptions, string> & Pick<MediaListOptions, 'status'>
 >
