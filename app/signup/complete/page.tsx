@@ -1,4 +1,4 @@
-import { UserCompleteForm } from '@/components/user-complete-form'
+import { UserCompleteForm } from '@/components/form/user-complete-form'
 import sdk from '@/sdk'
 import { buttonVariants } from '@/shadcn/ui/button'
 import { cn } from '@/shadcn/utils'

@@ -27,11 +27,12 @@ interface FormValues {
   confirmPassword: string
 }
 
-export function UserCompleteForm({
+export function ResetPasswordForm({
   className,
   ...props
 }: UserCompleteFormProps) {
-  const { signUpComplete } = useAuth()
+  const { signUpComplete, currentUser } = useAuth()
+  const isSignedIn = !!currentUser
   const qp = useSearchParams()
   const router = useRouter()
   const [token, setToken] = useState<string | null>(null)
@@ -45,7 +46,7 @@ export function UserCompleteForm({
 
   useEffect(() => {
     const _token = qp.get('token')
-    if (!_token) return
+    if (!_token) return router.replace('/signup')
 
     const decoded = decode(_token)
 
@@ -54,17 +55,22 @@ export function UserCompleteForm({
       return form.setValue('email', decoded.payload.toString())
     }
 
-    router.replace('/signup')
+    return router.replace(isSignedIn ? '/' : '/signup')
   }, [])
 
   async function onSubmit({ password }: FormValues) {
-    if (!token) return router.replace('/signup')
+    if (!token) return router.replace(isSignedIn ? '/' : '/signup')
+
     const [_, error] = await signUpComplete({ password, token })
-
     if (error) return toast.error('Something went wrong!')
-    toast.success("Welcome you're in!")
 
-    return router.replace(qp.get('callbackURL') ?? '/')
+    toast.success('Password reset successful!', {
+      description: isSignedIn
+        ? undefined
+        : 'You can now log in with your updated credentials.',
+    })
+
+    return router.replace(qp.get('callbackURL') ?? isSignedIn ? '/' : '/signin')
   }
 
   return (

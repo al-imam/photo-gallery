@@ -1,4 +1,4 @@
-import { UserSignupForm } from '@/components/user-signup-form'
+import { UserSignupForm } from '@/components/form/user-signup-form'
 import sdk from '@/sdk'
 import { buttonVariants } from '@/shadcn/ui/button'
 import { cn } from '@/shadcn/utils'
