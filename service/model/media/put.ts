@@ -41,7 +41,7 @@ export async function createMedia(
 ) {
   body.tags = validateAndFormatTags(body.tags as string[])
   const userPermission = userPermissionFactory(user)
-  if (!(userPermission.isVerified || userPermission.isModeratorLevel)) {
+  if (!userPermission.isVerifiedLevel) {
     delete body.status
   }
 
@@ -73,7 +73,7 @@ export async function createMedia(
 }
 
 export async function updateMedia(
-  user: PrettifyPick<User, 'id' | 'role' | 'isVerified'>,
+  user: PrettifyPick<User, 'id' | 'role'>,
   oldMedia: PrettifyPick<Media, 'id' | 'authorId' | 'status'>,
   body: UpdateMediaBody
 ) {
@@ -81,22 +81,16 @@ export async function updateMedia(
 
   const isAuthor = oldMedia.authorId === user.id
   const userPermission = userPermissionFactory(user)
-  const { isVerified } = userPermission
-  const isModerator = userPermission.isModeratorLevel
-
-  if (isAuthor && (isVerified || oldMedia.status === 'PENDING')) {
-    return db.media.update({
-      where: { id: oldMedia.id },
-      data: pick(body, ...mediaEditableFields),
-      include: MEDIA_INCLUDE_QUERY,
-    })
-  }
-
-  if (isModerator) {
-    return moderateMedia(user.id, oldMedia, body)
-  }
 
   if (isAuthor) {
+    if (oldMedia.status === 'PENDING' || userPermission.isVerifiedLevel) {
+      return db.media.update({
+        where: { id: oldMedia.id },
+        data: pick(body, ...mediaEditableFields),
+        include: MEDIA_INCLUDE_QUERY,
+      })
+    }
+
     await db.mediaUpdateRequest.create({
       data: {
         mediaId: oldMedia.id,
@@ -112,6 +106,10 @@ export async function updateMedia(
       where: { id: oldMedia.id },
       include: MEDIA_INCLUDE_QUERY,
     })
+  }
+
+  if (userPermission.isModeratorLevel) {
+    return moderateMedia(user.id, oldMedia, body)
   }
 
   throw new ReqErr('You are not allowed to edit this media', 403)
