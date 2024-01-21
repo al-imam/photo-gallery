@@ -48,7 +48,7 @@ export default {
   },
 
   sendResetToken(to: string, token: string) {
-    const url = `${env.NEXT_PUBLIC_URL}/reset-password/complete?token=${token}`
+    const url = `${env.NEXT_PUBLIC_URL}/reset-password?token=${token}`
     console.log(to, url, token)
 
     return mail(
