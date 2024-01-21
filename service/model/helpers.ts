@@ -2,17 +2,14 @@ import { User } from '@prisma/client'
 import { PrettifyPick } from '../utils'
 
 export function userPermissionFactory<
-  T extends PrettifyPick<User, 'id' | 'role', 'isVerified'> | null,
+  T extends PrettifyPick<User, 'id' | 'role'> | null,
 >(user: T) {
   const isAdmin = Boolean(user && user.role === 'ADMIN')
   const isModerator = Boolean(user && user.role === 'MODERATOR')
-  const isModeratorLevel = Boolean(isAdmin || isModerator)
+  const isModeratorLevel = isAdmin || isModerator
 
-  const isVerified = (user && user.isVerified) as T extends {
-    isVerified: boolean
-  }
-    ? T['isVerified']
-    : never
+  const isVerified = Boolean(user && user.role === 'VERIFIED')
+  const isVerifiedLevel = isModeratorLevel || isVerified
 
   const isBanned = Boolean(user && user.role === 'BANNED')
 
@@ -21,6 +18,7 @@ export function userPermissionFactory<
     isModerator,
     isModeratorLevel,
     isVerified,
+    isVerifiedLevel,
     isBanned,
   }
 }
