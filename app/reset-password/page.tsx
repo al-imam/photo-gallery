@@ -1,17 +1,28 @@
 import { ResetPasswordForm } from '@/components/form/reset-password-form'
 import { NavBar } from '@/components/nav-bar'
 import { ResetPasswordIllustration } from '@/icons/illustrations'
+import { decode } from '@/util/jwt'
+import { emailRegex } from '@/util/regex'
 import { Metadata } from 'next'
+import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {
-  title: 'Account recovery',
+  title: 'account recovery',
 }
 
-export default async function Complete({
-  searchParams: _,
+export default async function ResetPassword({
+  searchParams,
 }: {
   searchParams: Record<string, string>
 }) {
+  const auth = searchParams.token
+  if (!auth) return redirect('/signup')
+  const decoded = decode(auth)
+
+  if (!decoded.payload || !emailRegex.test(decoded.payload.toString())) {
+    return redirect('/signup')
+  }
+
   return (
     <div className="bg-background">
       <NavBar takeHeight={false} />
@@ -31,7 +42,10 @@ export default async function Complete({
                   process.
                 </p>
               </div>
-              <ResetPasswordForm />
+              <ResetPasswordForm
+                auth={auth}
+                email={decoded.payload.toString()}
+              />
             </div>
           </div>
         </div>

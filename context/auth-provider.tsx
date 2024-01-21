@@ -3,6 +3,10 @@
 /* eslint-disable no-async-promise-executor */
 
 import {
+  PatchBody as ResetPasswordBody,
+  PatchData as ResetPasswordRes,
+} from '@/app/api/auth/reset-password/route'
+import {
   PostBody as SignInBody,
   PostData as SignInRes,
 } from '@/app/api/auth/signin/route'
@@ -14,7 +18,8 @@ import {
   PostBody as SignUpCompleteBody,
   PostData as SignUpCompleteRes,
 } from '@/app/api/user/route'
-import { DELETE, POST, PUT } from '@/lib'
+
+import { DELETE, PATCH, POST, PUT } from '@/lib'
 import { Prettify, SafeUser } from '@/types'
 import { FunctionComponent, ReactNode, createContext, useState } from 'react'
 
@@ -32,7 +37,8 @@ type AuthFunWrapper<AugmentType, ReturnType = any> = (
 type SignUpFun = AuthFunWrapper<SignUpBody, SignUpRes>
 type SignUpCompleteFun = AuthFunWrapper<SignUpCompleteBody, SignUpCompleteRes>
 type SignInFun = AuthFunWrapper<SignInBody, SignInRes>
-type signOutFun = AuthFunWrapper<object, { success: true }>
+type SignOutFun = AuthFunWrapper<object, { success: true }>
+type ResetPasswordFun = AuthFunWrapper<ResetPasswordBody, ResetPasswordRes>
 type ChangePasswordFun = AuthFunWrapper<
   { current: string; password: string },
   { success: true }
@@ -41,10 +47,11 @@ type ChangePasswordFun = AuthFunWrapper<
 interface Value {
   signUp: SignUpFun
   signIn: SignInFun
-  signOut: signOutFun
+  signOut: SignOutFun
   currentUser: User | null
   signUpComplete: SignUpCompleteFun
   changePassword: ChangePasswordFun
+  resetPassword: ResetPasswordFun
   setCurrentUser: (user: User) => void
   auth: null | string
 }
@@ -67,7 +74,7 @@ const AuthProvider: FunctionComponent<AuthProviderProps> = ({
   const [currentUser, _setCurrentUser] = useState<User | null>(_currentUser)
   const [auth, _setAuth] = useState<string | null>(_auth)
 
-  const signOut: signOutFun = ({ onError = cb, onSuccess = cb }) => {
+  const signOut: SignOutFun = ({ onError = cb, onSuccess = cb }) => {
     return new Promise(async (resolve) => {
       try {
         await DELETE('auth/signout')
@@ -87,11 +94,11 @@ const AuthProvider: FunctionComponent<AuthProviderProps> = ({
   const signUp: SignUpFun = async ({
     onError = cb,
     onSuccess = cb,
-    ...body
+    ...credential
   }) => {
     return new Promise(async (resolve) => {
       try {
-        const { data: res } = await POST<SignUpRes>('auth/signup', body)
+        const { data: res } = await POST<SignUpRes>('auth/signup', credential)
 
         onSuccess(res)
         resolve([res, null])
@@ -105,11 +112,34 @@ const AuthProvider: FunctionComponent<AuthProviderProps> = ({
   const signUpComplete: SignUpCompleteFun = async ({
     onError = cb,
     onSuccess = cb,
-    ...body
+    ...credential
   }) => {
     return new Promise(async (resolve) => {
       try {
-        const { data: res } = await POST<SignUpCompleteRes>('user', body)
+        const { data: res } = await POST<SignUpCompleteRes>('user', credential)
+
+        _setAuth(res.jwt_token)
+        _setCurrentUser(res.user)
+        onSuccess(res)
+        resolve([res, null])
+      } catch (error) {
+        onError(error)
+        resolve([null, error])
+      }
+    })
+  }
+
+  const resetPassword: ResetPasswordFun = async ({
+    onError = cb,
+    onSuccess = cb,
+    ...credential
+  }) => {
+    return new Promise(async (resolve) => {
+      try {
+        const { data: res } = await PATCH<ResetPasswordRes>(
+          'auth/reset-password',
+          credential
+        )
 
         _setAuth(res.jwt_token)
         _setCurrentUser(res.user)
@@ -125,14 +155,11 @@ const AuthProvider: FunctionComponent<AuthProviderProps> = ({
   const signIn: SignInFun = async ({
     onError = cb,
     onSuccess = cb,
-    ...userCredential
+    ...credential
   }) => {
     return new Promise(async (resolve) => {
       try {
-        const { data: res } = await POST<SignInRes>(
-          'auth/signin',
-          userCredential
-        )
+        const { data: res } = await POST<SignInRes>('auth/signin', credential)
 
         _setAuth(res.jwt_token)
         _setCurrentUser(res.user)
@@ -148,13 +175,13 @@ const AuthProvider: FunctionComponent<AuthProviderProps> = ({
   const changePassword: ChangePasswordFun = async ({
     onError = cb,
     onSuccess = cb,
-    ...userCredential
+    ...credential
   }) => {
     return new Promise(async (resolve) => {
       try {
         const { data } = await PUT<{ success: true }>(
           'auth/change-password',
-          userCredential
+          credential
         )
         onSuccess(data)
         resolve([data, null])
@@ -179,6 +206,7 @@ const AuthProvider: FunctionComponent<AuthProviderProps> = ({
         setCurrentUser,
         changePassword,
         signUpComplete,
+        resetPassword,
         auth,
       }}
     >

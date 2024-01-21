@@ -13,64 +13,46 @@ import {
 } from '@/shadcn/ui/form'
 import { Input } from '@/shadcn/ui/input'
 import { cn } from '@/shadcn/utils'
-import { decode, emailRegex } from '@/util'
+import { emailRegex } from '@/util'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
-interface UserCompleteFormProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface ResetPasswordFormProps extends React.HTMLAttributes<HTMLDivElement> {
+  email: string
+  auth: string
+}
 
 interface FormValues {
   email: string
-  password: string
+  newPassword: string
   confirmPassword: string
 }
 
 export function ResetPasswordForm({
   className,
+  email,
+  auth,
   ...props
-}: UserCompleteFormProps) {
-  const { signUpComplete, currentUser } = useAuth()
-  const isSignedIn = !!currentUser
+}: ResetPasswordFormProps) {
+  const { resetPassword } = useAuth()
+
   const qp = useSearchParams()
   const router = useRouter()
-  const [token, setToken] = useState<string | null>(null)
   const form = useForm<FormValues>({
     defaultValues: {
-      email: '',
-      password: '',
+      email,
+      newPassword: '',
       confirmPassword: '',
     },
   })
 
-  useEffect(() => {
-    const _token = qp.get('token')
-    if (!_token) return router.replace('/signup')
-
-    const decoded = decode(_token)
-
-    if (decoded.payload && emailRegex.test(decoded.payload.toString())) {
-      setToken(_token)
-      return form.setValue('email', decoded.payload.toString())
-    }
-
-    return router.replace(isSignedIn ? '/' : '/signup')
-  }, [])
-
-  async function onSubmit({ password }: FormValues) {
-    if (!token) return router.replace(isSignedIn ? '/' : '/signup')
-
-    const [_, error] = await signUpComplete({ password, token })
+  async function onSubmit({ newPassword }: FormValues) {
+    const [_, error] = await resetPassword({ newPassword, token: auth })
     if (error) return toast.error('Something went wrong!')
 
-    toast.success('Password reset successful!', {
-      description: isSignedIn
-        ? undefined
-        : 'You can now log in with your updated credentials.',
-    })
-
-    return router.replace(qp.get('callbackURL') ?? isSignedIn ? '/' : '/signin')
+    toast.success('Password reset successful!')
+    return router.replace(qp.get('callbackURL') ?? '/')
   }
 
   return (
@@ -99,7 +81,7 @@ export function ResetPasswordForm({
             />
             <FormField
               control={form.control}
-              name="password"
+              name="newPassword"
               rules={{
                 required: 'Password is required',
                 minLength: {
@@ -110,7 +92,7 @@ export function ResetPasswordForm({
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Password placeholder="Password" {...field} />
+                    <Password placeholder="New password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -122,7 +104,7 @@ export function ResetPasswordForm({
               rules={{
                 required: 'Confirm Password is required',
                 validate: (value) => {
-                  if (value !== form.getValues('password'))
+                  if (value !== form.getValues('newPassword'))
                     return 'Password does not match'
                 },
               }}
