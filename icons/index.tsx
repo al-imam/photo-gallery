@@ -29,3 +29,5 @@ export function GoogleIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   )
 }
+
+export * from './illustrations'
