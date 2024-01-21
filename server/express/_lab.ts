@@ -1,4 +1,5 @@
 import db from '@/service/db'
+
 ;(async () => {
   const media = await db.media.findFirst({
     where: {},

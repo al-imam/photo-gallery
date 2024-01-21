@@ -81,7 +81,7 @@ export async function updateMedia(
 
   const isAuthor = oldMedia.authorId === user.id
   const userPermission = userPermissionFactory(user)
-  const isVerified = userPermission.isVerified
+  const { isVerified } = userPermission
   const isModerator = userPermission.isModeratorLevel
 
   if (isAuthor && (isVerified || oldMedia.status === 'PENDING')) {

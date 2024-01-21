@@ -2,8 +2,8 @@ import ReqErr from '@/service/ReqError'
 import db from '@/service/db'
 import { PrettifyPick } from '@/service/utils'
 import { Media, User } from '@prisma/client'
-import { userPermissionFactory } from '../helpers'
 import { USER_PUBLIC_FIELDS_QUERY } from '@/service/config'
+import { userPermissionFactory } from '../helpers'
 
 export async function getMessages(
   user: PrettifyPick<User, 'id' | 'role'>,
@@ -42,7 +42,7 @@ export async function createMessage(
     data: {
       userId: user.id,
       mediaId: media.id,
-      message: message,
+      message,
     },
 
     include: { user: { select: USER_PUBLIC_FIELDS_QUERY } },

@@ -1,12 +1,12 @@
 import ReqErr from '@/service/ReqError'
 import { Response } from 'express'
-import { MAX_MEDIA_FILE_SIZE, MAX_AVATAR_FILE_SIZE_HUMAN } from './config'
-import { UserRequest } from './middleware'
 import service from '@/service'
 import discord from '@/service/discord'
 import { addLovesToMedia } from '@/service/model/media/helpers'
 import db from '@/service/db'
 import { USER_SAFE_FIELDS_QUERY } from '@/service/config'
+import { UserRequest } from './middleware'
+import { MAX_MEDIA_FILE_SIZE, MAX_AVATAR_FILE_SIZE_HUMAN } from './config'
 
 export async function createMedia(req: UserRequest, res: Response) {
   const buffer = req.file?.buffer
