@@ -12,6 +12,5 @@ export default env({
   BACKUP_TOKEN: r.string().optional(),
 
   NEXT_PUBLIC_URL: r.string(),
-  NEXT_PUBLIC_GOOGLE_OAUTH_REDIRECT: r.string(),
   NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID: r.string(),
 })
