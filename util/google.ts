@@ -6,15 +6,15 @@ export default function googleAuth(state?: string) {
   form.setAttribute('method', 'GET')
 
   const params = {
-    state: state,
+    state,
     response_type: 'code',
     client_id: process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID,
-    redirect_uri: process.env.NEXT_PUBLIC_URL + '/api/auth/google',
+    redirect_uri: `${process.env.NEXT_PUBLIC_URL}/api/auth/google`,
     scope:
       'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
   }
 
-  for (let p in params) {
+  for (const p in params) {
     const input = document.createElement('input')
     input.setAttribute('type', 'hidden')
     input.setAttribute('name', p)

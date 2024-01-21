@@ -8,11 +8,13 @@ console.clear()
 configDotenv()
 
 const IMAGE_PER_USER = 10
-const REACTION_PER_USER = 50
 const USER_TO_CREATE = 20
+const CATEGORY_TO_CREATE = 10
+const REACTION_PER_USER = 50
 
 ;(async () => {
   await db.user.deleteMany({})
+  await db.mediaCategory.deleteMany({})
   console.log('Users deleted')
   const images = await fetchMessages(USER_TO_CREATE * IMAGE_PER_USER)
   console.log('Uploaded images Loaded')
@@ -20,6 +22,13 @@ const USER_TO_CREATE = 20
   const userList: User[] = []
   const mediaList: Media[] = []
   let iImage = 0
+  const categories = []
+
+  for (let i = 0; i < CATEGORY_TO_CREATE; i++) {
+    categories.push(
+      await service.category.createCategory(`Test Category ${i + 1}`)
+    )
+  }
 
   for (let i = 0; i < USER_TO_CREATE; i++) {
     const user = await service.user.create(
@@ -35,7 +44,7 @@ const USER_TO_CREATE = 20
         {
           status: 'APPROVED',
           title: `Test Media ${iImage + 1}`,
-          newCategory: Math.random().toString(36).substring(7),
+          categoryId: getRandomItems(categories, 1)[0].id,
         },
         async () => images[iImage] ?? uploadMessage(),
         async (result) => console.log('Deleting:', result.id)

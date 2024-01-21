@@ -1,3 +1,5 @@
+import db, { Collection } from '@/service/db'
+import { CollectionWithMediaCount } from '@/service/types'
 import {
   mediaPopulation,
   countPopulation,
@@ -5,9 +7,7 @@ import {
   GetCollectionsQuery,
   CreateCollectionInput,
 } from './helpers'
-import db, { Collection } from '@/service/db'
 import { paginationQueries } from '../../helpers'
-import { CollectionWithMediaCount } from '@/service/types'
 
 export async function createCollection(
   userId: string,

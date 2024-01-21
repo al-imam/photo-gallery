@@ -13,7 +13,7 @@ export default async function (
         code: authCode,
         client_secret: env.GOOGLE_OAUTH_SECRET,
         client_id: env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID,
-        redirect_uri: env.NEXT_PUBLIC_URL + '/api/auth/google',
+        redirect_uri: `${env.NEXT_PUBLIC_URL}/api/auth/google`,
         grant_type: 'authorization_code',
       }
     )

@@ -36,7 +36,7 @@ export const sendUserAndToken: NextUserHandler<{
   })
 }
 
-export const checkPassword: NextUserHandler<{}> = async (req, ctx, next) => {
+export const checkPassword: NextUserHandler<{}> = async (_, ctx, next) => {
   const body = ctx.body<{ password: string }>()
   if (!body.password) {
     throw new ReqErr('Password is required')
@@ -49,10 +49,18 @@ export const checkPassword: NextUserHandler<{}> = async (req, ctx, next) => {
   throw new ReqErr('Password is incorrect')
 }
 
-export const onlyAdmin: NextUserHandler<{}> = async (req, ctx, next) => {
+export const onlyAdmin: NextUserHandler<{}> = async (_, ctx, next) => {
   if (userPermissionFactory(ctx.user).isAdmin) {
     return next()
   }
 
-  throw new ReqErr('You are not allowed to do this')
+  throw new ReqErr('You need to be an admin to do this')
+}
+
+export const onlyModerator: NextUserHandler<{}> = async (_, ctx, next) => {
+  if (userPermissionFactory(ctx.user).isModeratorLevel) {
+    return next()
+  }
+
+  throw new ReqErr('You need to be a moderator to do this')
 }

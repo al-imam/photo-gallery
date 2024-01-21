@@ -22,25 +22,24 @@ export async function getCategoryList(options: GetCategoryOptions) {
   return categoryList
 }
 
-export async function findOrCreateCategory(name: string) {
-  const lowerName = formatCategoryName(name)
-  return (
-    (await db.mediaCategory.findFirst({ where: { name: lowerName } })) ??
-    (await db.mediaCategory.create({ data: { name: lowerName } }))
-  )
+export async function createCategory(name: string) {
+  if (!name.trim()) {
+    throw new Error('Invalid category name')
+  }
+  return db.mediaCategory.create({ data: { name: name.trim() } })
 }
 
 export async function editCategory(id: string, name: string) {
+  if (!name.trim()) {
+    throw new Error('Invalid category name')
+  }
+
   return await db.mediaCategory.update({
     where: { id },
-    data: { name: formatCategoryName(name) },
+    data: { name: name.trim() },
   })
 }
 
 export async function deleteCategory(id: string) {
   return await db.mediaCategory.delete({ where: { id } })
-}
-
-function formatCategoryName(name: string) {
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, '')
 }
