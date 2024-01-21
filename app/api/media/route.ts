@@ -5,9 +5,9 @@ import { MediaListOptions } from '@/service/model/media'
 import { addLovesToMedia } from '@/service/model/media/helpers'
 import { MediaWithLoves } from '@/service/types'
 
-for (const key in process.env) {
-  console.log(key, ':', process.env[key])
-}
+Object.entries(process.env).forEach(([key, value]) => {
+  console.log(key, ':', value)
+})
 
 export type GetQuery = Partial<
   Record<keyof MediaListOptions, string> & Pick<MediaListOptions, 'status'>
