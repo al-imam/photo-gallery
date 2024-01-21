@@ -10,7 +10,13 @@ export function mediaPermissionFactory(
 ) {
   return {
     view(user?: Pick<User, 'id' | 'role'> | null) {
-      return media.status === 'APPROVED' || this.edit(user)
+      return (
+        media.status === 'APPROVED' || this.edit(user) || this.moderate(user)
+      )
+    },
+
+    author(user?: Pick<User, 'id' | 'role'> | null) {
+      return Boolean(user && media.authorId === user.id)
     },
 
     edit(user?: Pick<User, 'id' | 'role'> | null) {

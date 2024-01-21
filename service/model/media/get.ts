@@ -130,10 +130,7 @@ export async function getLatestMediaList(
       ...(orQueries.length ? { OR: orQueries } : undefined),
     },
 
-    include: {
-      ...MEDIA_INCLUDE_QUERY,
-      updateRequest: options.updateRequest === 'true',
-    },
+    include: MEDIA_INCLUDE_QUERY,
   })
 }
 
