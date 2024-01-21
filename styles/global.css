@@ -77,7 +77,7 @@
     --accent: theme(__colors.zinc-800);
     --accent-foreground: theme(__colors.zinc-50);
 
-    --destructive: theme(__colors.red-800);
+    --destructive: theme(__colors.red-500);
     --destructive-foreground: theme(__colors.zinc-50);
 
     --border: theme(__colors.zinc-800);
