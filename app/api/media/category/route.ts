@@ -14,7 +14,7 @@ export const GET = router(async (_, ctx) => {
 export type PostBody = { name: string }
 export const POST = authRouter(onlyAdmin, async (_, ctx) => {
   return NextResponse.json({
-    category: await service.category.findOrCreateCategory(
+    category: await service.category.createCategory(
       ctx.body<PostBody>().name
     ),
   })

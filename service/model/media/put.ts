@@ -3,10 +3,10 @@ import {
   MediaWithReactionCountRaw,
 } from '@/service/types'
 import { MEDIA_INCLUDE_QUERY } from '@/service/config'
-import db, { Media, User } from '@/service/db'
+import db, { Media, Prisma, User } from '@/service/db'
 import { Prettify, PrettifyPick, pick } from '@/service/utils'
 import ReqErr from '@/service/ReqError'
-import { formatNewCategory, validateAndFormatTags } from './helpers'
+import { validateAndFormatTags } from './helpers'
 import { userPermissionFactory } from '../helpers'
 
 const mediaEditableFields = [
@@ -14,21 +14,14 @@ const mediaEditableFields = [
   'description',
   'tags',
   'status',
-  'newCategory',
   'categoryId',
-  'media_hasGraphicContent',
+  'hasGraphicContent',
 ] as const
 
-const mediaModerateFields = [
-  'status',
-  'newCategory',
-  'categoryId',
-  'tags',
-] as const
+const mediaModerateFields = ['status', 'categoryId', 'tags'] as const
 
-export type CreateMediaBody = PrettifyPick<
-  Media,
-  'title',
+export type CreateMediaBody = Pick<
+  Prisma.MediaUncheckedCreateInput,
   (typeof mediaEditableFields)[number]
 >
 
@@ -46,12 +39,10 @@ export async function createMedia(
   uploadToDiscord: () => Promise<DiscordMediaUploadResult>,
   onFailure: (result: DiscordMediaUploadResult) => Promise<any>
 ) {
-  body.tags = validateAndFormatTags(body.tags)
-  if (!userPermissionFactory(user).isVerifiedLevel) {
-    body.status = undefined
-  }
-  if (body.newCategory) {
-    body.categoryId = formatNewCategory(body.newCategory)
+  body.tags = validateAndFormatTags(body.tags as string[])
+  const userPermission = userPermissionFactory(user)
+  if (!(userPermission.isVerified || userPermission.isModeratorLevel)) {
+    delete body.status
   }
 
   const discord = await uploadToDiscord()
@@ -82,30 +73,18 @@ export async function createMedia(
 }
 
 export async function updateMedia(
-  user: PrettifyPick<User, 'id' | 'role'>,
+  user: PrettifyPick<User, 'id' | 'role' | 'isVerified'>,
   oldMedia: PrettifyPick<Media, 'id' | 'authorId' | 'status'>,
   body: UpdateMediaBody
 ) {
   body.tags = validateAndFormatTags(body.tags)
-  if (oldMedia.status === 'APPROVED' && (body.categoryId || body.newCategory)) {
-    throw new ReqErr('Cannot edit category of approved media')
-  }
-  if (body.newCategory) {
-    body.categoryId = formatNewCategory(body.newCategory)
-  }
 
   const isAuthor = oldMedia.authorId === user.id
-  const isModerator = userPermissionFactory(user).isModeratorLevel
+  const userPermission = userPermissionFactory(user)
+  const isVerified = userPermission.isVerified
+  const isModerator = userPermission.isModeratorLevel
 
-  if (isAuthor && isModerator && body.status) {
-    return moderateMedia(user.id, oldMedia, { status: body.status }, body)
-  }
-
-  if (isModerator) {
-    return moderateMedia(user.id, oldMedia, body)
-  }
-
-  if (isAuthor) {
+  if (isAuthor && (isVerified || oldMedia.status === 'PENDING')) {
     return db.media.update({
       where: { id: oldMedia.id },
       data: pick(body, ...mediaEditableFields),
@@ -113,7 +92,29 @@ export async function updateMedia(
     })
   }
 
-  throw new ReqErr('You do not have permission to update this media')
+  if (isModerator) {
+    return moderateMedia(user.id, oldMedia, body)
+  }
+
+  if (isAuthor) {
+    await db.mediaUpdateRequest.create({
+      data: {
+        mediaId: oldMedia.id,
+        title: body.title,
+        description: body.description,
+        tags: body.tags?.join(', '),
+        categoryId: body.categoryId,
+        hasGraphicContent: body.hasGraphicContent,
+      },
+    })
+
+    return db.media.findUniqueOrThrow({
+      where: { id: oldMedia.id },
+      include: MEDIA_INCLUDE_QUERY,
+    })
+  }
+
+  throw new ReqErr('You are not allowed to edit this media', 403)
 }
 
 export async function moderateMedia(
@@ -135,8 +136,7 @@ export async function moderateMedia(
     await db.lOG_MediaStatusChange.create({
       data: {
         mediaId: oldMedia.id,
-        status_old: oldMedia.status,
-        status_new: updatedMedia.status,
+        statusUpdatedTo: updatedMedia.status,
         userId: moderatorId,
       },
     })

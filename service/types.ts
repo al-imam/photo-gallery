@@ -1,4 +1,10 @@
-import { Collection, Media, MediaCategory, User } from '@prisma/client'
+import {
+  Collection,
+  Media,
+  MediaCategory,
+  MediaUpdateRequest,
+  User,
+} from '@prisma/client'
 import { NextRequest } from 'next/server'
 import { NextFunction } from 'router13'
 import { USER_PUBLIC_FIELDS } from './config'
@@ -40,6 +46,7 @@ export type MediaWithReactionCount = Omit<
 
 export type MediaWithLoves = MediaWithReactionCount & {
   isLoved: boolean
+  updateRequest?: MediaUpdateRequest | null
 }
 
 export type CollectionWithMediaCount = Collection & {
