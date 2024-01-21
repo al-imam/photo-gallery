@@ -5,9 +5,8 @@ import { MediaListOptions } from '@/service/model/media'
 import { addLovesToMedia } from '@/service/model/media/helpers'
 import { MediaWithLoves } from '@/service/types'
 
-Object.entries(process.env).forEach(([key, value]) => {
-  console.log(key, ':', value)
-})
+console.error('VERCEL_URL: ', process.env.VERCEL_URL)
+console.error('NEXT_PUBLIC_VERCEL_URL: ', process.env.NEXT_PUBLIC_VERCEL_URL)
 
 export type GetQuery = Partial<
   Record<keyof MediaListOptions, string> & Pick<MediaListOptions, 'status'>
