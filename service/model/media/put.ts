@@ -6,7 +6,7 @@ import { MEDIA_INCLUDE_QUERY } from '@/service/config'
 import db, { Media, User } from '@/service/db'
 import { Prettify, PrettifyPick, pick } from '@/service/utils'
 import ReqErr from '@/service/ReqError'
-import { validateAndFormatTags } from './helpers'
+import { formatNewCategory, validateAndFormatTags } from './helpers'
 import { userPermissionFactory } from '../helpers'
 
 const mediaEditableFields = [
@@ -50,6 +50,9 @@ export async function createMedia(
   if (!userPermissionFactory(user).isVerifiedLevel) {
     body.status = undefined
   }
+  if (body.newCategory) {
+    body.categoryId = formatNewCategory(body.newCategory)
+  }
 
   const discord = await uploadToDiscord()
   let media: MediaWithReactionCountRaw
@@ -86,6 +89,9 @@ export async function updateMedia(
   body.tags = validateAndFormatTags(body.tags)
   if (oldMedia.status === 'APPROVED' && (body.categoryId || body.newCategory)) {
     throw new ReqErr('Cannot edit category of approved media')
+  }
+  if (body.newCategory) {
+    body.categoryId = formatNewCategory(body.newCategory)
   }
 
   const isAuthor = oldMedia.authorId === user.id

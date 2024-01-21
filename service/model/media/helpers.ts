@@ -123,3 +123,10 @@ export function validateAndFormatTags(tags?: string[]) {
 
   return finalTags
 }
+
+export function formatNewCategory(newCategory?: string) {
+  if (!newCategory) return
+  const result = newCategory.toLowerCase().replace(/[^a-z0-9]+/g, '')
+  if (!result) return
+  return result
+}
