@@ -144,7 +144,9 @@ export default function DashboardLayout({
           )}
 
           <ResizablePanel minSize={80}>
-            <main className="p-4 sm:p-8">{children}</main>
+            <main className="[--padding:1rem] sm:[--pacing:2rem]">
+              {children}
+            </main>
           </ResizablePanel>
         </ResizablePanelGroup>
       </TooltipProvider>
