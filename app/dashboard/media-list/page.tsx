@@ -13,7 +13,7 @@ import { toast } from 'sonner'
 export default function MediaList() {
   const { status, data, error, fetchNextPage, hasNextPage, isFetching } =
     useInfiniteQuery<GetData['mediaList']>({
-      queryKey: ['projects'],
+      queryKey: ['media-list-infante-scroll'],
       queryFn: async ({ pageParam }) => {
         const res = await GET<GetData>(`media`, {
           params: { cursor: pageParam },
@@ -33,7 +33,7 @@ export default function MediaList() {
       async ([entry]) => {
         if (entry.isIntersecting) {
           try {
-            fetchNextPage()
+            if (!isFetching) fetchNextPage()
           } catch {
             toast('Something went wrong!', {
               action: {
@@ -56,7 +56,7 @@ export default function MediaList() {
         observer.unobserve(observerTarget.current)
       }
     }
-  }, [observerTarget])
+  }, [observerTarget, isFetching])
 
   return (
     <ScrollArea className="h-[calc(100vh-(var(--nav-size)+1px))] p-[--padding]">
