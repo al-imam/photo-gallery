@@ -147,6 +147,7 @@ export function UserSigninForm({ className, ...props }: UserSigninFormProps) {
               <AlertDialogTrigger asChild>
                 <button
                   type="button"
+                  disabled={form.formState.isSubmitting}
                   className="text-xs underline underline-offset-4 text-muted-foreground hover:text-foreground -mt-1 py-[2px] ml-auto font-medium text-right"
                 >
                   Having trouble remembering your password?

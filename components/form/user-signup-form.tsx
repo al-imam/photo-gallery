@@ -57,7 +57,11 @@ export function UserSignupForm({ className, ...props }: UserSignupFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Email" {...field} />
+                    <Input
+                      disabled={form.formState.isSubmitting}
+                      placeholder="Email"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
