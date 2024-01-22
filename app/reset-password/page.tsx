@@ -1,5 +1,5 @@
 import { ResetPasswordForm } from '@/components/form/reset-password-form'
-import { NavBar } from '@/components/nav-bar'
+import { NavBar } from '@/components/nav'
 import { ResetPasswordIllustration } from '@/icons/illustrations'
 import { decode, emailRegex } from '@/util'
 import { Metadata } from 'next'

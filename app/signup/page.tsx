@@ -1,5 +1,5 @@
 import { UserSignupForm } from '@/components/form/user-signup-form'
-import { NavBar } from '@/components/nav-bar'
+import { NavBar } from '@/components/nav'
 import { SignupIllustration } from '@/icons/illustrations'
 import { Metadata } from 'next'
 import Link from 'next/link'

@@ -1,5 +1,5 @@
 import { UserSigninForm } from '@/components/form/user-signin-form'
-import { NavBar } from '@/components/nav-bar'
+import { NavBar } from '@/components/nav'
 import { SigninIllustration } from '@/icons/illustrations'
 import { Metadata } from 'next'
 

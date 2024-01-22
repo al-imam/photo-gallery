@@ -36,7 +36,6 @@ export default function RootLayout({
           process.env.NODE_ENV === 'development' ? 'debug-screens' : undefined
         }`}
       >
-        <div className="fixed bottom-0 right-0 left-0 z-50 w-full h-[0.1rem] scroll-progress rounded-full opacity-50 backdrop-blur-md" />
         <Provider>{children}</Provider>
       </body>
     </html>

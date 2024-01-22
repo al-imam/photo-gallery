@@ -80,6 +80,8 @@
     "react-hook-form": "^7.48.2",
     "react-masonry-css": "^1.0.16",
     "react-photo-album": "^2.3.0",
+    "react-resizable-panels": "^1.0.9",
+    "react-use": "^17.5.0",
     "react-window": "^1.8.10",
     "router13": "^0.0.7",
     "rype": "^2.0.5",
