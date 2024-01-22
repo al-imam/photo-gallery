@@ -1,5 +1,5 @@
 import { ResetPasswordForm } from '@/components/form/reset-password-form'
-import { NavBar } from '@/components/nav-bar'
+import { NavBar } from '@/components/nav'
 import { ResetPasswordIllustration } from '@/icons/illustrations'
 import { decode, emailRegex } from '@/util'
 import { Metadata } from 'next'
@@ -16,9 +16,9 @@ export default async function ResetPassword({
 }) {
   const auth = searchParams.token
   if (!auth) return redirect('/signup')
-  const decoded = decode(auth)
+  const { payload } = decode(auth) as { payload: { email: string } }
 
-  if (!decoded.payload || !emailRegex.test(decoded.payload.toString())) {
+  if (!(payload && payload.email && emailRegex.test(payload.email))) {
     return redirect('/signup')
   }
 
@@ -41,10 +41,7 @@ export default async function ResetPassword({
                   process.
                 </p>
               </div>
-              <ResetPasswordForm
-                auth={auth}
-                email={decoded.payload.toString()}
-              />
+              <ResetPasswordForm auth={auth} email={payload.email} />
             </div>
           </div>
         </div>

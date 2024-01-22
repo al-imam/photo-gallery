@@ -1,6 +1,6 @@
 import { GetData } from '@/app/api/media/route'
 import { InfiniteScroll } from '@/components/infinite-scroll'
-import { NavBar } from '@/components/nav-bar'
+import { NavBar } from '@/components/nav'
 import { SearchInput } from '@/components/search-input'
 import { GET } from '@/lib'
 import { buttonVariants } from '@/shadcn/ui/button'

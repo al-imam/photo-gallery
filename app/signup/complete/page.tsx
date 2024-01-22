@@ -1,5 +1,5 @@
 import { UserCompleteForm } from '@/components/form/user-complete-form'
-import { NavBar } from '@/components/nav-bar'
+import { NavBar } from '@/components/nav'
 import { SignupCompleteIllustration } from '@/icons/illustrations'
 import { decode, emailRegex } from '@/util'
 import { Metadata } from 'next'
