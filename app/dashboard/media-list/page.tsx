@@ -3,6 +3,7 @@
 /* eslint-disable no-nested-ternary */
 
 import { GetData } from '@/app/api/media/route'
+import { ModifyMedia } from '@/components/dashboard'
 import { SpinnerIcon } from '@/icons'
 import { GET } from '@/lib'
 import {
@@ -18,6 +19,9 @@ import * as React from 'react'
 import { toast } from 'sonner'
 
 export default function MediaList() {
+  const [isOpen, setIsOpen] = React.useState(false)
+  const [selectedMedia, setSelectedMedia] =
+    React.useState<GetData['mediaList'][0]>()
   const { status, data, error, fetchNextPage, hasNextPage, isFetching } =
     useInfiniteQuery<GetData['mediaList']>({
       queryKey: ['media-list-infante-scroll'],
@@ -67,6 +71,13 @@ export default function MediaList() {
 
   return (
     <div className="p-[--padding]">
+      {selectedMedia && (
+        <ModifyMedia
+          isOpen={isOpen}
+          onOpenChange={setIsOpen}
+          media={selectedMedia}
+        />
+      )}
       {status === 'pending' ? null : status === 'error' ? (
         <span>Error: {error.message}</span>
       ) : (
@@ -83,7 +94,14 @@ export default function MediaList() {
             {data.pages.map((page, index) => (
               <React.Fragment key={index}>
                 {page.map((media) => (
-                  <TableRow key={media.id} className="hover:cursor-pointer">
+                  <TableRow
+                    key={media.id}
+                    className="hover:cursor-pointer"
+                    onClick={() => {
+                      setSelectedMedia(media)
+                      setIsOpen(true)
+                    }}
+                  >
                     <TableCell className="hidden sm:table-cell w-max text-nowrap max-w-52 text-ellipsis overflow-hidden">
                       {media.author.name}
                     </TableCell>
@@ -103,9 +121,7 @@ export default function MediaList() {
           </TableBody>
         </Table>
       )}
-
       <div ref={observerTarget} />
-
       <div>
         {hasNextPage || isFetching ? (
           <div className="mx-auto py-20 flex justify-center items-center text-foreground">
