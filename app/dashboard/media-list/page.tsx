@@ -5,7 +5,14 @@
 import { GetData } from '@/app/api/media/route'
 import { SpinnerIcon } from '@/icons'
 import { GET } from '@/lib'
-import { ScrollArea, ScrollBar } from '@/shadcn/ui/scroll-area'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/shadcn/ui/table'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import * as React from 'react'
 import { toast } from 'sonner'
@@ -59,31 +66,46 @@ export default function MediaList() {
   }, [observerTarget, isFetching])
 
   return (
-    <ScrollArea className="h-[calc(100vh-(var(--nav-size)+1px))] p-[--padding]">
+    <div className="p-[--padding]">
       {status === 'pending' ? null : status === 'error' ? (
         <span>Error: {error.message}</span>
       ) : (
-        data.pages.map((page, index) => (
-          <React.Fragment key={index}>
-            {page.map((media) => (
-              <p
-                key={media.id}
-                className="mb-4"
-                style={{
-                  border: '1px solid gray',
-                  borderRadius: '5px',
-                  padding: '5rem 1rem',
-                  background: `hsla(${Math.floor(Math.random() * 360)}, 60%, 80%, 1)`,
-                }}
-              >
-                {media.title}
-              </p>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="hidden sm:table-cell">Author</TableHead>
+              <TableHead>Title</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead className="text-right">Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.pages.map((page, index) => (
+              <React.Fragment key={index}>
+                {page.map((media) => (
+                  <TableRow key={media.id} className="hover:cursor-pointer">
+                    <TableCell className="hidden sm:table-cell w-max text-nowrap max-w-52 text-ellipsis overflow-hidden">
+                      {media.author.name}
+                    </TableCell>
+                    <TableCell className="font-medium w-max text-nowrap max-w-xs text-ellipsis overflow-hidden">
+                      {media.title}
+                    </TableCell>
+                    <TableCell className="w-max text-nowrap max-w-xs text-ellipsis overflow-hidden">
+                      {media.category?.name}
+                    </TableCell>
+                    <TableCell className="text-right w-max text-nowrap max-w-xs text-ellipsis overflow-hidden lowercase">
+                      {media.status}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </React.Fragment>
             ))}
-          </React.Fragment>
-        ))
+          </TableBody>
+        </Table>
       )}
 
       <div ref={observerTarget} />
+
       <div>
         {hasNextPage || isFetching ? (
           <div className="mx-auto py-20 flex justify-center items-center text-foreground">
@@ -97,7 +119,6 @@ export default function MediaList() {
           </div>
         )}
       </div>
-      <ScrollBar orientation="horizontal" />
-    </ScrollArea>
+    </div>
   )
 }
