@@ -1,9 +1,10 @@
 import axios from 'axios'
 import { generateToken } from './token'
+import env from '@/service/env'
 ;(async () => {
   try {
     const res = await axios.post(
-      'http://localhost:3000/api/service',
+      env.NEXT_PUBLIC_URL + '/api/service',
       {},
       {
         headers: {
