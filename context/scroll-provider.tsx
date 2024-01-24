@@ -2,19 +2,9 @@
 
 import { Prettify } from '@/types'
 import Lenis from '@studio-freight/lenis'
-import {
-  FunctionComponent,
-  ReactNode,
-  createContext,
-  useEffect,
-  useRef,
-} from 'react'
+import { FunctionComponent, ReactNode, createContext, useEffect } from 'react'
 
-interface Value {
-  lenis: Lenis
-  stopLenis: () => void
-  startLenis: () => void
-}
+interface Value {}
 
 const ScrollContext = createContext<Prettify<Value> | null>(null)
 
@@ -46,15 +36,13 @@ const ScrollProvider: FunctionComponent<ScrollProviderProps> = ({
   children,
   ...rest
 }) => {
-  const { current: lenis } = useRef(
-    new Lenis({
+  useEffect(() => {
+    const lenis = new Lenis({
       duration: 0.8,
       easing: (t: number) => Math.min(1, 1.001 - 2 ** (-10 * t)),
       ...rest,
     })
-  )
 
-  useEffect(() => {
     const raf: FrameRequestCallback = (time) => {
       lenis.raf(time)
       requestAnimationFrame(raf)
@@ -64,19 +52,7 @@ const ScrollProvider: FunctionComponent<ScrollProviderProps> = ({
     return () => lenis.raf(() => {})
   }, [])
 
-  function stopLenis() {
-    lenis.stop()
-  }
-
-  function startLenis() {
-    lenis.start()
-  }
-
-  return (
-    <ScrollContext.Provider value={{ lenis, stopLenis, startLenis }}>
-      {children}
-    </ScrollContext.Provider>
-  )
+  return <ScrollContext.Provider value={{}}>{children}</ScrollContext.Provider>
 }
 
 export { ScrollContext, ScrollProvider }
