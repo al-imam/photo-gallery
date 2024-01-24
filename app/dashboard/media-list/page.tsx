@@ -3,9 +3,17 @@
 /* eslint-disable no-nested-ternary */
 
 import { GetData } from '@/app/api/media/route'
-import { ModifyMedia } from '@/components/dashboard'
+import { FixedPopover, ModifyMedia, statuses } from '@/components/dashboard'
 import { SpinnerIcon } from '@/icons'
 import { GET } from '@/lib'
+import { Input } from '@/shadcn/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shadcn/ui/select'
 import {
   Table,
   TableBody,
@@ -15,19 +23,26 @@ import {
   TableRow,
 } from '@/shadcn/ui/table'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import * as React from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
+import { useMeasure } from 'react-use'
 import { toast } from 'sonner'
 
 export default function MediaList() {
-  const [isOpen, setIsOpen] = React.useState(false)
-  const [selectedMedia, setSelectedMedia] =
-    React.useState<GetData['mediaList'][0]>()
+  const [selected, setSelected] = useState('')
+  const [search, setSearch] = useState('')
+  const [isOpen, setIsOpen] = useState(false)
+  const [ref, { width }] = useMeasure<HTMLDivElement>()
+
+  const [selectedMedia, setSelectedMedia] = useState<GetData['mediaList'][0]>()
+
   const { status, data, error, fetchNextPage, hasNextPage, isFetching } =
     useInfiniteQuery<GetData['mediaList']>({
-      queryKey: ['media-list-infante-scroll'],
-      queryFn: async ({ pageParam }) => {
+      queryKey: ['media-list-infante-scroll', selected, search],
+      queryFn: async ({ pageParam, queryKey }) => {
+        const status = queryKey[1] === '' ? undefined : queryKey[1]
+        const title = queryKey[2] === '' ? undefined : queryKey[2]
         const res = await GET<GetData>(`media`, {
-          params: { cursor: pageParam },
+          params: { cursor: pageParam, status, search: title },
         })
         return res.data.mediaList
       },
@@ -37,9 +52,9 @@ export default function MediaList() {
       },
     })
 
-  const observerTarget = React.useRef<HTMLDivElement>(null)
+  const observerTarget = useRef<HTMLDivElement>(null)
 
-  React.useEffect(() => {
+  useEffect(() => {
     const observer = new IntersectionObserver(
       async ([entry]) => {
         if (entry.isIntersecting) {
@@ -70,7 +85,29 @@ export default function MediaList() {
   }, [observerTarget, isFetching])
 
   return (
-    <div className="p-[--padding]">
+    <div className="relative p-[--padding]" ref={ref}>
+      <FixedPopover style={{ width: width === 0 ? 'max-w-2xl' : width }}>
+        <div className="flex items-center max-w-2xl rounded-sm overflow-hidden mx-auto  bg-muted shadow-sm shadow-muted p-3 gap-2">
+          <Input
+            placeholder="Search by title"
+            value={search}
+            onChange={(evt) => setSearch(evt.target.value)}
+          />
+          <Select onValueChange={setSelected} value={selected}>
+            <SelectTrigger>
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+
+            <SelectContent>
+              {statuses.map((item) => (
+                <SelectItem key={item.id} value={item.id}>
+                  {item.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </FixedPopover>
       {selectedMedia && (
         <ModifyMedia
           isOpen={isOpen}
@@ -92,7 +129,7 @@ export default function MediaList() {
           </TableHeader>
           <TableBody>
             {data.pages.map((page, index) => (
-              <React.Fragment key={index}>
+              <Fragment key={index}>
                 {page.map((media) => (
                   <TableRow
                     key={media.id}
@@ -116,7 +153,7 @@ export default function MediaList() {
                     </TableCell>
                   </TableRow>
                 ))}
-              </React.Fragment>
+              </Fragment>
             ))}
           </TableBody>
         </Table>

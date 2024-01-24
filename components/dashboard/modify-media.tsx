@@ -44,7 +44,7 @@ interface FormValues {
   title: string
 }
 
-const statuses = [
+export const statuses = [
   {
     id: 'APPROVED',
     name: 'approved',

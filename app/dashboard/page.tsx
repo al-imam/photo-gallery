@@ -1,6 +1,6 @@
 export default function Index() {
   return (
-    <div>
+    <div className="p-[--padding]">
       Lorem, ipsum dolor sit amet consectetur adipisicing elit. A dolores
       consectetur voluptatum ducimus corporis, nostrum illum corrupti repellat
       itaque magnam vitae aliquid. Eius corrupti quos itaque obcaecati est at
