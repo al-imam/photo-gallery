@@ -34,9 +34,9 @@ export function FixedPopover({
     <div ref={ref} className={cn('w-full')}>
       <div
         className={cn(
-          'ml-auto mr-[--padding] px-[--padding]',
+          'ml-auto mr-[--padding] sm:px-[--padding]',
           {
-            'fixed inset-x-0 top-[--padding] z-50 mr-[--removed-body-scroll-bar-size]':
+            'fixed inset-x-0 top-[--padding] z-50 mr-[calc(var(--removed-body-scroll-bar-size,0px)_+_var(--padding))]':
               !isIntersecting,
           },
           className

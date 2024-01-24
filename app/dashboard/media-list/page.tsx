@@ -39,11 +39,14 @@ export default function MediaList() {
     useInfiniteQuery<GetData['mediaList']>({
       queryKey: ['media-list-infante-scroll', selected, search],
       queryFn: async ({ pageParam, queryKey }) => {
-        const status = queryKey[1] === '' ? undefined : queryKey[1]
-        const title = queryKey[2] === '' ? undefined : queryKey[2]
         const res = await GET<GetData>(`media`, {
-          params: { cursor: pageParam, status, search: title },
+          params: {
+            cursor: pageParam,
+            status: queryKey[1] || undefined,
+            search: queryKey[2] || undefined,
+          },
         })
+
         return res.data.mediaList
       },
       initialPageParam: undefined,
@@ -85,29 +88,31 @@ export default function MediaList() {
   }, [observerTarget, isFetching])
 
   return (
-    <div className="relative p-[--padding]" ref={ref}>
-      <FixedPopover style={{ width: width === 0 ? 'max-w-2xl' : width }}>
-        <div className="flex items-center max-w-2xl rounded-sm overflow-hidden mx-auto  bg-muted shadow-sm shadow-muted p-3 gap-2">
-          <Input
-            placeholder="Search by title"
-            value={search}
-            onChange={(evt) => setSearch(evt.target.value)}
-          />
-          <Select onValueChange={setSelected} value={selected}>
-            <SelectTrigger>
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
+    <div className="relative p-[--padding] [scrollbar-gutter:stable]" ref={ref}>
+      <div className="mb-4 sm:mb-6">
+        <FixedPopover style={{ width: width === 0 ? 'max-w-2xl' : width }}>
+          <div className="flex items-center max-w-2xl rounded-sm overflow-hidden mx-auto  bg-muted shadow-sm shadow-muted p-3 gap-2">
+            <Input
+              placeholder="Search by title"
+              value={search}
+              onChange={(evt) => setSearch(evt.target.value)}
+            />
+            <Select onValueChange={setSelected} value={selected}>
+              <SelectTrigger>
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
 
-            <SelectContent>
-              {statuses.map((item) => (
-                <SelectItem key={item.id} value={item.id}>
-                  {item.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </FixedPopover>
+              <SelectContent>
+                {statuses.map((item) => (
+                  <SelectItem key={item.id} value={item.id}>
+                    {item.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </FixedPopover>
+      </div>
       {selectedMedia && (
         <ModifyMedia
           isOpen={isOpen}
