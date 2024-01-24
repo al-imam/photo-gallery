@@ -59,7 +59,6 @@ export default function DashboardLayout({
             },
           ]}
         />
-
         <Separator key={1} />
         <Nav
           isCollapsed={isCollapsed}
@@ -120,6 +119,8 @@ export default function DashboardLayout({
                 collapsible={true}
                 minSize={15}
                 maxSize={20}
+                order={0}
+                id="panel-sidebar"
                 style={{
                   maxWidth: '24rem',
                   minWidth: isCollapsed ? '3.125rem' : '12rem',
@@ -143,8 +144,10 @@ export default function DashboardLayout({
             </Sheet>
           )}
 
-          <ResizablePanel minSize={80}>
-            <main className="p-4 sm:p-8">{children}</main>
+          <ResizablePanel minSize={80} id="panel-main-content" order={1}>
+            <main className="[--padding:1rem] sm:[--pacing:2rem]">
+              {children}
+            </main>
           </ResizablePanel>
         </ResizablePanelGroup>
       </TooltipProvider>
