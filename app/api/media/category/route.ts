@@ -3,10 +3,12 @@ import { NextResponse } from 'next/server'
 import { authRouter, router } from '@/server/next/router'
 import { onlyAdmin } from '@/server/next/middlewares/auth'
 import service from '@/service'
+import { MediaCategory } from '@prisma/client'
 
+export type GetData = { categories: MediaCategory[] }
 export type GetQuery = GetCategoryOptions
 export const GET = router(async (_, ctx) => {
-  return NextResponse.json({
+  return NextResponse.json<GetData>({
     categories: await service.category.getCategoryList(ctx.query<GetQuery>()),
   })
 })
