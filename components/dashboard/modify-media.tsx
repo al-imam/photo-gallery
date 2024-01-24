@@ -42,6 +42,7 @@ import { useMedia } from 'react-use'
 interface FormValues {
   status: string
   title: string
+  category: string
 }
 
 export const statuses = [
@@ -62,11 +63,16 @@ export const statuses = [
 function ProfileForm({
   className,
   media,
-}: React.ComponentProps<'form'> & { media: GetData['mediaList'][0] }) {
+  categories,
+}: React.ComponentProps<'form'> & {
+  media: GetData['mediaList'][0]
+  categories: any[]
+}) {
   const form = useForm<FormValues>({
     defaultValues: {
       status: media.status,
       title: media.title,
+      category: media.category?.id,
     },
   })
 
@@ -102,11 +108,36 @@ function ProfileForm({
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select property type" />
+                    <SelectValue placeholder="status" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
                   {statuses.map((data) => (
+                    <SelectItem key={data.id} value={data.id}>
+                      {data.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="category"
+          rules={{ required: 'Category is required' }}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Category</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="category" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {categories.map((data) => (
                     <SelectItem key={data.id} value={data.id}>
                       {data.name}
                     </SelectItem>
@@ -146,9 +177,15 @@ interface ModifyMediaProps {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
   media: GetData['mediaList'][0]
+  categories: any[]
 }
 
-export function ModifyMedia({ isOpen, onOpenChange, media }: ModifyMediaProps) {
+export function ModifyMedia({
+  isOpen,
+  onOpenChange,
+  media,
+  categories,
+}: ModifyMediaProps) {
   const isDesktop = useMedia('(min-width: 768px)', false)
 
   if (isDesktop) {
@@ -159,7 +196,7 @@ export function ModifyMedia({ isOpen, onOpenChange, media }: ModifyMediaProps) {
             <DialogTitle>Modify Media</DialogTitle>
           </DialogHeader>
 
-          <ProfileForm media={media} />
+          <ProfileForm media={media} categories={categories} />
         </DialogContent>
       </Dialog>
     )
@@ -171,7 +208,7 @@ export function ModifyMedia({ isOpen, onOpenChange, media }: ModifyMediaProps) {
         <DrawerHeader className="text-left">
           <DrawerTitle>Modify Media</DrawerTitle>
         </DrawerHeader>
-        <ProfileForm className="px-4" media={media} />
+        <ProfileForm className="px-4" media={media} categories={categories} />
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>

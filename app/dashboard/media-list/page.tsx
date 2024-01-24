@@ -4,6 +4,8 @@
 
 import { GetData } from '@/app/api/media/route'
 import { FixedPopover, ModifyMedia, statuses } from '@/components/dashboard'
+import { useAuth } from '@/hooks'
+import { useCategory } from '@/hooks/category'
 import { SpinnerIcon } from '@/icons'
 import { GET } from '@/lib'
 import { Input } from '@/shadcn/ui/input'
@@ -32,18 +34,26 @@ export default function MediaList() {
   const [search, setSearch] = useState('')
   const [isOpen, setIsOpen] = useState(false)
   const [ref, { width }] = useMeasure<HTMLDivElement>()
+  const { auth } = useAuth()
+  const {
+    data: { categories },
+  } = useCategory()
 
   const [selectedMedia, setSelectedMedia] = useState<GetData['mediaList'][0]>()
 
-  const { status, data, error, fetchNextPage, hasNextPage, isFetching } =
+  const { status, data, fetchNextPage, hasNextPage, isFetching } =
     useInfiniteQuery<GetData['mediaList']>({
       queryKey: ['media-list-infante-scroll', selected, search],
+
       queryFn: async ({ pageParam, queryKey }) => {
         const res = await GET<GetData>(`media`, {
           params: {
             cursor: pageParam,
             status: queryKey[1] || undefined,
             search: queryKey[2] || undefined,
+          },
+          headers: {
+            Authorization: auth,
           },
         })
 
@@ -62,7 +72,7 @@ export default function MediaList() {
       async ([entry]) => {
         if (entry.isIntersecting) {
           try {
-            if (!isFetching) fetchNextPage()
+            if (!isFetching) fetchNextPage({ throwOnError: true })
           } catch {
             toast('Something went wrong!', {
               action: {
@@ -93,7 +103,7 @@ export default function MediaList() {
         <FixedPopover style={{ width: width === 0 ? 'max-w-2xl' : width }}>
           <div className="flex items-center max-w-2xl rounded-sm overflow-hidden mx-auto  bg-muted shadow-sm shadow-muted p-3 gap-2">
             <Input
-              placeholder="Search by title"
+              placeholder="Search"
               value={search}
               onChange={(evt) => setSearch(evt.target.value)}
             />
@@ -118,10 +128,11 @@ export default function MediaList() {
           isOpen={isOpen}
           onOpenChange={setIsOpen}
           media={selectedMedia}
+          categories={categories}
         />
       )}
       {status === 'pending' ? null : status === 'error' ? (
-        <span>Error: {error.message}</span>
+        <span>Something went wrong!</span>
       ) : (
         <Table>
           <TableHeader>
