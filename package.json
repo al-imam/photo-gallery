@@ -90,6 +90,7 @@
     "sharp": "^0.33.1",
     "sonner": "^1.2.4",
     "tailwind-merge": "^2.1.0",
+    "use-debounce": "^10.0.0",
     "vaul": "^0.8.9",
     "xss-clean": "^0.1.4"
   },

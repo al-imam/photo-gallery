@@ -3,6 +3,9 @@
 import * as React from 'react'
 
 import { GetData } from '@/app/api/media/route'
+import { useAuth } from '@/hooks'
+import { SpinnerIcon } from '@/icons'
+import { PATCH } from '@/lib'
 import { Button } from '@/shadcn/ui/button'
 import {
   Dialog,
@@ -35,14 +38,16 @@ import {
   SelectValue,
 } from '@/shadcn/ui/select'
 import { cn } from '@/shadcn/utils'
+import { useQueryClient } from '@tanstack/react-query'
 import Image from 'next/image'
 import { useForm } from 'react-hook-form'
 import { useMedia } from 'react-use'
+import { toast } from 'sonner'
 
 interface FormValues {
   status: string
   title: string
-  category: string
+  categoryId: string
 }
 
 export const statuses = [
@@ -60,23 +65,43 @@ export const statuses = [
   },
 ]
 
-function ProfileForm({
+function ModifyForm({
   className,
   media,
   categories,
+  close,
 }: React.ComponentProps<'form'> & {
   media: GetData['mediaList'][0]
   categories: any[]
+  close: () => void
 }) {
+  const { auth } = useAuth()
+  const queryClient = useQueryClient()
   const form = useForm<FormValues>({
     defaultValues: {
       status: media.status,
       title: media.title,
-      category: media.category?.id,
+      categoryId: media.category?.id,
     },
   })
 
-  function onSubmit(_value: FormValues) {}
+  async function onSubmit(body: FormValues) {
+    try {
+      await PATCH(`media/${media.id}`, body, {
+        headers: { Authorization: auth },
+      })
+      queryClient.invalidateQueries({ queryKey: ['media-list-infante-scroll'] })
+      close()
+      return toast.success('Updated successfully!')
+    } catch {
+      return toast.error('Something went wrong!', {
+        action: {
+          label: 'Try again',
+          onClick: () => {},
+        },
+      })
+    }
+  }
 
   return (
     <Form {...form}>
@@ -105,7 +130,11 @@ function ProfileForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Status</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
+              <Select
+                onValueChange={field.onChange}
+                value={field.value}
+                disabled={form.formState.isSubmitting}
+              >
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="status" />
@@ -125,12 +154,16 @@ function ProfileForm({
         />
         <FormField
           control={form.control}
-          name="category"
+          name="categoryId"
           rules={{ required: 'Category is required' }}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Category</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
+              <Select
+                onValueChange={field.onChange}
+                value={field.value}
+                disabled={form.formState.isSubmitting}
+              >
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="category" />
@@ -167,7 +200,12 @@ function ProfileForm({
           )}
         />
 
-        <Button type="submit">Save changes</Button>
+        <Button type="submit" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting && (
+            <SpinnerIcon className="mr-2 h-4 w-4 animate-spin" />
+          )}
+          Save changes
+        </Button>
       </form>
     </Form>
   )
@@ -196,7 +234,11 @@ export function ModifyMedia({
             <DialogTitle>Modify Media</DialogTitle>
           </DialogHeader>
 
-          <ProfileForm media={media} categories={categories} />
+          <ModifyForm
+            media={media}
+            categories={categories}
+            close={() => onOpenChange(false)}
+          />
         </DialogContent>
       </Dialog>
     )
@@ -208,7 +250,12 @@ export function ModifyMedia({
         <DrawerHeader className="text-left">
           <DrawerTitle>Modify Media</DrawerTitle>
         </DrawerHeader>
-        <ProfileForm className="px-4" media={media} categories={categories} />
+        <ModifyForm
+          className="px-4"
+          media={media}
+          categories={categories}
+          close={() => onOpenChange(false)}
+        />
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>

@@ -28,10 +28,12 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { useMeasure } from 'react-use'
 import { toast } from 'sonner'
+import { useDebounce } from 'use-debounce'
 
 export default function MediaList() {
   const [selected, setSelected] = useState('')
   const [search, setSearch] = useState('')
+  const [debounceSearch] = useDebounce(search, 200)
   const [isOpen, setIsOpen] = useState(false)
   const [ref, { width }] = useMeasure<HTMLDivElement>()
   const { auth } = useAuth()
@@ -43,7 +45,7 @@ export default function MediaList() {
 
   const { status, data, fetchNextPage, hasNextPage, isFetching } =
     useInfiniteQuery<GetData['mediaList']>({
-      queryKey: ['media-list-infante-scroll', selected, search],
+      queryKey: ['media-list-infante-scroll', selected, debounceSearch],
 
       queryFn: async ({ pageParam, queryKey }) => {
         const res = await GET<GetData>(`media`, {
@@ -182,8 +184,8 @@ export default function MediaList() {
           </div>
         ) : (
           <div className="mx-auto py-20 flex justify-center items-center text-foreground">
-            <span className="font-sans text-lg text-muted-foreground">
-              Nothing left
+            <span className="font-sans text-sm text-muted-foreground">
+              That&apos;s all for now, thanks for exploring!
             </span>
           </div>
         )}
