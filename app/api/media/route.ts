@@ -12,9 +12,6 @@ export type GetData = {
   mediaList: MediaWithLoves[]
 }
 export const GET = optionalAuthRouter(async (req, ctx) => {
-  console.error('VERCEL_URL: ', process.env.VERCEL_URL)
-  console.error('NEXT_PUBLIC_VERCEL_URL: ', process.env.NEXT_PUBLIC_VERCEL_URL)
-
   const mediaList = await service.media.getLatestMediaList(
     ctx.user,
     ctx.query<GetQuery>()
