@@ -8,6 +8,7 @@ export default env({
   DISCORD_CHANNEL_AVATAR: r.string(),
   DISCORD_TOKEN: r.string(),
   JWT_SECRET: r.string(),
+  SERVICE_SECRET: r.string(),
   BCRYPT_SALT_ROUNDS: r.number(),
   BACKUP_TOKEN: r.string().optional(),
 

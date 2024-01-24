@@ -7,6 +7,8 @@ import Router from 'router13'
 import service from '@/service'
 import { NextResponse } from 'next/server'
 import errorFormat from '@/service/errorFormat'
+import { bcrypt, jwt } from '@/service/hash'
+import env from '@/service/env'
 
 export const router = Router.create<NextHandler>({
   middleware: [
@@ -35,6 +37,19 @@ export const router = Router.create<NextHandler>({
     const [message, status] = errorFormat(err)
     return NextResponse.json({ error: message.toString() }, { status })
   },
+})
+
+export const serviceRouter = router.create<NextHandler>({
+  middleware: [
+    async (req, _, next) => {
+      const token = req.headers.get('service-token')
+      if (!token) throw Error('Service token is required')
+      const { payload } = await jwt.verify('service-token', token)
+      const isOk = await bcrypt.compare(env.SERVICE_SECRET, payload)
+      if (!isOk) throw Error('Invalid service token')
+      return next()
+    },
+  ],
 })
 
 export const authRouter = router.create<NextUserHandler>({

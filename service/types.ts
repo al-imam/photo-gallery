@@ -63,6 +63,7 @@ export type CollectionWithMedia = Collection & {
 export type JWTPayload = {
   auth: string
   cookie: string
+  'service-token': string
   'signup-email': string
   'change-email': {
     userId: string
