@@ -14,12 +14,14 @@ import { TooltipProvider } from '@/shadcn/ui/tooltip'
 import { cn } from '@/shadcn/utils'
 import {
   LibraryIcon,
+  LineChartIcon,
   ListEndIcon,
   ListVideoIcon,
   ListXIcon,
   PanelLeftOpenIcon,
   Users2,
 } from 'lucide-react'
+import { useSelectedLayoutSegment } from 'next/navigation'
 import { Fragment, useMemo, useState } from 'react'
 import { useMedia } from 'react-use'
 
@@ -31,6 +33,7 @@ export default function DashboardLayout({
   const isWide = useMedia('(min-width: 640px)', true)
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
+  const selected = useSelectedLayoutSegment()
 
   const tabs = useMemo(
     () => (
@@ -40,22 +43,10 @@ export default function DashboardLayout({
           key={0}
           links={[
             {
-              title: 'Media List',
-              label: '128',
-              icon: ListVideoIcon,
-              variant: 'default',
-            },
-            {
-              title: 'Media Update',
-              label: '9',
-              icon: ListEndIcon,
-              variant: 'ghost',
-            },
-            {
-              title: 'Media Report',
-              label: '',
-              icon: ListXIcon,
-              variant: 'ghost',
+              title: 'Statics',
+              icon: LineChartIcon,
+              variant: selected === null ? 'default' : 'ghost',
+              href: '',
             },
           ]}
         />
@@ -65,22 +56,47 @@ export default function DashboardLayout({
           key={2}
           links={[
             {
+              title: 'Media List',
+              icon: ListVideoIcon,
+              variant: selected === 'media-list' ? 'default' : 'ghost',
+              href: 'media-list',
+            },
+            {
+              title: 'Media Update',
+              icon: ListEndIcon,
+              variant: selected === 'media-update' ? 'default' : 'ghost',
+              href: 'media-update',
+            },
+            {
+              title: 'Media Report',
+              icon: ListXIcon,
+              variant: selected === 'media-report' ? 'default' : 'ghost',
+              href: 'media-report',
+            },
+          ]}
+        />
+        <Separator key={3} />
+        <Nav
+          isCollapsed={isCollapsed}
+          key={4}
+          links={[
+            {
               title: 'Users',
-              label: '972',
               icon: Users2,
-              variant: 'ghost',
+              variant: selected === 'users' ? 'default' : 'ghost',
+              href: 'users',
             },
             {
               title: 'Collections',
-              label: '342',
               icon: LibraryIcon,
-              variant: 'ghost',
+              variant: selected === 'collections' ? 'default' : 'ghost',
+              href: 'collections',
             },
           ]}
         />
       </Fragment>
     ),
-    [isCollapsed]
+    [isCollapsed, selected]
   )
 
   return (
