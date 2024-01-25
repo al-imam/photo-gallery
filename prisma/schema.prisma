@@ -1,0 +1,234 @@
+model User {
+  id String @id @default(uuid()) @db.Uuid()
+
+  name     String   @db.VarChar(24)
+  profile  Profile?
+  role     UserRole @default(PUBLIC)
+  username String   @unique @default(cuid())
+
+  avatar_sm        String?
+  avatar_md        String?
+  avatar_lg        String?
+  avatar_storageId String?
+
+  password       String
+  email          String   @unique
+  authModifiedAt DateTime @default(now())
+
+  media         Media[]
+  reactions     MediaReaction[] @relation("MediaReaction")
+  collections   Collection[]    @relation("Collection")
+  notifications Notification[]  @relation("Notification")
+
+  Z_REPORTS                           MediaReport[]           @relation("MediaReport")
+  Z_LOG_ROLE                          LOG_RoleChange[]        @relation("LogRoleChange")
+  Z_LOG_ROLE_MODERATED                LOG_RoleChange[]        @relation("LogRoleChangeModerated")
+  Z_LOG_MEDIA_STATUS_CHANGE_MODERATED LOG_MediaStatusChange[] @relation("LogMediaStatusChangeModerated")
+}
+
+model Profile {
+  userId    String   @id @db.Uuid()
+  createdAt DateTime @default(now())
+
+  bio      String?       @db.VarChar(200)
+  location String?       @db.VarChar(48)
+  email    String?
+  links    ProfileLink[] @relation("ProfileLink")
+
+  ZZZ_USER User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ProfileLink {
+  id        String   @id @default(uuid()) @db.Uuid()
+  userId    String   @db.Uuid()
+  createdAt DateTime @default(now())
+
+  type ProfileLinkType @default(OTHER)
+  url  String          @db.VarChar(48)
+
+  Z_PROFILE Profile @relation("ProfileLink", fields: [userId], references: [userId], onDelete: Cascade)
+}
+
+model Media {
+  id        String   @id @default(uuid()) @db.Uuid()
+  createdAt DateTime @default(now())
+  storageId String
+
+  status        ContentStatus @default(PENDING)
+  url_media     String
+  url_thumbnail String
+  media_size    Int
+  media_width   Int
+  media_height  Int
+
+  title             String   @db.VarChar(48)
+  description       String?  @db.VarChar(200)
+  tags              String[] @db.VarChar(16)
+  hasGraphicContent Boolean  @default(false)
+
+  authorId String @db.Uuid()
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  // TODO: Make it required
+  categoryId String?        @db.Uuid()
+  category   MediaCategory? @relation("MediaCategory", fields: [categoryId], references: [id])
+
+  reactions     MediaReaction[]     @relation("MediaReaction")
+  updateRequest MediaUpdateRequest? @relation("PendingMedia")
+
+  Z_COLLECTIONS Collection[]            @relation("Collection")
+  Z_LOG_MEDIA   LOG_MediaStatusChange[] @relation("LogMediaStatusChange")
+  Z_REPORTS     MediaReport[]           @relation("MediaReport")
+}
+
+model MediaUpdateRequest {
+  mediaId    String   @id @db.Uuid()
+  modifiedAt DateTime @default(now())
+
+  title             String?  @db.VarChar(48)
+  description       String?  @db.VarChar(200)
+  hasGraphicContent Boolean? @default(false)
+  categoryId        String?  @db.Uuid()
+  tags              String?
+
+  Z_MEDIA Media @relation("PendingMedia", fields: [mediaId], references: [id], onDelete: Cascade)
+}
+
+model MediaCategory {
+  id        String   @id @default(uuid()) @db.Uuid()
+  createdAt DateTime @default(now())
+  name      String   @unique @db.VarChar(16)
+  media     Media[]  @relation("MediaCategory")
+}
+
+model MediaReaction {
+  id        String   @id @default(uuid()) @db.Uuid()
+  createdAt DateTime @default(now())
+  mediaId   String   @db.Uuid()
+  userId    String   @db.Uuid()
+
+  Z_MEDIA Media @relation("MediaReaction", fields: [mediaId], references: [id], onDelete: Cascade)
+  Z_USER  User  @relation("MediaReaction", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([mediaId, userId])
+}
+
+model MediaReport {
+  id        String   @id @default(uuid()) @db.Uuid()
+  createdAt DateTime @default(now())
+  mediaId   String   @db.Uuid()
+  userId    String   @db.Uuid()
+
+  type    MediaReportType
+  message String?         @db.VarChar(192)
+  status  ContentStatus   @default(PENDING)
+
+  Z_MEDIA Media @relation("MediaReport", fields: [mediaId], references: [id], onDelete: Cascade)
+  Z_USER  User  @relation("MediaReport", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([mediaId, userId])
+}
+
+model Collection {
+  id        String   @id @default(uuid()) @db.Uuid()
+  createdAt DateTime @default(now())
+  userId    String   @db.Uuid()
+
+  name        String               @db.VarChar(48)
+  description String?              @db.VarChar(300)
+  visibility  CollectionVisibility @default(PUBLIC)
+
+  media  Media[] @relation("Collection")
+  Z_USER User    @relation("Collection", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(uuid()) @db.Uuid()
+  createdAt DateTime @default(now())
+  userId    String   @db.Uuid()
+  message   String   @db.VarChar(128)
+  read      Boolean  @default(false)
+
+  Z_USER User @relation("Notification", fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model LOG_RoleChange {
+  id        String   @id @default(uuid()) @db.Uuid()
+  createdAt DateTime @default(now())
+  comment   String?  @db.VarChar(128)
+
+  role_old UserRole
+  role_new UserRole
+
+  userId        String @db.Uuid()
+  moderatedById String @db.Uuid()
+
+  Z_USER        User @relation("LogRoleChange", fields: [userId], references: [id], onDelete: Cascade)
+  Z_MODERATEDBY User @relation("LogRoleChangeModerated", fields: [moderatedById], references: [id])
+}
+
+model LOG_MediaStatusChange {
+  id        String   @id @default(uuid()) @db.Uuid()
+  mediaId   String   @db.Uuid()
+  userId    String   @db.Uuid()
+  user      User     @relation("LogMediaStatusChangeModerated", fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  message               String?        @db.VarChar(128)
+  statusUpdatedTo       ContentStatus?
+  isUpdateRequestMerged Boolean?
+
+  Z_MEDIA Media @relation("LogMediaStatusChange", fields: [mediaId], references: [id], onDelete: Cascade)
+}
+
+// Enums
+enum UserRole {
+  ADMIN
+  MODERATOR
+  VERIFIED
+  PUBLIC
+  BANNED
+}
+
+enum ProfileLinkType {
+  TWITTER
+  INSTAGRAM
+  FACEBOOK
+  YOUTUBE
+  TIKTOK
+  WEBSITE
+  OTHER
+}
+
+enum ContentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum CollectionVisibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum MediaReportType {
+  IRRELEVANT
+  GRAPHIC_CONTENT
+  ADULT_CONTENT
+  INAPPROPRIATE
+  SPAM
+  OTHER
+}
+
+// Config
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}

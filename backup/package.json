@@ -1,0 +1,14 @@
+{
+  "name": "ps-backup",
+  "version": "0.0.1",
+  "bin": "./index.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "nodemon ./index.js"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.10",
+    "archiver": "^6.0.1",
+    "axios": "^1.6.3"
+  }
+}

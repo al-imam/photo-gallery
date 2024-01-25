@@ -1,0 +1,11 @@
+.next
+node_modules
+shadcn
+/server
+/service
+/util
+/sdk
+/prisma
+/demo
+/backup
+/*/api
