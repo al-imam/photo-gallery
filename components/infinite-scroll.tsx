@@ -1,11 +1,12 @@
 'use client'
 
+import { GetData } from '@/app/api/media/route'
 import { SpinnerIcon } from '@/icons'
 import { GET } from '@/lib'
 import { MediaWithLoves } from '@/service/types'
+import { useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { GetData } from '@/app/api/media/route'
 import { PhotosMasonry } from './photos-masonry'
 
 interface InfiniteScrollProps {
@@ -19,6 +20,8 @@ export function InfiniteScroll({
   cursor: _cursor,
   userId,
 }: Partial<InfiniteScrollProps>) {
+  const searchParams = useSearchParams()
+  const search = searchParams.get('q')
   const [cursor, setCursor] = useState(_cursor)
   const [items, setItems] = useState<MediaWithLoves[]>(_initialItems ?? [])
   const observerTarget = useRef<HTMLDivElement>(null)
@@ -37,6 +40,7 @@ export function InfiniteScroll({
 
             if (cursor) con.params.cursor = cursor
             if (userId) con.body.userId = userId
+            if (search) con.body.search = search
 
             const { data } = await GET<GetData>('media', con)
 
@@ -69,7 +73,7 @@ export function InfiniteScroll({
         observer.unobserve(observerTarget.current)
       }
     }
-  }, [observerTarget, hasMore, cursor, error, userId])
+  }, [observerTarget, hasMore, cursor, error, userId, search])
 
   return (
     <div>
@@ -82,8 +86,8 @@ export function InfiniteScroll({
           </div>
         ) : (
           <div className="mx-auto py-20 flex justify-center items-center text-foreground">
-            <span className="font-sans text-lg text-muted-foreground">
-              Nothing left
+            <span className="font-sans text-sm text-muted-foreground">
+              That&apos;s all for now, thanks for exploring!
             </span>
           </div>
         )}

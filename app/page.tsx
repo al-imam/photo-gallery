@@ -5,9 +5,13 @@ import { NavBar } from '@/components/nav'
 import { SearchInput } from '@/components/search-input'
 import { GET } from '@/lib'
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Record<string, string>
+}) {
   const { data: res } = await GET<GetData>('media', {
-    params: { limit: 50 },
+    params: { limit: 50, search: searchParams.q },
   })
 
   return (
