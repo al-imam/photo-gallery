@@ -1,11 +1,9 @@
 import { GetData } from '@/app/api/media/route'
+import { CategoryMarquee } from '@/components/category-marquee'
 import { InfiniteScroll } from '@/components/infinite-scroll'
 import { NavBar } from '@/components/nav'
 import { SearchInput } from '@/components/search-input'
 import { GET } from '@/lib'
-import { buttonVariants } from '@/shadcn/ui/button'
-import Link from 'next/link'
-import Marquee from 'react-fast-marquee'
 
 export default async function Home() {
   const { data: res } = await GET<GetData>('media', {
@@ -36,23 +34,7 @@ export default async function Home() {
         </div>
       </div>
 
-      <div className="relative isolate overlay py-14 content-expand">
-        <Marquee className="gap-2" pauseOnHover>
-          <div className="flex gap-2 items-center">
-            {Array(50)
-              .fill(null)
-              .map((_, i) => (
-                <Link
-                  href="#"
-                  key={i}
-                  className={buttonVariants({ variant: 'secondary' })}
-                >
-                  Nature {i}
-                </Link>
-              ))}
-          </div>
-        </Marquee>
-      </div>
+      <CategoryMarquee />
 
       <main className="pb-6">
         <InfiniteScroll
