@@ -9,7 +9,7 @@ model User {
   avatar_sm        String?
   avatar_md        String?
   avatar_lg        String?
-  avatar_storageId String?
+  avatar_bucketId String?
 
   password       String
   email          String   @unique
@@ -52,7 +52,7 @@ model ProfileLink {
 model Media {
   id        String   @id @default(uuid()) @db.Uuid()
   createdAt DateTime @default(now())
-  storageId String
+  bucketId String
 
   status        ContentStatus @default(PENDING)
   url_media     String

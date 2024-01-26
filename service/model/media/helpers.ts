@@ -51,7 +51,7 @@ export async function AddLoveToMediaCore(
   const mediaIdSet = new Set(userAndMedia.map((m) => m.mediaId))
 
   return function (...args: MediaWithReactionCountRaw[]) {
-    return args.map<MediaWithLoves>(({ storageId: _, ...media }) => ({
+    return args.map<MediaWithLoves>(({ bucketId: _, ...media }) => ({
       ...media,
       isLoved: mediaIdSet.has(media.id),
     }))
