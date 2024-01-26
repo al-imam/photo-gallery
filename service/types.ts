@@ -33,7 +33,7 @@ export type MediaWithReactionCountRaw = Media & {
   }
 }
 
-export type MediaWithReactionCount = Omit<MediaWithReactionCountRaw, 'storageId'>
+export type MediaWithReactionCount = Omit<MediaWithReactionCountRaw, 'bucketId'>
 
 export type MediaWithLoves = MediaWithReactionCount & {
   isLoved: boolean

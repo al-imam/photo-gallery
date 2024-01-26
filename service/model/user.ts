@@ -88,13 +88,13 @@ export function update(userId: string, data: UserUpdateBody) {
 
 export type UpdateAvatarBody = PrettifyPick<
   User,
-  'avatar_storageId' | 'avatar_lg' | 'avatar_md' | 'avatar_sm'
+  'avatar_bucketId' | 'avatar_lg' | 'avatar_md' | 'avatar_sm'
 >
 export function updateAvatar(userId: string, data: UpdateAvatarBody) {
   return db.user.update({
     where: { id: userId },
     data: {
-      avatar_storageId: data.avatar_storageId,
+      avatar_bucketId: data.avatar_bucketId,
       avatar_lg: data.avatar_lg,
       avatar_md: data.avatar_md,
       avatar_sm: data.avatar_sm,

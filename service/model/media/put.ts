@@ -21,7 +21,7 @@ export type CreateMediaBody = Prettify<
     Prisma.MediaUncheckedCreateInput,
     (typeof mediaEditableFields)[number]
   > & {
-    storageId: string
+    bucketId: string
     media_size: number
     media_width: number
     media_height: number
@@ -55,7 +55,7 @@ export async function createMedia(
       ...pick(body, ...mediaEditableFields),
 
       authorId: user.id,
-      storageId: body.storageId,
+      bucketId: body.bucketId,
       media_size: body.media_size,
       media_width: body.media_width,
       media_height: body.media_height,
