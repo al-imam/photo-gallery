@@ -3,7 +3,7 @@ import service from '@/service'
 import db, { Media, User } from '@/service/db'
 import { jwt } from '@/service/hash'
 import { getRandomItems } from './utils'
-// import { fetchMessages, getRandomItems, uploadMessage } from './utils'
+import axios from 'axios'
 
 console.clear()
 configDotenv()
@@ -17,7 +17,16 @@ const REACTION_PER_USER = 50
   await db.user.deleteMany({})
   await db.mediaCategory.deleteMany({})
   console.log('Users deleted')
-  // const images = await fetchMessages(USER_TO_CREATE * IMAGE_PER_USER)
+  const { data: images } = await axios.get<
+    {
+      bucketId: string
+      media_size: number
+      media_width: number
+      media_height: number
+      url_media: string
+      url_thumbnail: string
+    }[]
+  >('http://localhost:8000/demo?limit=' + USER_TO_CREATE * IMAGE_PER_USER)
   console.log('Uploaded images Loaded')
 
   const userList: User[] = []
@@ -39,42 +48,41 @@ const REACTION_PER_USER = 50
     console.log('created:', user.email)
     userList.push(user)
 
-    // for (let i = 1; i <= IMAGE_PER_USER; i++) {
-    //   const media = await service.media.createMedia(
-    //     { ...user, role: 'VERIFIED' },
-    //     {
-    //       status: 'APPROVED',
-    //       title: `Test Media ${iImage + 1}`,
-    //       categoryId: getRandomItems(categories, 1)[0].id,
-    //     },
-    //     async () => images[iImage] ?? uploadMessage(),
-    //     async (result) => console.log('Deleting:', result.id)
-    //   )
+    for (let i = 1; i <= IMAGE_PER_USER; i++) {
+      const media = await service.media.createMedia(
+        { ...user, role: 'VERIFIED' },
+        {
+          status: 'APPROVED',
+          title: `Test Media ${iImage + 1}`,
+          categoryId: getRandomItems(categories, 1)[0].id,
+          ...images[iImage],
+        }
+      )
 
-    //   console.log('Image created:', media.id)
-    //   mediaList.push(media)
-    //   iImage++
-    // }
+      console.log('Image created:', media.id)
+      mediaList.push(media)
+      iImage++
+    }
   }
 
-  // const reactionsToCreate = []
-  // const reportsToCreate = []
+  const reactionsToCreate = []
+  const reportsToCreate = []
 
-  // for (const user of userList) {
-  //   const randomMedia = getRandomItems(mediaList, REACTION_PER_USER)
-  //   for (const media of randomMedia) {
-  //     reactionsToCreate.push({ mediaId: media.id, userId: user.id })
-  //     reportsToCreate.push({
-  //       userId: user.id,
-  //       mediaId: media.id,
-  //       type: 'OTHER' as const,
-  //       message: 'This is a test report',
-  //     })
-  //   }
-  // }
+  for (const user of userList) {
+    const randomMedia = getRandomItems(mediaList, REACTION_PER_USER)
+    for (const media of randomMedia) {
+      reactionsToCreate.push({ mediaId: media.id, userId: user.id })
+      reportsToCreate.push({
+        userId: user.id,
+        mediaId: media.id,
+        type: 'OTHER' as const,
+        message: 'This is a test report',
+      })
+    }
+  }
 
-  // await db.mediaReport.createMany({ data: reportsToCreate })
-  // await db.mediaReaction.createMany({ data: reactionsToCreate })
+  await db.mediaReport.createMany({ data: reportsToCreate })
+  await db.mediaReaction.createMany({ data: reactionsToCreate })
 
   console.log('Done')
   process.exit()
