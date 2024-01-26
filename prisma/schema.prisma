@@ -6,10 +6,10 @@ model User {
   role     UserRole @default(PUBLIC)
   username String   @unique @default(cuid())
 
-  avatar_sm        String?
-  avatar_md        String?
-  avatar_lg        String?
-  avatar_bucketId String?
+  avatar_sm              String?
+  avatar_md              String?
+  avatar_lg              String?
+  avatar_storageRecordId String?
 
   password       String
   email          String   @unique
@@ -50,9 +50,9 @@ model ProfileLink {
 }
 
 model Media {
-  id        String   @id @default(uuid()) @db.Uuid()
-  createdAt DateTime @default(now())
-  bucketId String
+  id              String   @id @default(uuid()) @db.Uuid()
+  createdAt       DateTime @default(now())
+  storageRecordId String
 
   status        ContentStatus @default(PENDING)
   url_media     String

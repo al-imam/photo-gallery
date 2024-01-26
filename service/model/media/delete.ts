@@ -5,7 +5,7 @@ import { mediaPermissionFactory } from './helpers'
 
 export async function deleteMedia(
   user: PrettifyPick<User, 'id' | 'role'>,
-  media: PrettifyPick<Media, 'id' | 'status' | 'authorId' | 'bucketId'>
+  media: PrettifyPick<Media, 'id' | 'status' | 'authorId' | 'storageRecordId'>
 ) {
   const permission = mediaPermissionFactory(media)
   if (!permission.delete(user)) {
@@ -13,4 +13,5 @@ export async function deleteMedia(
   }
 
   await db.media.delete({ where: { id: media.id } })
+  return media
 }

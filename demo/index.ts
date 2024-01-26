@@ -19,7 +19,7 @@ const REACTION_PER_USER = 50
   console.log('Users deleted')
   const { data: images } = await axios.get<
     {
-      bucketId: string
+      storageRecordId: string
       media_size: number
       media_width: number
       media_height: number
