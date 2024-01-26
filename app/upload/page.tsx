@@ -84,7 +84,7 @@ export default function Upload() {
 
                     <div className="space-y-4">
                       <Input placeholder="Title" />
-                      <Input placeholder="description" />
+                      <Input placeholder="Description" />
                       <Input placeholder="Category" />
                       <MultiSelect
                         placeholder="Create tags"
