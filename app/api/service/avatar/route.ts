@@ -9,5 +9,17 @@ export const POST = serviceUserRouter(async (_, ctx) => {
     ctx.user.id,
     ctx.body<PostBody>()
   )
-  return NextResponse.json({ user })
+
+  return NextResponse.json({ user, storageRecordId: ctx.user.avatar_storageRecordId })
+})
+
+export const DELETE = serviceUserRouter(async (_, ctx) => {
+  const user = await service.user.updateAvatar(ctx.user.id, {
+    avatar_storageRecordId: null,
+    avatar_lg: null,
+    avatar_md: null,
+    avatar_sm: null,
+  })
+
+  return NextResponse.json({ user, storageRecordId: ctx.user.avatar_storageRecordId })
 })
