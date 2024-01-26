@@ -8,18 +8,18 @@ import ReqErr from '@/service/ReqError'
 export async function getUpdateRequests() {}
 
 export async function getMediaUpdateRequest(
-  id: string,
-  user?: PrettifyPick<User, 'id' | 'role'>
+  requestId: string,
+  user: PrettifyPick<User, 'id' | 'role'>
 ) {
   const media = await db.media.findUniqueOrThrow({
-    where: { id },
+    where: { id: requestId },
   })
 
   if (!mediaPermissionFactory(media).view(user)) {
     throw new ReqErr('Permission denied to view update request')
   }
 
-  return db.mediaUpdateRequest.findUnique({ where: { mediaId: id } })
+  return db.mediaUpdateRequest.findUnique({ where: { mediaId: requestId } })
 }
 
 export async function rejectUpdateRequest() {}

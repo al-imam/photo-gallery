@@ -1,26 +1,16 @@
-import db, { Media, Prisma, User } from '@/service/db'
+import db, { ContentStatus, Media, Prisma, User } from '@/service/db'
 import { Prettify, PrettifyPick, pick } from '@/service/utils'
 import ReqErr from '@/service/ReqError'
 import { validateAndFormatTags } from './helpers'
 import { userPermissionFactory } from '../helpers'
 import config from '@/service/config'
 
-const mediaEditableFields = [
-  'title',
-  'description',
-  'tags',
-  'status',
-  'categoryId',
-  'hasGraphicContent',
-] as const
-
-const mediaModerateFields = ['status', 'categoryId', 'tags'] as const
-
 export type CreateMediaBody = Prettify<
   Pick<
     Prisma.MediaUncheckedCreateInput,
-    (typeof mediaEditableFields)[number]
+    (typeof config.media.editableFields)[number]
   > & {
+    status?: ContentStatus
     storageRecordId: string
     media_size: number
     media_width: number
@@ -31,12 +21,13 @@ export type CreateMediaBody = Prettify<
 >
 
 export type ModerateMediaBody = Partial<
-  Pick<Media, (typeof mediaModerateFields)[number]>
+  Pick<Media, (typeof config.media.moderateFields)[number]>
 >
 
 export type UpdateMediaBody = Partial<
   Prettify<
-    Pick<Media, (typeof mediaEditableFields)[number]> & ModerateMediaBody
+    Pick<Media, (typeof config.media.editableFields)[number]> &
+      ModerateMediaBody
   >
 >
 
@@ -52,7 +43,7 @@ export async function createMedia(
 
   return db.media.create({
     data: {
-      ...pick(body, ...mediaEditableFields),
+      ...pick(body, ...config.media.editableFields),
 
       authorId: user.id,
       storageRecordId: body.storageRecordId,
@@ -83,7 +74,7 @@ export async function updateMedia(
     ) {
       return db.media.update({
         where: { id: oldMedia.id },
-        data: pick(body, ...mediaEditableFields),
+        data: pick(body, ...config.media.editableFields),
         include: config.media.includePublicFields,
       })
     }
@@ -130,8 +121,8 @@ export async function moderateMedia(
     where: { id: oldMedia.id },
     include: config.media.includePublicFields,
     data: {
-      ...(extraData && pick(extraData, ...mediaEditableFields)),
-      ...pick(data, ...mediaModerateFields),
+      ...(extraData && pick(extraData, ...config.media.editableFields)),
+      ...pick(data, ...config.media.moderateFields),
     },
   })
 

@@ -1,16 +1,17 @@
 import { createIncludeQuery } from '../../utils'
+import model from './_helper'
 
-export const publicFields = [
+export const publicFields = model.User(
   'id',
   'name',
   'role',
   'avatar_sm',
   'avatar_md',
   'avatar_lg',
-  'username',
-] as const
+  'username'
+)
 
-export const safeFields = [...publicFields, 'email'] as const
+export const safeFields = model.User(...publicFields, 'email')
 
 export const selectSafeFields = createIncludeQuery(safeFields)
 
