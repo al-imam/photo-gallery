@@ -4,6 +4,7 @@ import ReqErr from '@/service/ReqError'
 import { validateAndFormatTags } from './helpers'
 import { userPermissionFactory } from '../helpers'
 import config from '@/service/config'
+import { putUpdateRequest } from './request'
 
 export type CreateMediaBody = Prettify<
   Pick<
@@ -79,28 +80,13 @@ export async function updateMedia(
       })
     }
 
-    const data = {
-      mediaId: oldMedia.id,
+    await putUpdateRequest(oldMedia.id, {
       title: body.title,
       description: body.description,
       tags: body.tags?.join(', '),
       categoryId: body.categoryId,
       hasGraphicContent: body.hasGraphicContent,
-    }
-
-    if (
-      await db.mediaUpdateRequest.findUnique({
-        where: { mediaId: oldMedia.id },
-        select: { mediaId: true },
-      })
-    ) {
-      await db.mediaUpdateRequest.update({
-        where: { mediaId: oldMedia.id },
-        data,
-      })
-    } else {
-      await db.mediaUpdateRequest.create({ data })
-    }
+    })
 
     return db.media.findUniqueOrThrow({
       where: { id: oldMedia.id },
