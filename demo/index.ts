@@ -14,9 +14,15 @@ const CATEGORY_TO_CREATE = 10
 const REACTION_PER_USER = 50
 
 ;(async () => {
-  await db.user.deleteMany({})
-  await db.mediaCategory.deleteMany({})
-  console.log('Users deleted')
+  for (let element in db) {
+    const value: any = db[element as keyof typeof db]
+    const isModel = Object.hasOwn(value, 'deleteMany')
+    if (isModel) {
+      await value.deleteMany({})
+    }
+  }
+
+  console.log('Database cleared')
   const { data: images } = await axios.get<
     {
       storageRecordId: string
