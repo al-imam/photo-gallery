@@ -12,9 +12,9 @@
     "type-check": "tsc --noEmit",
     "type-watch": "tsc --noEmit --watch",
     "prisma": "prisma db push",
-    "lab": "ts-node -r tsconfig-paths/register ./service/__lab/index.ts",
     "demo": "ts-node -r tsconfig-paths/register ./demo/index.ts",
-    "demo:dev": "nodemon -r tsconfig-paths/register ./demo/index.ts"
+    "demo:dev": "nodemon -r tsconfig-paths/register ./demo/index.ts",
+    "lab": "nodemon -r tsconfig-paths/register ./service/__lab/index.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",

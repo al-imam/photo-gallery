@@ -1,4 +1,4 @@
+import config from '@/service/config'
 import { User as FullUser } from '@/service/db'
-import { USER_SAFE_FIELDS } from '../service/config'
 
-export type SafeUser = Pick<FullUser, (typeof USER_SAFE_FIELDS)[number]>
+export type SafeUser = Pick<FullUser, (typeof config.user.safeFields)[number]>

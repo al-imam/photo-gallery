@@ -1,11 +1,10 @@
-import { MEDIA_INCLUDE_QUERY } from '@/service/config'
 import db, { ContentStatus, Media, Prisma, User } from '@/service/db'
 import { PrettifyPick } from '@/service/utils'
 import ReqErr from '@/service/ReqError'
 import { MediaWithReactionCountRaw } from '@/service/types'
 import { PaginationQueries, paginationQueries } from '@/service/helpers'
 import { mediaPermissionFactory, mediaSearchQueryOR } from './helpers'
-import { userPermissionFactory } from '../helpers'
+import config from '@/service/config'
 
 export async function getMedia(
   id: string,
@@ -13,7 +12,7 @@ export async function getMedia(
 ) {
   const media = await db.media.findUnique({
     where: { id },
-    include: MEDIA_INCLUDE_QUERY,
+    include: config.media.includePublicFields,
   })
 
   if (media && mediaPermissionFactory(media).view(user)) return media
@@ -67,7 +66,7 @@ export async function getRelatedMedia(
 
     const matchedMediaList = await db.media.findMany({
       take: remaining,
-      include: MEDIA_INCLUDE_QUERY,
+      include: config.media.includePublicFields,
       orderBy: { createdAt: 'desc' },
       where: {
         ...where,
@@ -90,9 +89,7 @@ export type MediaListOptions = PaginationQueries & {
   updateRequest?: boolean
 }
 
-export async function getLatestMediaList(
-   options: MediaListOptions = {}
-) {
+export async function getLatestMediaList(options: MediaListOptions = {}) {
   const orQueries = mediaSearchQueryOR(options.search)
   return db.media.findMany({
     ...paginationQueries({
@@ -108,7 +105,7 @@ export async function getLatestMediaList(
       ...(orQueries.length ? { OR: orQueries } : undefined),
     },
 
-    include: MEDIA_INCLUDE_QUERY,
+    include: config.media.includePublicFields,
   })
 }
 

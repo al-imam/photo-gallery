@@ -1,26 +1,25 @@
+import { UserCreateBody, UserUpdateBody } from '@/service/model/user'
 import {
-  UserCreateBody,
-  UserUpdateBody,
-  GetUserListOptions,
-} from '@/service/model/user'
-import {
-  onlyAdmin,
   sendUserAndToken,
   SendUserAndTokenData,
 } from '@/server/middlewares/auth'
 import { authRouter, router } from '@/server/router'
 import service from '@/service'
+import { Profile, ProfileLink, User } from '@prisma/client'
+import config from '@/service/config'
 import { NextResponse } from 'next/server'
+import { pick } from '@/service/utils'
 
-export type GetQuery = Partial<
-  Record<keyof GetUserListOptions, string> & Pick<GetUserListOptions, 'role'>
->
-export type GetData = {
-  users: Awaited<ReturnType<typeof service.user.getUserList>>
+export type GetBody = {
+  user: Pick<User, (typeof config.user.safeFields)[number]>
+  profile: Profile & { links: ProfileLink[] }
 }
-export const GET = authRouter(onlyAdmin, async (req, ctx, next) => {
-  const users = await service.user.getUserList(ctx.query<GetQuery>())
-  return NextResponse.json<GetData>({ users })
+export const GET = authRouter(async (_, ctx) => {
+  const profile = await service.profile.getUserProfile(ctx.user.id)
+  return NextResponse.json<GetBody>({
+    user: pick(ctx.user, ...config.user.safeFields),
+    profile: profile!,
+  })
 })
 
 export type PostBody = UserCreateBody & { token: string }

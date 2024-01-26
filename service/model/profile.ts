@@ -5,6 +5,13 @@ import { jwt } from '../hash'
 import mail from '../mail'
 import ReqErr from '../ReqError'
 
+export function getUserProfile(userId: string) {
+  return db.profile.findUnique({
+    where: { userId },
+    include: { links: true },
+  })
+}
+
 export type UpdateProfileBody = PrettifyPick<Profile, never, 'bio' | 'location'>
 export async function updateProfile(userId: string, body: UpdateProfileBody) {
   const profile = await db.profile.update({

@@ -1,42 +1,20 @@
-import { optionalAuthRouter } from '@/server/router'
-import ReqErr from '@/service/ReqError'
-import {
-  USER_PUBLIC_FIELDS,
-  USER_PUBLIC_FIELDS_QUERY,
-  USER_SAFE_FIELDS,
-} from '@/service/config'
-import db from '@/service/db'
+import { router } from '@/server/router'
+import service from '@/service'
+import config from '@/service/config'
 import { pick } from '@/service/utils'
 import { Profile, ProfileLink, User } from '@prisma/client'
 import { NextResponse } from 'next/server'
 
 export type GetBody = {
-  user: Pick<User, (typeof USER_PUBLIC_FIELDS)[number]>
+  user: Pick<User, (typeof config.user.publicFields)[number]>
   profile: Profile & { links: ProfileLink[] }
 }
-export const GET = optionalAuthRouter(async (_, ctx) => {
-  const username = ctx.params.userId
-  if (!username) throw new ReqErr('Missing username')
-
-  const { profile, ...user } =
-    ctx.user && (username === ctx.user.username || username === '@')
-      ? {
-          ...pick(ctx.user, ...USER_SAFE_FIELDS)!,
-          profile: await db.profile.findUnique({
-            where: { userId: ctx.user.id },
-            include: { links: true },
-          }),
-        }
-      : pick(
-          await db.user.findUniqueOrThrow({
-            where: { username },
-            include: {
-              profile: { include: { links: true } },
-            },
-          }),
-          ...USER_PUBLIC_FIELDS,
-          'profile'
-        )
-
-  return NextResponse.json<GetBody>({ user, profile: profile! })
+export const GET = router(async (_, ctx) => {
+  const username = ctx.params.userId!
+  const user = await service.user.fetchByUsername(username)
+  const profile = await service.profile.getUserProfile(user.id)
+  return NextResponse.json<GetBody>({
+    user: pick(user, ...config.user.publicFields),
+    profile: profile!,
+  })
 })

@@ -1,9 +1,9 @@
-import { MEDIA_INCLUDE_QUERY } from '@/service/config'
 import db, { Media, Prisma, User } from '@/service/db'
 import { Prettify, PrettifyPick, pick } from '@/service/utils'
 import ReqErr from '@/service/ReqError'
 import { validateAndFormatTags } from './helpers'
 import { userPermissionFactory } from '../helpers'
+import config from '@/service/config'
 
 const mediaEditableFields = [
   'title',
@@ -63,7 +63,7 @@ export async function createMedia(
       url_thumbnail: body.url_thumbnail,
     },
 
-    include: MEDIA_INCLUDE_QUERY,
+    include: config.media.includePublicFields,
   })
 }
 
@@ -84,7 +84,7 @@ export async function updateMedia(
       return db.media.update({
         where: { id: oldMedia.id },
         data: pick(body, ...mediaEditableFields),
-        include: MEDIA_INCLUDE_QUERY,
+        include: config.media.includePublicFields,
       })
     }
 
@@ -113,7 +113,7 @@ export async function updateMedia(
 
     return db.media.findUniqueOrThrow({
       where: { id: oldMedia.id },
-      include: MEDIA_INCLUDE_QUERY,
+      include: config.media.includePublicFields,
     })
   }
 
@@ -128,7 +128,7 @@ export async function moderateMedia(
 ) {
   const updatedMedia = await db.media.update({
     where: { id: oldMedia.id },
-    include: MEDIA_INCLUDE_QUERY,
+    include: config.media.includePublicFields,
     data: {
       ...(extraData && pick(extraData, ...mediaEditableFields)),
       ...pick(data, ...mediaModerateFields),

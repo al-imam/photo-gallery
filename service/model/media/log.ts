@@ -2,7 +2,7 @@ import ReqErr from '@/service/ReqError'
 import db from '@/service/db'
 import { PrettifyPick } from '@/service/utils'
 import { Media, User } from '@prisma/client'
-import { USER_PUBLIC_FIELDS_QUERY } from '@/service/config'
+import config from '@/service/config'
 import { userPermissionFactory } from '../helpers'
 
 export async function getMessages(
@@ -18,7 +18,7 @@ export async function getMessages(
 
   return db.lOG_MediaStatusChange.findMany({
     where: { mediaId: media.id },
-    include: { user: { select: USER_PUBLIC_FIELDS_QUERY } },
+    include: { user: { select: config.user.selectPublicFields } },
   })
 }
 
@@ -45,6 +45,6 @@ export async function createMessage(
       message,
     },
 
-    include: { user: { select: USER_PUBLIC_FIELDS_QUERY } },
+    include: { user: { select: config.user.selectPublicFields } },
   })
 }

@@ -51,3 +51,4 @@ if (process.env.NODE_ENV === 'production') {
 
 export default db
 export * from '@prisma/client'
+export { field } from './field'
