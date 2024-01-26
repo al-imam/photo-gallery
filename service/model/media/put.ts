@@ -75,10 +75,12 @@ export async function updateMedia(
   body.tags = validateAndFormatTags(body.tags)
 
   const isAuthor = oldMedia.authorId === user.id
-  const userPermission = userPermissionFactory(user)
 
   if (isAuthor) {
-    if (oldMedia.status === 'PENDING' || userPermission.isVerifiedLevel) {
+    if (
+      oldMedia.status === 'PENDING' ||
+      userPermissionFactory(user).isVerified
+    ) {
       return db.media.update({
         where: { id: oldMedia.id },
         data: pick(body, ...mediaEditableFields),
@@ -113,10 +115,6 @@ export async function updateMedia(
       where: { id: oldMedia.id },
       include: MEDIA_INCLUDE_QUERY,
     })
-  }
-
-  if (userPermission.isModeratorLevel) {
-    return moderateMedia(user.id, oldMedia, body)
   }
 
   throw new ReqErr('You are not allowed to edit this media', 403)

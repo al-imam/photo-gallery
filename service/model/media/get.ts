@@ -87,34 +87,12 @@ export type MediaListOptions = PaginationQueries & {
   authorId?: string
   status?: ContentStatus
   search?: string
-  updateRequest?: string
+  updateRequest?: boolean
 }
 
 export async function getLatestMediaList(
-  user?: PrettifyPick<User, 'id' | 'role'>,
-  options: MediaListOptions = {}
+   options: MediaListOptions = {}
 ) {
-  const isMediaAuthor = Boolean(
-    user && options.authorId && options.authorId === user.id
-  )
-
-  const isModerator = Boolean(
-    user && userPermissionFactory(user).isModeratorLevel
-  )
-
-  if (!(isMediaAuthor || isModerator)) {
-    options.status = 'APPROVED'
-  }
-
-  if (
-    options.updateRequest &&
-    !(isMediaAuthor || (options.authorId && isModerator))
-  ) {
-    throw new ReqErr('Permission denied to get pending updates')
-  }
-
-  if (!options.authorId) options.status ??= 'APPROVED'
-
   const orQueries = mediaSearchQueryOR(options.search)
   return db.media.findMany({
     ...paginationQueries({
