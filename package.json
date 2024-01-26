@@ -68,6 +68,7 @@
     "react-dom": "^18.2.0",
     "react-fast-marquee": "^1.6.2",
     "react-hook-form": "^7.48.2",
+    "react-images-uploading": "^3.1.7",
     "react-masonry-css": "^1.0.16",
     "react-photo-album": "^2.3.0",
     "react-resizable-panels": "^1.0.9",
@@ -81,7 +82,6 @@
     "vaul": "^0.8.9"
   },
   "devDependencies": {
-    "dotenv": "^16.4.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/color": "^3.0.6",
     "@types/node": "^20.10.3",
@@ -91,6 +91,7 @@
     "@typescript-eslint/eslint-plugin": "^6.14.0",
     "@typescript-eslint/parser": "^6.14.0",
     "autoprefixer": "^10.4.16",
+    "dotenv": "^16.4.1",
     "eslint": "^8.55.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-next": "^14.0.3",
