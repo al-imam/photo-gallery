@@ -50,18 +50,14 @@ export type UpdateReportBody = Partial<
   CreateReportBody & PrettifyPick<MediaReport, 'status'>
 >
 export async function updateReport(
-  user: PrettifyPick<User, 'id' | 'role'>,
   reportId: string,
+  user: PrettifyPick<User, 'id' | 'role'>,
   body: UpdateReportBody
 ) {
-  if (!userPermissionFactory(user).isModeratorLevel) {
-    delete body.status
-  }
-
   return db.mediaReport.update({
     where: {
       id: reportId,
-      userId: typeof user === 'string' ? user : user.id,
+      userId: user.id,
     },
     data: pick(body, 'type', 'status', 'message'),
   })

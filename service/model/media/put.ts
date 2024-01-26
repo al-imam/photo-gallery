@@ -1,26 +1,17 @@
-import { MEDIA_INCLUDE_QUERY } from '@/service/config'
-import db, { Media, Prisma, User } from '@/service/db'
+import db, { ContentStatus, Media, Prisma, User } from '@/service/db'
 import { Prettify, PrettifyPick, pick } from '@/service/utils'
 import ReqErr from '@/service/ReqError'
 import { validateAndFormatTags } from './helpers'
 import { userPermissionFactory } from '../helpers'
-
-const mediaEditableFields = [
-  'title',
-  'description',
-  'tags',
-  'status',
-  'categoryId',
-  'hasGraphicContent',
-] as const
-
-const mediaModerateFields = ['status', 'categoryId', 'tags'] as const
+import config from '@/service/config'
+import { putUpdateRequest } from './request'
 
 export type CreateMediaBody = Prettify<
   Pick<
     Prisma.MediaUncheckedCreateInput,
-    (typeof mediaEditableFields)[number]
+    (typeof config.media.editableFields)[number]
   > & {
+    status?: ContentStatus
     storageRecordId: string
     media_size: number
     media_width: number
@@ -31,12 +22,13 @@ export type CreateMediaBody = Prettify<
 >
 
 export type ModerateMediaBody = Partial<
-  Pick<Media, (typeof mediaModerateFields)[number]>
+  Pick<Media, (typeof config.media.moderateFields)[number]>
 >
 
 export type UpdateMediaBody = Partial<
   Prettify<
-    Pick<Media, (typeof mediaEditableFields)[number]> & ModerateMediaBody
+    Pick<Media, (typeof config.media.editableFields)[number]> &
+      ModerateMediaBody
   >
 >
 
@@ -52,7 +44,7 @@ export async function createMedia(
 
   return db.media.create({
     data: {
-      ...pick(body, ...mediaEditableFields),
+      ...pick(body, ...config.media.editableFields),
 
       authorId: user.id,
       storageRecordId: body.storageRecordId,
@@ -63,7 +55,7 @@ export async function createMedia(
       url_thumbnail: body.url_thumbnail,
     },
 
-    include: MEDIA_INCLUDE_QUERY,
+    include: config.media.includePublicFields,
   })
 }
 
@@ -74,49 +66,16 @@ export async function updateMedia(
 ) {
   body.tags = validateAndFormatTags(body.tags)
 
-  const isAuthor = oldMedia.authorId === user.id
-  const userPermission = userPermissionFactory(user)
-
-  if (isAuthor) {
-    if (oldMedia.status === 'PENDING' || userPermission.isVerifiedLevel) {
-      return db.media.update({
-        where: { id: oldMedia.id },
-        data: pick(body, ...mediaEditableFields),
-        include: MEDIA_INCLUDE_QUERY,
-      })
-    }
-
-    const data = {
-      mediaId: oldMedia.id,
-      title: body.title,
-      description: body.description,
-      tags: body.tags?.join(', '),
-      categoryId: body.categoryId,
-      hasGraphicContent: body.hasGraphicContent,
-    }
-
-    if (
-      await db.mediaUpdateRequest.findUnique({
-        where: { mediaId: oldMedia.id },
-        select: { mediaId: true },
-      })
-    ) {
-      await db.mediaUpdateRequest.update({
-        where: { mediaId: oldMedia.id },
-        data,
-      })
-    } else {
-      await db.mediaUpdateRequest.create({ data })
-    }
-
-    return db.media.findUniqueOrThrow({
-      where: { id: oldMedia.id },
-      include: MEDIA_INCLUDE_QUERY,
-    })
+  if (oldMedia.authorId !== user.id) {
+    throw new ReqErr('You are not allowed to edit this media', 403)
   }
 
-  if (userPermission.isModeratorLevel) {
-    return moderateMedia(user.id, oldMedia, body)
+  if (oldMedia.status === 'PENDING' || userPermissionFactory(user).isVerified) {
+    return db.media.update({
+      where: { id: oldMedia.id },
+      data: pick(body, ...config.media.editableFields),
+      include: config.media.includePublicFields,
+    })
   }
 
   throw new ReqErr('You are not allowed to edit this media', 403)
@@ -124,17 +83,13 @@ export async function updateMedia(
 
 export async function moderateMedia(
   moderatorId: string,
-  oldMedia: Pick<Media, 'id' | 'authorId' | 'status'>,
-  data: ModerateMediaBody,
-  extraData?: UpdateMediaBody
+  oldMedia: Pick<Media, 'id' | 'status'>,
+  data: ModerateMediaBody
 ) {
   const updatedMedia = await db.media.update({
     where: { id: oldMedia.id },
-    include: MEDIA_INCLUDE_QUERY,
-    data: {
-      ...(extraData && pick(extraData, ...mediaEditableFields)),
-      ...pick(data, ...mediaModerateFields),
-    },
+    include: config.media.includePublicFields,
+    data: pick(data, ...config.media.moderateFields),
   })
 
   if (oldMedia.status !== updatedMedia.status) {

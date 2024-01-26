@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { USER_SAFE_FIELDS } from '@/service/config'
+import config from '@/service/config'
 import * as hash from '@/service/hash'
 import { NextUserHandler } from '@/service/types'
 import { pick } from '@/service/utils'
@@ -9,7 +9,7 @@ import { User } from '@prisma/client'
 import { userPermissionFactory } from '@/service/model/helpers'
 
 export type SendUserAndTokenData = {
-  user: Pick<User, (typeof USER_SAFE_FIELDS)[number]> & {}
+  user: Pick<User, (typeof config.user.safeFields)[number]> & {}
   jwt_token: string
 }
 
@@ -30,7 +30,7 @@ export const sendUserAndToken: NextUserHandler<{
   return NextResponse.json<SendUserAndTokenData>({
     ...ctx.response,
     user: {
-      ...pick(ctx.user, ...USER_SAFE_FIELDS),
+      ...pick(ctx.user, ...config.user.safeFields),
     },
     jwt_token: authToken,
   })

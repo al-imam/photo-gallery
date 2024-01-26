@@ -1,7 +1,7 @@
 import { Collection, Media, MediaCategory, User } from '@prisma/client'
 import { NextRequest } from 'next/server'
 import { NextFunction } from 'router13'
-import { USER_PUBLIC_FIELDS } from './config'
+import config from './config'
 import { Prettify, PrettifyPick } from './utils'
 
 type NextCtx = {
@@ -26,7 +26,7 @@ export type NextUserMediaHandler<T = {}> = NextUserHandler<
 >
 
 export type MediaWithReactionCountRaw = Media & {
-  author: PrettifyPick<User, (typeof USER_PUBLIC_FIELDS)[number]>
+  author: PrettifyPick<User, (typeof config.user.publicFields)[number]>
   category: MediaCategory | null
   _count: {
     reactions: number

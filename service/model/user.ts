@@ -3,11 +3,15 @@ import db, { User, UserRole } from '../db'
 import { PrettifyPick } from '../utils'
 import mail from '../mail'
 import ReqErr from '../ReqError'
-import { USER_PUBLIC_FIELDS_QUERY } from '../config'
+import config from '../config'
 import { PaginationQueries, paginationQueries } from '../helpers'
 
 export function fetchById(id: string) {
   return db.user.findUniqueOrThrow({ where: { id } })
+}
+
+export function fetchByUsername(username: string) {
+  return db.user.findUniqueOrThrow({ where: { username } })
 }
 
 export type GetUserListOptions = PaginationQueries &
@@ -37,7 +41,7 @@ export async function getUserList(options: GetUserListOptions = {}) {
         : undefined),
     },
 
-    select: USER_PUBLIC_FIELDS_QUERY,
+    select: config.user.selectPublicFields,
   })
 }
 

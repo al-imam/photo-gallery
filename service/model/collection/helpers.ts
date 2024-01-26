@@ -1,4 +1,4 @@
-import { MEDIA_INCLUDE_QUERY } from '@/service/config'
+import config from '@/service/config'
 import { CollectionWithMedia, CollectionWithRawMedia } from '@/service/types'
 import { PrettifyPick } from '@/service/utils'
 import { Collection } from '@prisma/client'
@@ -17,7 +17,7 @@ export const countPopulation = {
 
 export const mediaPopulation = {
   include: {
-    media: { include: MEDIA_INCLUDE_QUERY },
+    media: { include: config.media.includePublicFields },
   },
 }
 
