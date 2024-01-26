@@ -1,23 +1,21 @@
 import { onlyModerator } from '@/server/middlewares/auth'
-import { sendMediaWithLoves } from '@/server/middlewares/media'
+import { sendMediaWithLoves, setMedia } from '@/server/middlewares/media'
 import { authRouter } from '@/server/router'
+import service from '@/service'
 
-// TODO: Implement this route
-
-export const GET = authRouter(
-  onlyModerator,
-  async (_, ctx, next) => {
-    const { mediaId } = ctx.params
-    return next(mediaId)
-  },
-  sendMediaWithLoves
-)
+export const GET = authRouter(onlyModerator, setMedia, sendMediaWithLoves)
 
 export const PATCH = authRouter(
   onlyModerator,
+  setMedia,
   async (_, ctx, next) => {
-    const { mediaId } = ctx.params
-    return next(mediaId)
+    ctx.media = await service.media.moderateMedia(
+      ctx.user.id,
+      ctx.media,
+      ctx.body()
+    )
+
+    return next()
   },
   sendMediaWithLoves
 )

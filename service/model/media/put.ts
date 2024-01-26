@@ -66,30 +66,14 @@ export async function updateMedia(
 ) {
   body.tags = validateAndFormatTags(body.tags)
 
-  const isAuthor = oldMedia.authorId === user.id
+  if (oldMedia.authorId !== user.id) {
+    throw new ReqErr('You are not allowed to edit this media', 403)
+  }
 
-  if (isAuthor) {
-    if (
-      oldMedia.status === 'PENDING' ||
-      userPermissionFactory(user).isVerified
-    ) {
-      return db.media.update({
-        where: { id: oldMedia.id },
-        data: pick(body, ...config.media.editableFields),
-        include: config.media.includePublicFields,
-      })
-    }
-
-    await putUpdateRequest(oldMedia.id, {
-      title: body.title,
-      description: body.description,
-      tags: body.tags?.join(', '),
-      categoryId: body.categoryId,
-      hasGraphicContent: body.hasGraphicContent,
-    })
-
-    return db.media.findUniqueOrThrow({
+  if (oldMedia.status === 'PENDING' || userPermissionFactory(user).isVerified) {
+    return db.media.update({
       where: { id: oldMedia.id },
+      data: pick(body, ...config.media.editableFields),
       include: config.media.includePublicFields,
     })
   }
@@ -99,17 +83,13 @@ export async function updateMedia(
 
 export async function moderateMedia(
   moderatorId: string,
-  oldMedia: Pick<Media, 'id' | 'authorId' | 'status'>,
-  data: ModerateMediaBody,
-  extraData?: UpdateMediaBody
+  oldMedia: Pick<Media, 'id' | 'status'>,
+  data: ModerateMediaBody
 ) {
   const updatedMedia = await db.media.update({
     where: { id: oldMedia.id },
     include: config.media.includePublicFields,
-    data: {
-      ...(extraData && pick(extraData, ...config.media.editableFields)),
-      ...pick(data, ...config.media.moderateFields),
-    },
+    data: pick(data, ...config.media.moderateFields),
   })
 
   if (oldMedia.status !== updatedMedia.status) {

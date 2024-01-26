@@ -1,5 +1,3 @@
-// TODO: Implement media request model
-
 import db, { Prisma, User } from '@/service/db'
 import { PrettifyPick } from '@/service/utils'
 import { mediaPermissionFactory } from './helpers'
