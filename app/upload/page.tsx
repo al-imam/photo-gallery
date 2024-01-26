@@ -1,15 +1,35 @@
 'use client'
 
+import { Item, MultiSelect } from '@/components/multi-select'
 import { NavBar } from '@/components/nav'
 import { Button } from '@/shadcn/ui/button'
+import { Input } from '@/shadcn/ui/input'
 import { cn } from '@/shadcn/utils'
 import React, { Fragment } from 'react'
 import ImageUploading, { ImageType } from 'react-images-uploading'
 
 const maxNumber = 20
 
+function createTags(tags: string[]) {
+  return tags.map((tag) => ({ value: tag, label: tag }))
+}
+
+const photoTags = createTags([
+  'Nature',
+  'Architecture',
+  'Portrait',
+  'Landscape',
+  'Food',
+  'Travel',
+  'Animals',
+  'Technology',
+  'Black and White',
+  'Abstract',
+])
+
 export default function Upload() {
   const [images, setImages] = React.useState<ImageType[]>([])
+  const [tags, setTags] = React.useState<Item[]>([])
 
   return (
     <div className="content relative isolate min-h-screen overflow-hidden bg-background">
@@ -31,10 +51,10 @@ export default function Upload() {
           dragProps,
         }) => (
           <div>
-            <div className="flex flex-col gap-8 mt-8">
+            <div className="flex flex-col gap-8">
               {imageList.map((image, index) => (
                 <Fragment key={image.dataURL}>
-                  <div className="grid lg:grid-cols-2 gap-8">
+                  <div className="grid lg:grid-cols-2 gap-x-8 gap-y-4">
                     <div className="space-y-2">
                       <div className="rounded-lg overflow-hidden ">
                         <img
@@ -61,7 +81,24 @@ export default function Upload() {
                         </Button>
                       </div>
                     </div>
+
+                    <div className="space-y-4">
+                      <Input placeholder="Title" />
+                      <Input placeholder="description" />
+                      <Input placeholder="Category" />
+                      <MultiSelect
+                        placeholder="Create tags"
+                        items={photoTags}
+                        selected={tags}
+                        limit={5}
+                        setSelected={setTags}
+                      />
+                    </div>
                   </div>
+
+                  {imageList.length > index + 1 && (
+                    <hr className="border-dashed" />
+                  )}
                 </Fragment>
               ))}
             </div>
