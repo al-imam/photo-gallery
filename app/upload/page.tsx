@@ -51,7 +51,11 @@ export default function Upload() {
           dragProps,
         }) => (
           <div>
-            <div className="flex flex-col gap-8">
+            <div
+              className={cn('flex flex-col gap-8', {
+                'mt-12': imageList.length > 0,
+              })}
+            >
               {imageList.map((image, index) => (
                 <Fragment key={image.dataURL}>
                   <div className="grid lg:grid-cols-2 gap-x-8 gap-y-4">
