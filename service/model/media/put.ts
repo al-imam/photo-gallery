@@ -91,7 +91,7 @@ export async function moderateMedia(
   })
 
   if (oldMedia.status !== updatedMedia.status) {
-    await db.lOG_MediaStatusChange.create({
+    await db.lOG_MediaChange.create({
       data: {
         mediaId: oldMedia.id,
         statusUpdatedTo: updatedMedia.status,

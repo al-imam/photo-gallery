@@ -16,7 +16,7 @@ export async function getMessages(
     throw new ReqErr('You cannot view the messages of this media')
   }
 
-  return db.lOG_MediaStatusChange.findMany({
+  return db.lOG_MediaChange.findMany({
     where: { mediaId: media.id },
     include: { user: { select: config.user.selectPublicFields } },
   })
@@ -38,7 +38,7 @@ export async function createMessage(
     throw new ReqErr('Cannot message approved media', 400)
   }
 
-  return db.lOG_MediaStatusChange.create({
+  return db.lOG_MediaChange.create({
     data: {
       userId: user.id,
       mediaId: media.id,
