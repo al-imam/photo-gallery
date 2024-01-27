@@ -1,10 +1,20 @@
 import { onlyModerator } from '@/server/middlewares/auth'
-import { sendMediaWithLoves, setMedia } from '@/server/middlewares/media'
+import {
+  setMedia,
+  sendMediaWithLoves,
+  SendMediaWithLovesData,
+} from '@/server/middlewares/media'
 import { authRouter } from '@/server/router'
 import service from '@/service'
+import { ModerateMediaBody } from '@/service/model/media'
 
+export type GetData = Omit<SendMediaWithLovesData, 'relatedMedia'>
 export const GET = authRouter(onlyModerator, setMedia, sendMediaWithLoves)
 
+export type PatchBody = ModerateMediaBody
+export type PatchData = {
+  media: Awaited<ReturnType<typeof service.media.moderateMedia>>
+}
 export const PATCH = authRouter(
   onlyModerator,
   setMedia,
@@ -12,7 +22,7 @@ export const PATCH = authRouter(
     ctx.media = await service.media.moderateMedia(
       ctx.user.id,
       ctx.media,
-      ctx.body()
+      ctx.body<PatchBody>()
     )
 
     return next()

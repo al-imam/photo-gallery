@@ -7,6 +7,9 @@ import { NextResponse } from 'next/server'
 import { authRouter } from '@/server/router'
 
 export type GetQuery = GetCollectionsQuery
+export type GetData = {
+  collections: Awaited<ReturnType<typeof service.collection.getCollections>>
+}
 export const GET = authRouter(async (_, ctx) => {
   const { userId: userIdFromQuery, ...query } = ctx.query<GetQuery>()
   const userId = userIdFromQuery ?? ctx.user.id
@@ -16,15 +19,18 @@ export const GET = authRouter(async (_, ctx) => {
     ...(ctx.user.id === userId ? {} : { visibility: 'PUBLIC' }),
   })
 
-  return NextResponse.json({ collections })
+  return NextResponse.json<GetData>({ collections })
 })
 
 export type PostBody = CreateCollectionInput
+export type PostData = {
+  collection: Awaited<ReturnType<typeof service.collection.createCollection>>
+}
 export const POST = authRouter(async (_, ctx) => {
   const collection = await service.collection.createCollection(
     ctx.user.id,
     ctx.body<PostBody>()
   )
 
-  return NextResponse.json({ collection })
+  return NextResponse.json<PostData>({ collection })
 })

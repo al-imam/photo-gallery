@@ -1,17 +1,17 @@
-import db, { ContentStatus, Media, Prisma, User } from '@/service/db'
+import db, { Media, Prisma, User } from '@/service/db'
 import { Prettify, PrettifyPick, pick } from '@/service/utils'
 import ReqErr from '@/service/ReqError'
 import { validateAndFormatTags } from './helpers'
 import { userPermissionFactory } from '../helpers'
 import config from '@/service/config'
-import { putUpdateRequest } from './request'
+
+export type CreateMediaApiBody = Pick<
+  Prisma.MediaUncheckedCreateInput,
+  (typeof config.media.editableFields)[number]
+>
 
 export type CreateMediaBody = Prettify<
-  Pick<
-    Prisma.MediaUncheckedCreateInput,
-    (typeof config.media.editableFields)[number]
-  > & {
-    status?: ContentStatus
+  CreateMediaApiBody & {
     storageRecordId: string
     media_size: number
     media_width: number
@@ -38,15 +38,13 @@ export async function createMedia(
 ) {
   body.tags = validateAndFormatTags(body.tags as string[])
   const userPermission = userPermissionFactory(user)
-  if (!userPermission.isVerifiedLevel) {
-    delete body.status
-  }
 
   return db.media.create({
     data: {
       ...pick(body, ...config.media.editableFields),
-
       authorId: user.id,
+      status: userPermission.isVerifiedLevel ? 'APPROVED' : 'PENDING',
+
       storageRecordId: body.storageRecordId,
       media_size: body.media_size,
       media_width: body.media_width,
