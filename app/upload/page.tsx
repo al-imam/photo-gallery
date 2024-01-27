@@ -3,6 +3,7 @@
 import { NavBar } from '@/components/nav'
 import { UploadImage } from '@/components/upload-image'
 import { ImageUploadProvider, Submit } from '@/context/upload-images'
+import { SpinnerIcon } from '@/icons'
 import { Button } from '@/shadcn/ui/button'
 import { cn } from '@/shadcn/utils'
 import { CheckCircleIcon } from 'lucide-react'
@@ -35,14 +36,14 @@ export default function Upload() {
     for (const id in submitRefs.current) {
       await submitRefs.current[id](async () => {
         const _image = images.find((img) => img.file?.name === id)
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        await new Promise((resolve) => setTimeout(resolve, 5000))
       })
     }
     setIsAllSubmitting(false)
   }
 
   return (
-    <div className="content relative isolate min-h-screen overflow-hidden bg-background gap-y-16 pb-20">
+    <div className="content relative isolate min-h-screen overflow-hidden bg-background gap-y-10 sm:gap-y-16 pb-20">
       <NavBar takeHeight={true} />
 
       <ImageUploading
@@ -117,15 +118,20 @@ export default function Upload() {
         )}
       </ImageUploading>
       {images.length > 0 && (
-        <div className="flex justify-between sm:justify-around ">
-          <Button onClick={onSubmit}>Submit images</Button>
+        <div className="flex justify-end sm:justify-evenly">
+          <Button onClick={onSubmit} disabled={isAllSubmitting}>
+            {isAllSubmitting && (
+              <SpinnerIcon className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            Submit images
+          </Button>
         </div>
       )}
 
-      <div className="space-y-1">
+      <div className="space-y-1.5">
         {requirements.map((requirement) => (
-          <div key={requirement} className="flex items-center gap-2">
-            <span>
+          <div key={requirement} className="flex items-start gap-2">
+            <span className="inline-flex h-[1.5rem] justify-center items-center">
               <CheckCircleIcon className="h-4 min-h-[1rem] w-4 min-w-[1rem] text-success" />
             </span>
             <span>{requirement}</span>

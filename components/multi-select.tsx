@@ -22,6 +22,10 @@ interface SelectProps {
   duplicateWarning?: string
 }
 
+function createLabel(value: string) {
+  return `"${value}" enter to create new!`
+}
+
 export function MultiSelect({
   selected,
   setSelected,
@@ -64,7 +68,14 @@ export function MultiSelect({
     []
   )
 
-  const selectables = items.filter((item) => !selected.includes(item))
+  const selectables = React.useMemo(() => {
+    const filtered = items.filter((item) => !selected.includes(item))
+    if (inputValue === '' || !creatable) return filtered
+    return filtered.concat({
+      label: createLabel(inputValue),
+      value: inputValue,
+    })
+  }, [selected, inputValue, items])
 
   return (
     <Command
@@ -134,7 +145,16 @@ export function MultiSelect({
                       }
 
                       if (!selected.find((s) => s.value === item.value)) {
-                        return setSelected((prev) => [...prev, item])
+                        return setSelected((prev) => [
+                          ...prev,
+                          {
+                            value: item.value,
+                            label:
+                              item.label === createLabel(item.value)
+                                ? item.value
+                                : item.label,
+                          },
+                        ])
                       }
 
                       toast.info(duplicateWarning)
@@ -145,33 +165,6 @@ export function MultiSelect({
                   </CommandItem>
                 )
               })}
-              {inputValue && creatable && (
-                <CommandItem
-                  onMouseDown={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                  }}
-                  onSelect={() => {
-                    setInputValue('')
-
-                    if (selected.length >= limit) {
-                      return toast.info("You've reached the limit!")
-                    }
-
-                    if (!selected.find((s) => s.value === inputValue)) {
-                      return setSelected((prev) => [
-                        ...prev,
-                        { label: inputValue, value: inputValue },
-                      ])
-                    }
-
-                    toast.info("You've already selected this item!")
-                  }}
-                  className={'cursor-pointer'}
-                >
-                  &apos;{inputValue}&apos; enter to create new!
-                </CommandItem>
-              )}
             </CommandGroup>
           </div>
         )}
