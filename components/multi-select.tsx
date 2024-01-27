@@ -5,6 +5,7 @@ import * as React from 'react'
 
 import { Badge } from '@/shadcn/ui/badge'
 import { Command, CommandGroup, CommandItem } from '@/shadcn/ui/command'
+import { cn } from '@/shadcn/utils'
 import { Command as CommandPrimitive } from 'cmdk'
 import { toast } from 'sonner'
 
@@ -30,6 +31,7 @@ export function MultiSelect({
   limit = Infinity,
   limitWaring = "You've reached the limit!",
   duplicateWarning = "You've already selected this item!",
+  disabled,
   ...rest
 }: SelectProps & React.ComponentProps<typeof CommandPrimitive.Input>) {
   const inputRef = React.useRef<HTMLInputElement>(null)
@@ -73,7 +75,11 @@ export function MultiSelect({
         <div className="flex gap-1 flex-wrap">
           {selected.map((item) => {
             return (
-              <Badge key={item.value} variant="secondary">
+              <Badge
+                key={item.value}
+                variant="secondary"
+                className={cn({ 'opacity-50 pointer-events-none': disabled })}
+              >
                 {item.label}
                 <button
                   className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
@@ -87,6 +93,7 @@ export function MultiSelect({
                     e.stopPropagation()
                   }}
                   onClick={() => handleUnselect(item)}
+                  disabled={disabled}
                 >
                   <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
                 </button>
@@ -101,6 +108,7 @@ export function MultiSelect({
             onBlur={() => setOpen(false)}
             onFocus={() => setOpen(true)}
             placeholder={placeholder ?? 'Select item'}
+            disabled={disabled}
             className="ml-2 bg-transparent outline-none placeholder:text-muted-foreground flex-1 placeholder:select-none"
             {...rest}
           />
