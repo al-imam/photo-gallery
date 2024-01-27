@@ -33,10 +33,14 @@ export default function Upload() {
 
   async function onSubmit() {
     setIsAllSubmitting(true)
+
     for (const id in submitRefs.current) {
       await submitRefs.current[id](async () => {
-        const _image = images.find((img) => img.file?.name === id)
-        await new Promise((resolve) => setTimeout(resolve, 5000))
+        const img = images.find((img) => img.file?.name === id)
+        if (!img || !img.file) return
+
+        const form = new FormData()
+        form.append('file', img.file)
       })
     }
     setIsAllSubmitting(false)
@@ -95,11 +99,21 @@ export default function Upload() {
             <div
               {...dragProps}
               className={cn(
-                'flex flex-col gap-2 relative justify-center items-center p-8 sm:p-12 border border-dashed rounded-lg max-w-2xl mx-auto w-full',
-                { 'bg-blue-500': isDragging }
+                'isolate flex flex-col gap-2 relative justify-center items-center p-8 sm:p-12 border border-dashed rounded-lg max-w-2xl mx-auto w-full overflow-hidden'
               )}
             >
-              <div className="absolute bottom-4 right-4 text-muted-foreground select-none">
+              <div
+                className={cn(
+                  'absolute inset-[1px] bg-blue-300 dark:bg-blue-600 -z-10 rounded-lg scale-95 opacity-0 pointer-events-none transition-none duration-300',
+                  { 'opacity-100 scale-100 transition-all': isDragging }
+                )}
+              ></div>
+              <div
+                className={cn(
+                  'absolute bottom-4 right-4 text-foreground/80 select-none pointer-events-none',
+                  { 'opacity-0': isDragging }
+                )}
+              >
                 ({maxNumber}/{images.length})
               </div>
               <span className="text-center pointer-events-none select-none">
