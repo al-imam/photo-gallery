@@ -52,20 +52,30 @@ export function ImageForm({ id }: { id: string }) {
     },
   })
 
-  function onSubmit(_values: ImageFormValues) {}
+  function onSubmit() {}
+
+  async function submit(
+    callback: (value: ImageFormValues) => Promise<void> | void
+  ) {
+    form.handleSubmit(callback)()
+    return form.reset
+  }
 
   return (
     <Form {...form}>
       <form
         className="flex flex-col gap-4"
+        onSubmit={form.handleSubmit(onSubmit)}
         ref={(el) => {
           if (el) {
-            submitRefs.current = { ...submitRefs.current, [id]: el }
+            submitRefs.current = {
+              ...submitRefs.current,
+              [id]: submit,
+            }
           } else if (submitRefs.current[id]) {
             delete submitRefs.current[id]
           }
         }}
-        onSubmit={form.handleSubmit(onSubmit)}
       >
         <FormField
           control={form.control}

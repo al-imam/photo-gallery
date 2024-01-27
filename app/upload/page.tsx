@@ -2,7 +2,7 @@
 
 import { NavBar } from '@/components/nav'
 import { UploadImage } from '@/components/upload-image'
-import { ImageFormValues, ImageUploadProvider } from '@/context/upload-images'
+import { ImageUploadProvider, Submit } from '@/context/upload-images'
 import { Button } from '@/shadcn/ui/button'
 import { cn } from '@/shadcn/utils'
 import { Fragment, useRef, useState } from 'react'
@@ -13,13 +13,20 @@ const maxNumber = 10
 
 export default function Upload() {
   const [images, setImages] = useState<ImageType[]>([])
-  const submitRefs = useRef<Record<string, HTMLFormElement>>({})
-  const [_imageFormList, setImageFormList] = useState<
-    (ImageFormValues & { id: string })[]
-  >([])
+  const submitRefs = useRef<Record<string, Submit>>({})
+
+  async function onSubmit() {
+    const submits = Object.values(submitRefs.current)
+
+    for (const submit of submits) {
+      submit(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 5000))
+      })
+    }
+  }
 
   return (
-    <div className="content relative isolate min-h-screen overflow-hidden bg-background">
+    <div className="content relative isolate min-h-screen overflow-hidden bg-background mb-20">
       <NavBar takeHeight={true} />
 
       <ImageUploading
@@ -50,7 +57,6 @@ export default function Upload() {
               isDragging,
               dragProps,
               submitRefs,
-              setImageFormList,
               ...rest,
             }}
           >
@@ -72,11 +78,14 @@ export default function Upload() {
               <div
                 {...dragProps}
                 className={cn(
-                  'flex flex-col gap-2 justify-center items-center p-4 sm:p-8 border border-dashed rounded-lg max-w-2xl mx-auto w-full my-10',
+                  'flex flex-col gap-2 relative justify-center items-center p-8 sm:p-12 border border-dashed rounded-lg max-w-2xl mx-auto w-full my-10',
                   { 'bg-blue-500': isDragging }
                 )}
               >
-                <span className="text-center pointer-events-none">
+                <div className="absolute bottom-4 right-4 text-muted-foreground select-none">
+                  ({maxNumber}/{images.length})
+                </div>
+                <span className="text-center pointer-events-none select-none">
                   Drag and drop {imageList.length > 0 ? 'more' : 'your'} images
                   here <br /> or
                 </span>
@@ -92,6 +101,9 @@ export default function Upload() {
           </ImageUploadProvider>
         )}
       </ImageUploading>
+      <div className="flex justify-between sm:justify-around ">
+        <Button onClick={onSubmit}>Submit images</Button>
+      </div>
     </div>
   )
 }

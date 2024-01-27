@@ -1,5 +1,6 @@
 import { Item } from '@/components/multi-select'
 import { ComponentProps, createContext } from 'react'
+import { UseFormReset } from 'react-hook-form'
 import { ExportInterface } from 'react-images-uploading/dist/typings'
 
 export interface ImageFormValues {
@@ -9,16 +10,13 @@ export interface ImageFormValues {
   tags: Item[]
 }
 
+export type Submit = (
+  callback: (value: ImageFormValues) => Promise<void> | void
+) => Promise<UseFormReset<ImageFormValues>>
+
 export const ImageUploadContext = createContext<
   | (ExportInterface & {
-      submitRefs: React.MutableRefObject<Record<string, HTMLFormElement>>
-      setImageFormList: React.Dispatch<
-        React.SetStateAction<
-          (ImageFormValues & {
-            id: string
-          })[]
-        >
-      >
+      submitRefs: React.MutableRefObject<Record<string, Submit>>
     })
   | null
 >(null)
