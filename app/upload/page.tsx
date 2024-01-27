@@ -14,14 +14,17 @@ const maxNumber = 10
 export default function Upload() {
   const [images, setImages] = useState<ImageType[]>([])
   const submitRefs = useRef<Record<string, Submit>>({})
+  const [isAllSubmitting, setIsAllSubmitting] = useState(false)
 
   async function onSubmit() {
+    setIsAllSubmitting(true)
     for (const id in submitRefs.current) {
       await submitRefs.current[id](async () => {
         const _image = images.find((img) => img.file?.name === id)
         await new Promise((resolve) => setTimeout(resolve, 1000))
       })
     }
+    setIsAllSubmitting(false)
   }
 
   return (
@@ -56,6 +59,7 @@ export default function Upload() {
               isDragging,
               dragProps,
               submitRefs,
+              isAllSubmitting,
               ...rest,
             }}
           >

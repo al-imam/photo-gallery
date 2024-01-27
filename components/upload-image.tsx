@@ -10,7 +10,7 @@ export function UploadImage({
   image: ImageType
   index: number
 }) {
-  const { onImageRemove, onImageUpdate } = useImageUpload()
+  const { onImageRemove, onImageUpdate, isAllSubmitting } = useImageUpload()
 
   return (
     <div className="grid lg:grid-cols-2 gap-x-8 gap-y-4">
@@ -27,6 +27,7 @@ export function UploadImage({
           <Button
             variant={'ghost'}
             size={'sm'}
+            disabled={isAllSubmitting}
             onClick={() => onImageUpdate(index)}
           >
             Change
@@ -34,6 +35,7 @@ export function UploadImage({
           <Button
             variant={'ghost'}
             size={'sm'}
+            disabled={isAllSubmitting}
             onClick={() => onImageRemove(index)}
           >
             Remove

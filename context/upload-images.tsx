@@ -17,6 +17,7 @@ export type Submit = (
 export const ImageUploadContext = createContext<
   | (ExportInterface & {
       submitRefs: React.MutableRefObject<Record<string, Submit>>
+      isAllSubmitting: boolean
     })
   | null
 >(null)

@@ -42,7 +42,7 @@ const photoTags = createTags([
 
 export function ImageForm({ id }: { id: string }) {
   const { data } = useCategory()
-  const { submitRefs } = useImageUpload()
+  const { submitRefs, isAllSubmitting } = useImageUpload()
   const form = useForm<ImageFormValues>({
     defaultValues: {
       title: '',
@@ -86,7 +86,7 @@ export function ImageForm({ id }: { id: string }) {
               <FormLabel>Title *</FormLabel>
               <FormControl>
                 <Input
-                  disabled={form.formState.isSubmitting}
+                  disabled={form.formState.isSubmitting || isAllSubmitting}
                   placeholder="Title"
                   {...field}
                 />
@@ -103,7 +103,7 @@ export function ImageForm({ id }: { id: string }) {
               <FormLabel>Description</FormLabel>
               <FormControl>
                 <Input
-                  disabled={form.formState.isSubmitting}
+                  disabled={form.formState.isSubmitting || isAllSubmitting}
                   placeholder="Description"
                   {...field}
                 />
@@ -122,7 +122,7 @@ export function ImageForm({ id }: { id: string }) {
               <Select
                 onValueChange={field.onChange}
                 value={field.value}
-                disabled={form.formState.isSubmitting}
+                disabled={form.formState.isSubmitting || isAllSubmitting}
               >
                 <FormControl>
                   <SelectTrigger>
@@ -154,7 +154,7 @@ export function ImageForm({ id }: { id: string }) {
                   items={photoTags}
                   selected={form.getValues('tags')}
                   limit={5}
-                  disabled={form.formState.isSubmitting}
+                  disabled={form.formState.isSubmitting || isAllSubmitting}
                   setSelected={(set) =>
                     typeof set === 'function'
                       ? field.onChange(set(form.getValues('tags')))
