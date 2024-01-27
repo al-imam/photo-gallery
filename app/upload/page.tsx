@@ -7,6 +7,7 @@ import { Button } from '@/shadcn/ui/button'
 import { cn } from '@/shadcn/utils'
 import { Fragment, useState } from 'react'
 import ImageUploading, { ImageType } from 'react-images-uploading'
+import { toast } from 'sonner'
 
 const maxNumber = 10
 
@@ -20,7 +21,20 @@ export default function Upload() {
       <ImageUploading
         multiple
         value={images}
-        onChange={(_images) => setImages(_images)}
+        onChange={(_images) => {
+          if (_images.length > images.length) {
+            const _lastImg = _images.at(-1)
+
+            if (
+              _lastImg &&
+              images.find((img) => img.file?.name === _lastImg.file?.name)
+            ) {
+              return toast.warning('Can not upload same image twice!')
+            }
+          }
+
+          setImages(_images)
+        }}
         maxNumber={maxNumber}
         dataURLKey="data_url"
       >
@@ -41,7 +55,7 @@ export default function Upload() {
                 })}
               >
                 {imageList.map((image, index) => (
-                  <Fragment key={image.dataURL}>
+                  <Fragment key={JSON.stringify(image)}>
                     <UploadImage image={image} index={index} />
                     {imageList.length > index + 1 && (
                       <hr className="border-dashed" />
