@@ -17,7 +17,7 @@ export type NextHandler<TCtx = {}> = (
 ) => any
 
 export type NextUserHandler<T = {}> = NextHandler<{ user: User } & T>
- export type NextOptUserHandler<T = {}> = NextHandler<{ user?: User } & T>
+export type NextOptUserHandler<T = {}> = NextHandler<{ user?: User } & T>
 export type NextUserMediaHandler<T = {}> = NextUserHandler<
   {
     media: MediaWithReactionCountRaw
@@ -33,7 +33,10 @@ export type MediaWithReactionCountRaw = Media & {
   }
 }
 
-export type MediaWithReactionCount = Omit<MediaWithReactionCountRaw, 'storageRecordId'>
+export type MediaWithReactionCount = Omit<
+  MediaWithReactionCountRaw,
+  'storageRecordId'
+>
 
 export type MediaWithLoves = MediaWithReactionCount & {
   isLoved: boolean
@@ -54,7 +57,8 @@ export type CollectionWithMedia = Collection & {
 export type JWTPayload = {
   auth: string
   cookie: string
-  'service-token': string
+  'service-token-outer': string
+  'service-token-inner': boolean
   'signup-email': string
   'change-email': {
     userId: string
