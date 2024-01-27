@@ -12,18 +12,21 @@ model User {
   avatar_storageRecordId String?
 
   password       String
-  email          String   @unique
+  email          String   @unique()
   authModifiedAt DateTime @default(now())
 
-  media         Media[]
-  reactions     MediaReaction[] @relation("MediaReaction")
-  collections   Collection[]    @relation("Collection")
-  notifications Notification[]  @relation("Notification")
+  Z_MEDIA         Media[]         @relation("Media")
+  Z_REACTIONS     MediaReaction[] @relation("MediaReaction")
+  Z_COLLECTIONS   Collection[]    @relation("Collection")
+  Z_NOTIFICATIONS Notification[]  @relation("Notification")
 
-  Z_REPORTS                           MediaReport[]           @relation("MediaReport")
-  Z_LOG_ROLE                          LOG_RoleChange[]        @relation("LogRoleChange")
-  Z_LOG_ROLE_MODERATED                LOG_RoleChange[]        @relation("LogRoleChangeModerated")
-  Z_LOG_MEDIA_STATUS_CHANGE_MODERATED LOG_MediaStatusChange[] @relation("LogMediaStatusChangeModerated")
+  Z_REPORTS                           MediaReport[]     @relation("MediaReport")
+  Z_LOG_ROLE                          LOG_RoleChange[]  @relation("LogRoleChange")
+  Z_LOG_ROLE_MODERATED                LOG_RoleChange[]  @relation("LogRoleChangeModerated")
+  Z_LOG_MEDIA_STATUS_CHANGE_MODERATED LOG_MediaChange[] @relation("LogMediaStatusChangeModerated")
+
+  @@index([email])
+  @@index([username])
 }
 
 model Profile {
@@ -35,7 +38,7 @@ model Profile {
   email    String?
   links    ProfileLink[] @relation("ProfileLink")
 
-  ZZZ_USER User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Z_USER User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model ProfileLink {
@@ -47,6 +50,8 @@ model ProfileLink {
   url  String          @db.VarChar(48)
 
   Z_PROFILE Profile @relation("ProfileLink", fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@unique([userId])
 }
 
 model Media {
@@ -67,18 +72,20 @@ model Media {
   hasGraphicContent Boolean  @default(false)
 
   authorId String @db.Uuid()
-  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author   User   @relation("Media", fields: [authorId], references: [id], onDelete: Cascade)
 
-  // TODO: Make it required
-  categoryId String?        @db.Uuid()
-  category   MediaCategory? @relation("MediaCategory", fields: [categoryId], references: [id])
+  categoryId String        @db.Uuid()
+  category   MediaCategory @relation("MediaCategory", fields: [categoryId], references: [id])
 
   reactions     MediaReaction[]     @relation("MediaReaction")
   updateRequest MediaUpdateRequest? @relation("PendingMedia")
 
-  Z_COLLECTIONS Collection[]            @relation("Collection")
-  Z_LOG_MEDIA   LOG_MediaStatusChange[] @relation("LogMediaStatusChange")
-  Z_REPORTS     MediaReport[]           @relation("MediaReport")
+  Z_COLLECTIONS Collection[]      @relation("Collection")
+  Z_LOG_MEDIA   LOG_MediaChange[] @relation("LogMediaStatusChange")
+  Z_REPORTS     MediaReport[]     @relation("MediaReport")
+
+  @@index([authorId])
+  @@index([categoryId])
 }
 
 model MediaUpdateRequest {
@@ -97,8 +104,10 @@ model MediaUpdateRequest {
 model MediaCategory {
   id        String   @id @default(uuid()) @db.Uuid()
   createdAt DateTime @default(now())
-  name      String   @unique @db.VarChar(16)
+  name      String   @unique() @db.VarChar(16)
   media     Media[]  @relation("MediaCategory")
+
+  @@index([name])
 }
 
 model MediaReaction {
@@ -137,9 +146,9 @@ model Collection {
   name        String               @db.VarChar(48)
   description String?              @db.VarChar(300)
   visibility  CollectionVisibility @default(PUBLIC)
+  media       Media[]              @relation("Collection")
 
-  media  Media[] @relation("Collection")
-  Z_USER User    @relation("Collection", fields: [userId], references: [id], onDelete: Cascade)
+  Z_USER User @relation("Collection", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -152,6 +161,8 @@ model Notification {
   read      Boolean  @default(false)
 
   Z_USER User @relation("Notification", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model LOG_RoleChange {
@@ -169,7 +180,7 @@ model LOG_RoleChange {
   Z_MODERATEDBY User @relation("LogRoleChangeModerated", fields: [moderatedById], references: [id])
 }
 
-model LOG_MediaStatusChange {
+model LOG_MediaChange {
   id        String   @id @default(uuid()) @db.Uuid()
   mediaId   String   @db.Uuid()
   userId    String   @db.Uuid()
