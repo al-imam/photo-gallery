@@ -30,7 +30,8 @@ export function MultiSelect({
   limit = Infinity,
   limitWaring = "You've reached the limit!",
   duplicateWarning = "You've already selected this item!",
-}: SelectProps) {
+  ...rest
+}: SelectProps & React.ComponentProps<typeof CommandPrimitive.Input>) {
   const inputRef = React.useRef<HTMLInputElement>(null)
   const [open, setOpen] = React.useState(false)
   const [inputValue, setInputValue] = React.useState('')
@@ -101,6 +102,7 @@ export function MultiSelect({
             onFocus={() => setOpen(true)}
             placeholder={placeholder ?? 'Select item'}
             className="ml-2 bg-transparent outline-none placeholder:text-muted-foreground flex-1 placeholder:select-none"
+            {...rest}
           />
         </div>
       </div>

@@ -57,7 +57,7 @@ export function ImageForm({ id }: { id: string }) {
   async function submit(
     callback: (value: ImageFormValues) => Promise<void> | void
   ) {
-    form.handleSubmit(callback)()
+    await form.handleSubmit(callback)()
     return form.reset
   }
 
@@ -154,6 +154,7 @@ export function ImageForm({ id }: { id: string }) {
                   items={photoTags}
                   selected={form.getValues('tags')}
                   limit={5}
+                  disabled={form.formState.isSubmitting}
                   setSelected={(set) =>
                     typeof set === 'function'
                       ? field.onChange(set(form.getValues('tags')))

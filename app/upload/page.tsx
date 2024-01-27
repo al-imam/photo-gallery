@@ -16,11 +16,10 @@ export default function Upload() {
   const submitRefs = useRef<Record<string, Submit>>({})
 
   async function onSubmit() {
-    const submits = Object.values(submitRefs.current)
-
-    for (const submit of submits) {
-      submit(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 5000))
+    for (const id in submitRefs.current) {
+      await submitRefs.current[id](async () => {
+        const _image = images.find((img) => img.file?.name === id)
+        await new Promise((resolve) => setTimeout(resolve, 1000))
       })
     }
   }
