@@ -1,35 +1,16 @@
 'use client'
 
-import { Item, MultiSelect } from '@/components/multi-select'
+import { ImageForm } from '@/components/form/upload-form'
 import { NavBar } from '@/components/nav'
 import { Button } from '@/shadcn/ui/button'
-import { Input } from '@/shadcn/ui/input'
 import { cn } from '@/shadcn/utils'
 import React, { Fragment } from 'react'
 import ImageUploading, { ImageType } from 'react-images-uploading'
 
 const maxNumber = 20
 
-function createTags(tags: string[]) {
-  return tags.map((tag) => ({ value: tag, label: tag }))
-}
-
-const photoTags = createTags([
-  'Nature',
-  'Architecture',
-  'Portrait',
-  'Landscape',
-  'Food',
-  'Travel',
-  'Animals',
-  'Technology',
-  'Black and White',
-  'Abstract',
-])
-
 export default function Upload() {
   const [images, setImages] = React.useState<ImageType[]>([])
-  const [tags, setTags] = React.useState<Item[]>([])
 
   return (
     <div className="content relative isolate min-h-screen overflow-hidden bg-background">
@@ -85,19 +66,7 @@ export default function Upload() {
                         </Button>
                       </div>
                     </div>
-
-                    <div className="space-y-4">
-                      <Input placeholder="Title" />
-                      <Input placeholder="Description" />
-                      <Input placeholder="Category" />
-                      <MultiSelect
-                        placeholder="Create tags"
-                        items={photoTags}
-                        selected={tags}
-                        limit={5}
-                        setSelected={setTags}
-                      />
-                    </div>
+                    <ImageForm />
                   </div>
 
                   {imageList.length > index + 1 && (
