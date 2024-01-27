@@ -43,11 +43,17 @@ export const router = Router.create<NextHandler>({
 export const serviceRouter = router.create<NextHandler>({
   middleware: [
     async (req, _, next) => {
-      const token = req.headers.get('service-token')
-      if (!token) throw Error('Service token is required')
-      const { payload } = await jwt.verify('service-token', token)
-      const isOk = await bcrypt.compare(env.SERVICE_SECRET, payload)
-      if (!isOk) throw Error('Invalid service token')
+      const tokenLv1 = req.headers.get('service-token')
+      if (!tokenLv1) throw Error('Service token is required')
+
+      const result1 = await jwt.verify('service-token-outer', tokenLv1)
+      const result2 = await jwt.verify(
+        'service-token-inner',
+        result1.payload,
+        env.SERVICE_SECRET
+      )
+
+      if (result2.payload !== true) throw Error('Invalid service token')
       return next()
     },
   ],

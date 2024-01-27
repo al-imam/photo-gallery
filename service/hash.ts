@@ -29,7 +29,11 @@ export const jwt = {
       .sign(JWT_SECRET)
   },
 
-  async verify<T extends keyof JWTPayload>(mode: T, token: string) {
+  async verify<T extends keyof JWTPayload>(
+    mode: T,
+    token: string,
+    KEY?: string
+  ) {
     type Payload = {
       payload: JWTPayload[T]
       mode: T
@@ -37,9 +41,14 @@ export const jwt = {
       exp: number
     }
 
-    const { payload } = await jose.jwtVerify<Payload>(token, JWT_SECRET, {
-      algorithms: ['HS256'],
-    })
+    const { payload } = await jose.jwtVerify<Payload>(
+      token,
+      KEY ? new TextEncoder().encode(KEY) : JWT_SECRET,
+      {
+        algorithms: ['HS256'],
+      }
+    )
+    
     if (payload.mode !== mode) throw new ReqErr('Invalid token')
 
     return {

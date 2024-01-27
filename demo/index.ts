@@ -58,7 +58,6 @@ const REACTION_PER_USER = 50
       const media = await service.media.createMedia(
         { ...user, role: 'VERIFIED' },
         {
-          status: 'APPROVED',
           title: `Test Media ${iImage + 1}`,
           categoryId: getRandomItems(categories, 1)[0].id,
           ...images[iImage],
