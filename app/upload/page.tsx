@@ -2,10 +2,10 @@
 
 import { NavBar } from '@/components/nav'
 import { UploadImage } from '@/components/upload-image'
-import { ImageUploadProvider } from '@/context/upload-images'
+import { ImageFormValues, ImageUploadProvider } from '@/context/upload-images'
 import { Button } from '@/shadcn/ui/button'
 import { cn } from '@/shadcn/utils'
-import { Fragment, useState } from 'react'
+import { Fragment, useRef, useState } from 'react'
 import ImageUploading, { ImageType } from 'react-images-uploading'
 import { toast } from 'sonner'
 
@@ -13,6 +13,10 @@ const maxNumber = 10
 
 export default function Upload() {
   const [images, setImages] = useState<ImageType[]>([])
+  const submitRefs = useRef<Record<string, HTMLFormElement>>({})
+  const [_imageFormList, setImageFormList] = useState<
+    (ImageFormValues & { id: string })[]
+  >([])
 
   return (
     <div className="content relative isolate min-h-screen overflow-hidden bg-background">
@@ -45,6 +49,8 @@ export default function Upload() {
               onImageUpload,
               isDragging,
               dragProps,
+              submitRefs,
+              setImageFormList,
               ...rest,
             }}
           >
@@ -55,7 +61,7 @@ export default function Upload() {
                 })}
               >
                 {imageList.map((image, index) => (
-                  <Fragment key={JSON.stringify(image)}>
+                  <Fragment key={image.file?.name}>
                     <UploadImage image={image} index={index} />
                     {imageList.length > index + 1 && (
                       <hr className="border-dashed" />

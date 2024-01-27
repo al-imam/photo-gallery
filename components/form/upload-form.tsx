@@ -1,7 +1,9 @@
 'use client'
 
-import { Item, MultiSelect } from '@/components/multi-select'
+import { MultiSelect } from '@/components/multi-select'
+import { ImageFormValues } from '@/context/upload-images'
 import { useCategory } from '@/hooks/category'
+import { useImageUpload } from '@/hooks/images'
 import {
   Form,
   FormControl,
@@ -38,15 +40,9 @@ const photoTags = createTags([
   'Abstract',
 ])
 
-interface ImageFormValues {
-  title: string
-  description: string
-  category: string | undefined
-  tags: Item[]
-}
-
-export function ImageForm() {
+export function ImageForm({ id }: { id: string }) {
   const { data } = useCategory()
+  const { submitRefs } = useImageUpload()
   const form = useForm<ImageFormValues>({
     defaultValues: {
       title: '',
@@ -62,6 +58,13 @@ export function ImageForm() {
     <Form {...form}>
       <form
         className="flex flex-col gap-4"
+        ref={(el) => {
+          if (el) {
+            submitRefs.current = { ...submitRefs.current, [id]: el }
+          } else if (submitRefs.current[id]) {
+            delete submitRefs.current[id]
+          }
+        }}
         onSubmit={form.handleSubmit(onSubmit)}
       >
         <FormField

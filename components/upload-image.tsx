@@ -40,7 +40,7 @@ export function UploadImage({
           </Button>
         </div>
       </div>
-      <ImageForm />
+      <ImageForm id={`${image.file?.name}`} />
     </div>
   )
 }
