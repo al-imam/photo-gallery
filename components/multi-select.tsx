@@ -5,6 +5,7 @@ import * as React from 'react'
 
 import { Badge } from '@/shadcn/ui/badge'
 import { Command, CommandGroup, CommandItem } from '@/shadcn/ui/command'
+import { cn } from '@/shadcn/utils'
 import { Command as CommandPrimitive } from 'cmdk'
 import { toast } from 'sonner'
 
@@ -21,6 +22,10 @@ interface SelectProps {
   duplicateWarning?: string
 }
 
+function createLabel(value: string) {
+  return `"${value}" enter to create new!`
+}
+
 export function MultiSelect({
   selected,
   setSelected,
@@ -30,7 +35,9 @@ export function MultiSelect({
   limit = Infinity,
   limitWaring = "You've reached the limit!",
   duplicateWarning = "You've already selected this item!",
-}: SelectProps) {
+  disabled,
+  ...rest
+}: SelectProps & React.ComponentProps<typeof CommandPrimitive.Input>) {
   const inputRef = React.useRef<HTMLInputElement>(null)
   const [open, setOpen] = React.useState(false)
   const [inputValue, setInputValue] = React.useState('')
@@ -61,7 +68,14 @@ export function MultiSelect({
     []
   )
 
-  const selectables = items.filter((item) => !selected.includes(item))
+  const selectables = React.useMemo(() => {
+    const filtered = items.filter((item) => !selected.includes(item))
+    if (inputValue === '' || !creatable) return filtered
+    return filtered.concat({
+      label: createLabel(inputValue),
+      value: inputValue,
+    })
+  }, [selected, inputValue, items])
 
   return (
     <Command
@@ -72,7 +86,11 @@ export function MultiSelect({
         <div className="flex gap-1 flex-wrap">
           {selected.map((item) => {
             return (
-              <Badge key={item.value} variant="secondary">
+              <Badge
+                key={item.value}
+                variant="secondary"
+                className={cn({ 'opacity-50 pointer-events-none': disabled })}
+              >
                 {item.label}
                 <button
                   className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
@@ -86,6 +104,7 @@ export function MultiSelect({
                     e.stopPropagation()
                   }}
                   onClick={() => handleUnselect(item)}
+                  disabled={disabled}
                 >
                   <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
                 </button>
@@ -100,7 +119,9 @@ export function MultiSelect({
             onBlur={() => setOpen(false)}
             onFocus={() => setOpen(true)}
             placeholder={placeholder ?? 'Select item'}
+            disabled={disabled}
             className="ml-2 bg-transparent outline-none placeholder:text-muted-foreground flex-1 placeholder:select-none"
+            {...rest}
           />
         </div>
       </div>
@@ -124,7 +145,16 @@ export function MultiSelect({
                       }
 
                       if (!selected.find((s) => s.value === item.value)) {
-                        return setSelected((prev) => [...prev, item])
+                        return setSelected((prev) => [
+                          ...prev,
+                          {
+                            value: item.value,
+                            label:
+                              item.label === createLabel(item.value)
+                                ? item.value
+                                : item.label,
+                          },
+                        ])
                       }
 
                       toast.info(duplicateWarning)
@@ -135,33 +165,6 @@ export function MultiSelect({
                   </CommandItem>
                 )
               })}
-              {inputValue && creatable && (
-                <CommandItem
-                  onMouseDown={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                  }}
-                  onSelect={() => {
-                    setInputValue('')
-
-                    if (selected.length >= limit) {
-                      return toast.info("You've reached the limit!")
-                    }
-
-                    if (!selected.find((s) => s.value === inputValue)) {
-                      return setSelected((prev) => [
-                        ...prev,
-                        { label: inputValue, value: inputValue },
-                      ])
-                    }
-
-                    toast.info("You've already selected this item!")
-                  }}
-                  className={'cursor-pointer'}
-                >
-                  &apos;{inputValue}&apos; enter to create new!
-                </CommandItem>
-              )}
             </CommandGroup>
           </div>
         )}
