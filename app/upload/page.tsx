@@ -46,6 +46,37 @@ export default function Upload() {
     setIsAllSubmitting(false)
   }
 
+  function handleImageUpload(_images: TypeImage[], aui: number[] | undefined) {
+    if (!Array.isArray(aui)) {
+      const [dImg] = images.filter(
+        (cImg) => !_images.find((pImg) => pImg.file.name === cImg.file.name)
+      )
+
+      return setImages((prev) =>
+        prev.filter((img) => img.file.name !== dImg.file.name)
+      )
+    }
+
+    if (aui && aui.length === 1 && images.length > aui[0]) {
+      const newImages = [...images]
+      newImages[aui[0]] = { ..._images[aui[0]], id: newImages[aui[0]].id }
+      return setImages(newImages)
+    }
+
+    const newAllImages = _images.filter(
+      (img, index) =>
+        aui.includes(index) &&
+        !images.find((pImg) => pImg.file.name === img.file.name)
+    )
+
+    return setImages((prev) => [
+      ...prev,
+      ...newAllImages.map((cImg) => ({ ...cImg, id: uuid() })),
+    ])
+  }
+
+  const isHasImage = images.length > 0
+
   return (
     <div className="content relative isolate min-h-screen overflow-hidden bg-background gap-y-10 sm:gap-y-16 pb-20">
       <NavBar takeHeight={true} />
@@ -55,20 +86,7 @@ export default function Upload() {
         value={images}
         maxNumber={maxNumber}
         dataURLKey="data_url"
-        onChange={(_images) => {
-          if (_images.length > images.length) {
-            const _lastImg = _images.at(-1)
-
-            if (
-              _lastImg &&
-              images.find((img) => img.file?.name === _lastImg.file?.name)
-            ) {
-              return toast.warning('Can not upload same image twice!')
-            }
-          }
-
-          setImages(_images)
-        }}
+        onChange={handleImageUpload as any}
       >
         {({ imageList, onImageUpload, isDragging, dragProps, ...rest }) => (
           <ImageUploadProvider
