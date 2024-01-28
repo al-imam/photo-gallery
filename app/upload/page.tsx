@@ -9,6 +9,7 @@ import { uuid } from '@/lib'
 import { Button } from '@/shadcn/ui/button'
 import { cn } from '@/shadcn/utils'
 import { Modify } from '@/types'
+import { joinUrl } from '@/util'
 import axios from 'axios'
 import { AnimatePresence, motion } from 'framer-motion'
 import { CheckCircleIcon } from 'lucide-react'
@@ -42,9 +43,9 @@ export default function Upload() {
   async function onSubmit() {
     setIsAllSubmitting(true)
 
-    for (const id in submitRefs.current) {
-      await submitRefs.current[id](async (values) => {
-        const img = images.find((img) => img.file?.name === id)
+    for (const [key, submit] of Object.entries(submitRefs.current)) {
+      await submit(async (values) => {
+        const img = images.find((img) => img.file?.name === key)
         if (!img || !img.file) return
 
         const form = new FormData()
@@ -53,16 +54,23 @@ export default function Upload() {
         form.append('description', values.description)
         form.append('tags', JSON.stringify(values.tags.map((tag) => tag.value)))
         form.append('categoryId', values.category!)
-        await new Promise((r) => setTimeout(r, 5000))
+
         try {
-          await axios.post('https://api.palestinian.top/media', form, {
-            headers: { Authorization: auth },
-          })
+          await axios.post(
+            joinUrl(process.env.NEXT_PUBLIC_API_URL, 'media'),
+            form,
+            { headers: { Authorization: auth } }
+          )
+
+          toast.success(`Successfully uploaded "${values.title}"`)
+
+          return setImages((prev) => prev.filter((cImg) => cImg.id !== img.id))
         } catch (error) {
-          toast.error(`Failed to upload ${img.file.name}`)
+          return toast.error(`Failed to upload "${values.title}"`)
         }
       })
     }
+
     setIsAllSubmitting(false)
   }
 
