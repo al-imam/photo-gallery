@@ -3,7 +3,7 @@
 import { NavBar } from '@/components/nav'
 import { UploadImage } from '@/components/upload-image'
 import { ImageUploadProvider, Submit } from '@/context/upload-images'
-import { SpinnerIcon } from '@/icons'
+import { FilesIllustration, SpinnerIcon } from '@/icons'
 import { Button } from '@/shadcn/ui/button'
 import { cn } from '@/shadcn/utils'
 import { CheckCircleIcon } from 'lucide-react'
@@ -135,7 +135,8 @@ export default function Upload() {
         )}
       </ImageUploading>
       {images.length > 0 && (
-        <div className="flex justify-end sm:justify-evenly">
+        <div className="flex justify-between items-center sm:justify-evenly relative sm:mb-0 mb-10">
+          <span>Thank you for contributing</span>
           <Button onClick={onSubmit} disabled={isAllSubmitting}>
             {isAllSubmitting && (
               <SpinnerIcon className="mr-2 h-4 w-4 animate-spin" />
@@ -145,7 +146,8 @@ export default function Upload() {
         </div>
       )}
 
-      <div className="space-y-1.5">
+      <div className="space-y-1.5 relative">
+        <FilesIllustration className="absolute -left-1/3 -top-full w-full h-[200%] -z-50 opacity-20 dark:opacity-[0.02]" />
         {requirements.map((requirement) => (
           <div key={requirement} className="flex items-start gap-2">
             <span className="inline-flex h-[1.5rem] justify-center items-center">
