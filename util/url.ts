@@ -4,13 +4,13 @@ export function joinUrl(...args: Paths[]) {
   return args
     .filter(Boolean)
     .map((url, index) => {
-      const path = `${url}`
-      if (index === 0)
-        return path.replace(/\/{1,}$/g, '').replace(/^\/{2,}/g, '/')
+      const path = `${url}`.toString()
+      if (index === 0) return path.replace(/(?!^\/$)\/+$/g, '')
       return path.replace(/^\/{1,}|\/{1,}$/g, '')
     })
     .filter(Boolean)
     .join('/')
+    .replace(/(?<!http:|https:)\/{2,}/g, '/')
 }
 
 export function getStorageUrl(folder: 'media' | 'avatar', url: string) {

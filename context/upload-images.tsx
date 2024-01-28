@@ -11,7 +11,7 @@ export interface ImageFormValues {
 }
 
 export type Submit = (
-  callback: (value: ImageFormValues) => Promise<void> | void
+  callback: (value: ImageFormValues) => Promise<void> | void | Promise<any>
 ) => Promise<UseFormReset<ImageFormValues>>
 
 export const ImageUploadContext = createContext<
