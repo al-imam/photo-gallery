@@ -3,9 +3,14 @@
 import { NavBar } from '@/components/nav'
 import { UploadImage } from '@/components/upload-image'
 import { ImageUploadProvider, Submit } from '@/context/upload-images'
+import { useAuth } from '@/hooks'
 import { FilesIllustration, SpinnerIcon } from '@/icons'
+import { uuid } from '@/lib'
 import { Button } from '@/shadcn/ui/button'
 import { cn } from '@/shadcn/utils'
+import { Modify } from '@/types'
+import axios from 'axios'
+import { AnimatePresence, motion } from 'framer-motion'
 import { CheckCircleIcon } from 'lucide-react'
 import { Fragment, useRef, useState } from 'react'
 import ImageUploading, { ImageType } from 'react-images-uploading'
@@ -26,8 +31,11 @@ const requirements = [
 
 const maxNumber = 10
 
+type TypeImage = Modify<ImageType, { file: File }>
+
 export default function Upload() {
-  const [images, setImages] = useState<ImageType[]>([])
+  const { auth } = useAuth()
+  const [images, setImages] = useState<(TypeImage & { id: string })[]>([])
   const submitRefs = useRef<Record<string, Submit>>({})
   const [isAllSubmitting, setIsAllSubmitting] = useState(false)
 
@@ -35,12 +43,24 @@ export default function Upload() {
     setIsAllSubmitting(true)
 
     for (const id in submitRefs.current) {
-      await submitRefs.current[id](async () => {
+      await submitRefs.current[id](async (values) => {
         const img = images.find((img) => img.file?.name === id)
         if (!img || !img.file) return
 
         const form = new FormData()
         form.append('file', img.file)
+        form.append('title', values.title)
+        form.append('description', values.description)
+        form.append('tags', JSON.stringify(values.tags.map((tag) => tag.value)))
+        form.append('categoryId', values.category!)
+        await new Promise((r) => setTimeout(r, 5000))
+        try {
+          await axios.post('https://api.palestinian.top/media', form, {
+            headers: { Authorization: auth },
+          })
+        } catch (error) {
+          toast.error(`Failed to upload ${img.file.name}`)
+        }
       })
     }
     setIsAllSubmitting(false)
@@ -100,27 +120,37 @@ export default function Upload() {
               ...rest,
             }}
           >
-            {imageList.length > 0 && (
-              <div
-                className={cn('flex flex-col gap-8', {
-                  'mt-12': imageList.length > 1000,
-                })}
-              >
-                {imageList.map((image, index) => (
-                  <Fragment key={image.file?.name}>
-                    <UploadImage image={image} index={index} />
-                    {imageList.length > index + 1 && (
-                      <hr className="border-dashed" />
-                    )}
-                  </Fragment>
-                ))}
+            {isHasImage && (
+              <div className={cn('flex flex-col gap-8')}>
+                <AnimatePresence mode="popLayout">
+                  {imageList.map((image, index) => (
+                    <Fragment key={image.id}>
+                      <motion.div
+                        key={image.id}
+                        layout
+                        initial={{ opacity: 0, x: -400, scale: 0.5 }}
+                        animate={{ opacity: 1, x: 0, scale: 1 }}
+                        exit={{ opacity: 0, x: 200, scale: 1.2 }}
+                        transition={{ duration: 0.6, type: 'spring' }}
+                      >
+                        <UploadImage image={image} index={index} />
+                      </motion.div>
+                      {imageList.length > index + 1 && (
+                        <hr className="border-dashed" />
+                      )}
+                    </Fragment>
+                  ))}
+                </AnimatePresence>
               </div>
             )}
             <div
               {...dragProps}
               className={cn(
                 'isolate flex flex-col gap-2 relative justify-center items-center py-16 px-8 border border-dashed rounded-lg max-w-2xl mx-auto w-full overflow-hidden bg-background',
-                { 'my-[20vh]': imageList.length === 0 }
+                {
+                  'my-[20vh]': !isHasImage,
+                  'pointer-events-none': isAllSubmitting,
+                }
               )}
             >
               <div
@@ -138,13 +168,17 @@ export default function Upload() {
                 ({maxNumber}/{images.length})
               </div>
               <span className="text-center pointer-events-none select-none">
-                Drag and drop {imageList.length > 0 ? 'more' : 'your'} images
-                here <br /> or
+                Drag and drop {isHasImage ? 'more' : 'your'} images here <br />{' '}
+                or
               </span>
 
               <Button
                 onClick={onImageUpload}
-                className={cn('w-max', { 'pointer-events-none': isDragging })}
+                disabled={isAllSubmitting}
+                variant={isHasImage ? 'secondary' : 'default'}
+                className={cn('w-max transition-all duration-500', {
+                  'pointer-events-none': isDragging,
+                })}
               >
                 Explore
               </Button>
@@ -152,7 +186,7 @@ export default function Upload() {
           </ImageUploadProvider>
         )}
       </ImageUploading>
-      {images.length > 0 && (
+      {isHasImage && (
         <div className="flex justify-between items-center sm:justify-evenly relative sm:mb-0 mb-10">
           <span>Thank you for contributing</span>
           <Button onClick={onSubmit} disabled={isAllSubmitting}>
