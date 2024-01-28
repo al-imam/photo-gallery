@@ -82,24 +82,27 @@ export default function Upload() {
               ...rest,
             }}
           >
-            <div
-              className={cn('flex flex-col gap-8', {
-                'mt-12': imageList.length > 1000,
-              })}
-            >
-              {imageList.map((image, index) => (
-                <Fragment key={image.file?.name}>
-                  <UploadImage image={image} index={index} />
-                  {imageList.length > index + 1 && (
-                    <hr className="border-dashed" />
-                  )}
-                </Fragment>
-              ))}
-            </div>
+            {imageList.length > 0 && (
+              <div
+                className={cn('flex flex-col gap-8', {
+                  'mt-12': imageList.length > 1000,
+                })}
+              >
+                {imageList.map((image, index) => (
+                  <Fragment key={image.file?.name}>
+                    <UploadImage image={image} index={index} />
+                    {imageList.length > index + 1 && (
+                      <hr className="border-dashed" />
+                    )}
+                  </Fragment>
+                ))}
+              </div>
+            )}
             <div
               {...dragProps}
               className={cn(
-                'isolate flex flex-col gap-2 relative justify-center items-center p-8 sm:p-12 border border-dashed rounded-lg max-w-2xl mx-auto w-full overflow-hidden'
+                'isolate flex flex-col gap-2 relative justify-center items-center py-16 px-8 border border-dashed rounded-lg max-w-2xl mx-auto w-full overflow-hidden bg-background',
+                { 'my-[20vh]': imageList.length === 0 }
               )}
             >
               <div
