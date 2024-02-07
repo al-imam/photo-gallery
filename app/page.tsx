@@ -28,8 +28,8 @@ export default async function Home({
         <div className="content place-content-center">
           <div className="max-w-xl mx-auto flex flex-col gap-4">
             <h1 className="font-display text-2xl sm:text-4xl">
-              The best free stock photos, royalty free images & videos shared by
-              creators.
+              Explore Palestine: A Collection of Free Stock Photos by Creators
+              Worldwide
             </h1>
             <div className="w-full">
               <SearchInput />
