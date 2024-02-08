@@ -6,13 +6,16 @@ import { Button, buttonVariants } from '@/shadcn/ui/button'
 import { getAvatarUrl, joinUrl } from '@/util'
 import { MapPinIcon } from 'lucide-react'
 import Link from 'next/link'
+import { notFound } from 'next/navigation'
 
 export default async function UserProfile({
   params: { authorId },
 }: {
   params: { authorId: string }
 }) {
-  const { data: author } = await GET<GetBody>(joinUrl('user', authorId))
+  const { data: author } = await GET<GetBody>(joinUrl('user', authorId)).catch(
+    () => notFound()
+  )
 
   return (
     <main className="content">
