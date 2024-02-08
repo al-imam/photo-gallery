@@ -13,13 +13,10 @@ import { Sheet, SheetContent } from '@/shadcn/ui/sheet'
 import { TooltipProvider } from '@/shadcn/ui/tooltip'
 import { cn } from '@/shadcn/utils'
 import {
-  LibraryIcon,
-  LineChartIcon,
-  ListEndIcon,
-  ListVideoIcon,
-  ListXIcon,
   PanelLeftOpenIcon,
-  Users2,
+  SettingsIcon,
+  UserCogIcon,
+  UserIcon,
 } from 'lucide-react'
 import { useSelectedLayoutSegment } from 'next/navigation'
 import { Fragment, useMemo, useState } from 'react'
@@ -30,78 +27,47 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  const isWide = useMedia('(min-width: 640px)', true)
+  const isWide = useMedia('(min-width: 768px)', true)
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const selected = useSelectedLayoutSegment()
 
   const tabs = useMemo(
     () => (
-      <Fragment>
-        <Nav
-          isCollapsed={isCollapsed}
-          key={0}
-          links={[
-            {
-              title: 'Statics',
-              icon: LineChartIcon,
-              variant: selected === null ? 'default' : 'ghost',
-              href: '',
-            },
-          ]}
-        />
-        <Separator key={1} />
-        <Nav
-          isCollapsed={isCollapsed}
-          key={2}
-          links={[
-            {
-              title: 'Media List',
-              icon: ListVideoIcon,
-              variant: selected === 'media-list' ? 'default' : 'ghost',
-              href: 'media-list',
-            },
-            {
-              title: 'Media Update',
-              icon: ListEndIcon,
-              variant: selected === 'media-update' ? 'default' : 'ghost',
-              href: 'media-update',
-            },
-            {
-              title: 'Media Report',
-              icon: ListXIcon,
-              variant: selected === 'media-report' ? 'default' : 'ghost',
-              href: 'media-report',
-            },
-          ]}
-        />
-        <Separator key={3} />
-        <Nav
-          isCollapsed={isCollapsed}
-          key={4}
-          links={[
-            {
-              title: 'Users',
-              icon: Users2,
-              variant: selected === 'users' ? 'default' : 'ghost',
-              href: 'users',
-            },
-            {
-              title: 'Collections',
-              icon: LibraryIcon,
-              variant: selected === 'collections' ? 'default' : 'ghost',
-              href: 'collections',
-            },
-          ]}
-        />
-      </Fragment>
+      <Nav
+        isCollapsed={isCollapsed}
+        key={0}
+        className={cn('pl-0 ', {
+          'group-[[data-collapsed=true]]:px-0 mr-auto': isCollapsed,
+        })}
+        links={[
+          {
+            title: 'Settings',
+            icon: SettingsIcon,
+            variant: selected === null ? 'default' : 'ghost',
+            href: '',
+          },
+          {
+            title: 'Profile',
+            icon: UserIcon,
+            variant: selected === 'media-list' ? 'default' : 'ghost',
+            href: '/settings/profile',
+          },
+          {
+            title: 'Account',
+            icon: UserCogIcon,
+            variant: selected === 'media-update' ? 'default' : 'ghost',
+            href: '/settings/account',
+          },
+        ]}
+      />
     ),
     [isCollapsed, selected]
   )
 
   return (
-    <Fragment>
-      <div className="flex h-[var(--nav-size)] items-center justify-between px-4">
+    <div className="content">
+      <div className="flex h-[var(--nav-size)] items-center justify-between">
         <NavMenu className="order-1" />
         {isWide ? (
           <Brand />
@@ -115,7 +81,7 @@ export default function DashboardLayout({
           </Button>
         )}
       </div>
-      <Separator />
+      <Separator className="content-expand" />
       <TooltipProvider delayDuration={0}>
         <ResizablePanelGroup
           direction="horizontal"
@@ -126,20 +92,20 @@ export default function DashboardLayout({
               setIsCollapsed(false)
             }
           }}
-          className="min-h-[calc(100vh-(var(--nav-size)+1px))] items-stretch"
+          className="h-[calc(100vh-(var(--nav-size)+0.25rem))] items-stretch"
         >
           {isWide ? (
             <Fragment>
               <ResizablePanel
                 collapsedSize={4}
                 collapsible={true}
-                minSize={15}
+                minSize={12}
                 maxSize={20}
                 order={0}
                 id="panel-sidebar"
                 style={{
                   maxWidth: '24rem',
-                  minWidth: isCollapsed ? '3.125rem' : '12rem',
+                  minWidth: isCollapsed ? '3.125rem' : '10rem',
                   minHeight: '100%',
                 }}
                 className={cn({
@@ -161,12 +127,15 @@ export default function DashboardLayout({
           )}
 
           <ResizablePanel minSize={80} id="panel-main-content" order={1}>
-            <main className="[--padding:1rem] sm:[--pacing:2rem]">
+            <main
+              className="pt-4 md:pl-4 max-h-[calc(100vh-(var(--nav-size)+0.25rem))] overflow-y-scroll no-scrollbar"
+              onWheel={(e) => e.stopPropagation()}
+            >
               {children}
             </main>
           </ResizablePanel>
         </ResizablePanelGroup>
       </TooltipProvider>
-    </Fragment>
+    </div>
   )
 }
