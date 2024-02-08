@@ -45,18 +45,18 @@ export default function DashboardLayout({
             title: 'Settings',
             icon: SettingsIcon,
             variant: selected === null ? 'default' : 'ghost',
-            href: '',
+            href: '/settings',
           },
           {
             title: 'Profile',
             icon: UserIcon,
-            variant: selected === 'media-list' ? 'default' : 'ghost',
+            variant: selected === 'profile' ? 'default' : 'ghost',
             href: '/settings/profile',
           },
           {
             title: 'Account',
             icon: UserCogIcon,
-            variant: selected === 'media-update' ? 'default' : 'ghost',
+            variant: selected === 'account' ? 'default' : 'ghost',
             href: '/settings/account',
           },
         ]}
@@ -66,7 +66,7 @@ export default function DashboardLayout({
   )
 
   return (
-    <div className="content">
+    <div className="content h-screen">
       <div className="flex h-[var(--nav-size)] items-center justify-between">
         <NavMenu className="order-1" />
         {isWide ? (
@@ -85,6 +85,7 @@ export default function DashboardLayout({
       <TooltipProvider delayDuration={0}>
         <ResizablePanelGroup
           direction="horizontal"
+          style={{ height: 'calc(100vh - (var(--nav-size) + 1px))' }}
           onLayout={(sizes: number[]) => {
             if (sizes[0] === 4) {
               setIsCollapsed(true)
@@ -92,7 +93,7 @@ export default function DashboardLayout({
               setIsCollapsed(false)
             }
           }}
-          className="h-[calc(100vh-(var(--nav-size)+0.25rem))] items-stretch"
+          className="items-stretch"
         >
           {isWide ? (
             <Fragment>
@@ -128,7 +129,7 @@ export default function DashboardLayout({
 
           <ResizablePanel minSize={80} id="panel-main-content" order={1}>
             <main
-              className="pt-4 md:pl-4 max-h-[calc(100vh-(var(--nav-size)+0.25rem))] overflow-y-scroll no-scrollbar"
+              className="pt-[calc(var(--padding-inline)*2)] md:pl-[--padding-inline] h-full overflow-y-scroll no-scrollbar"
               onWheel={(e) => e.stopPropagation()}
             >
               {children}
