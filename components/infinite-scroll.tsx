@@ -39,8 +39,8 @@ export function InfiniteScroll({
             }
 
             if (cursor) con.params.cursor = cursor
-            if (userId) con.body.userId = userId
-            if (search) con.body.search = search
+            if (userId) con.params.authorId = userId
+            if (search) con.params.search = search
 
             const { data } = await GET<GetData>('media', con)
 

@@ -10,8 +10,8 @@ export type GetBody = {
   profile: Profile & { links: ProfileLink[] }
 }
 export const GET = router(async (_, ctx) => {
-  const username = ctx.params.userId!
-  const user = await service.user.fetchByUsername(username)
+  const id = ctx.params.userId!
+  const user = await service.user.fetchById(id)
   const profile = await service.profile.getUserProfile(user.id)
   return NextResponse.json<GetBody>({
     user: pick(user, ...config.user.publicFields),

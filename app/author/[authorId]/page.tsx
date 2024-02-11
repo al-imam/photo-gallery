@@ -1,16 +1,28 @@
+import { GetBody } from '@/app/api/user/[userId]/route'
 import { InfiniteScroll } from '@/components/infinite-scroll'
-import { Button } from '@/shadcn/ui/button'
-import { BriefcaseIcon, GraduationCapIcon, MapPinIcon } from 'lucide-react'
-import Image from 'next/image'
+import { GET } from '@/lib'
+import { Avatar, AvatarFallback, AvatarImage } from '@/shadcn/ui/avatar'
+import { Button, buttonVariants } from '@/shadcn/ui/button'
+import { getAvatarUrl, joinUrl } from '@/util'
+import { MapPinIcon } from 'lucide-react'
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
 
-export default function UserProfile() {
+export default async function UserProfile({
+  params: { authorId },
+}: {
+  params: { authorId: string }
+}) {
+  const { data: author } = await GET<GetBody>(joinUrl('user', authorId)).catch(
+    () => notFound()
+  )
+
   return (
     <main className="content">
       <section className="relative h-96 overflow-hidden rounded-b-md">
-        <Image
-          src="https://source.unsplash.com/random/1280x384"
+        <img
+          src="https://source.unsplash.com/random"
           alt="random"
-          layout="fill"
           className="w-full h-full object-cover select-none dragging-none"
         />
 
@@ -44,15 +56,18 @@ export default function UserProfile() {
                 Follow
               </Button>
             </div>
-            <div className="w-36 h-36 overflow-hidden rounded-full -translate-y-1/2 shadow-md order-2">
-              <Image
-                src="https://source.unsplash.com/random/144x144?character"
-                alt="random"
-                width={144}
-                height={144}
+
+            <Avatar className="w-36 h-36 -translate-y-1/2 order-2 bg-foreground">
+              <AvatarImage
+                src={getAvatarUrl(author.user.avatar_md!)}
                 className="w-full h-full object-cover select-none dragging-none"
+                alt={author.user.name}
               />
-            </div>
+              <AvatarFallback className="bg-foreground text-background">
+                {author.user.name}
+              </AvatarFallback>
+            </Avatar>
+
             <div className="flex flex-col  sm:flex-row gap-y-2 p-2 gap-x-6 self-center justify-center order-1 flex-1 ">
               <div className="text-center">
                 <p className="text-xl font-bold uppercase tracking-wide">10</p>
@@ -65,41 +80,42 @@ export default function UserProfile() {
             </div>
           </div>
           <div className="flex flex-col items-center gap-2">
-            <h3 className="text-4xl font-semibold font-display">Al Imam</h3>
-            <div className="text-sm flex items-center gap-2 font-bold uppercase">
-              <MapPinIcon className="w-4 h-4" />
-              Noakhali, Bangladesh
-            </div>
-            <div className="text-sm flex items-center gap-2 font-bold uppercase">
-              <BriefcaseIcon className="w-4 h-4" />
-              Software Engineer - Creative It Officer
-            </div>
-            <div className="text-sm flex items-center gap-2 font-bold uppercase">
-              <GraduationCapIcon className="w-4 h-4" />
-              University of Computer Science
-            </div>
+            <h3 className="text-4xl font-semibold font-display">
+              {author.user.name}
+            </h3>
+
+            {author.profile.location && (
+              <div className="text-sm flex items-center gap-2 font-bold uppercase">
+                <MapPinIcon className="w-4 h-4" />
+                {author.profile.location}
+              </div>
+            )}
+
             <div className="flex flex-wrap gap-1">
-              {Array.from({ length: 3 }).map((_1, i) => (
-                <Button key={i} variant="link">
-                  Link
-                </Button>
+              {author.profile.links.map((link) => (
+                <Link
+                  href={link.url}
+                  key={link.id}
+                  className={buttonVariants({ variant: 'link' })}
+                >
+                  {link.type}
+                </Link>
               ))}
             </div>
           </div>
-          <div className="mt-10 py-10 border-t border-border text-center">
-            <div className="flex flex-wrap justify-center">
-              <p className="leading-relaxed [text-wrap:balance] w-full px-4 max-w-[60ch]">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Reiciendis eaque ipsam debitis quasi. Minima ipsum magnam
-                provident dolore voluptates perferendis autem nisi explicabo
-                error? Est similique incidunt exercitationem facilis voluptatum!
-              </p>
+          {author.profile.bio && (
+            <div className="mt-10 py-10 border-t border-border text-center">
+              <div className="flex flex-wrap justify-center">
+                <p className="leading-relaxed [text-wrap:balance] w-full px-4 max-w-[60ch]">
+                  {author.profile.bio}
+                </p>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
       <section className="-mt-10">
-        <InfiniteScroll />
+        <InfiniteScroll userId={author.user.id} />
       </section>
     </main>
   )

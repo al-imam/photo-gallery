@@ -18,11 +18,12 @@ export function PhotoCard({
   author,
   createdAt,
   description,
+  id,
   tags,
 }: MediaWithLoves) {
   return (
     <div className="stack-content group cursor-pointer rounded overflow-hidden shadow shadow-muted h-full">
-      <Link href="#">
+      <Link href={`/photo/${id}`}>
         <img
           src={getMediaUrl(url_thumbnail)}
           alt={`${title}`}
@@ -37,7 +38,7 @@ export function PhotoCard({
           <HoverCard>
             <HoverCardTrigger asChild>
               <Link
-                href="#"
+                href={`/author/${author.id}`}
                 className="font-sm font-semibold text-foreground group-hover:pointer-events-auto"
               >
                 <Avatar className="h-10 w-10">
