@@ -1,9 +1,12 @@
-import { onlyModerator } from '@/server/middlewares/auth'
+import service from '@/service'
+import { NextResponse } from 'next/server'
 import { authRouter } from '@/server/router'
-import ReqErr from '@/service/ReqError'
-
-// TODO:
+import { onlyModerator } from '@/server/middlewares/auth'
 
 export const POST = authRouter(onlyModerator, async (_, ctx, next) => {
-  throw new ReqErr('This route is not implemented')
+  const media = await service.media.rejectUpdateRequest(
+    ctx.params.mediaId!,
+    ctx.user.id
+  )
+  return NextResponse.json({ media })
 })

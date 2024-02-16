@@ -106,8 +106,36 @@ export function updateAvatar(userId: string, data: UpdateAvatarBody) {
   })
 }
 
-export function remove(userId: string) {
-  return db.user.delete({ where: { id: userId } })
+export function remove(user: User) {
+  return db.user.update({
+    where: { id: user.id },
+    data: {
+      name: 'DELETED',
+      role: 'DELETED',
+      password: 'DELETED',
+
+      email: 'DELETED ' + user.id,
+      username: 'DELETED ' + user.id,
+
+      avatar_lg: null,
+      avatar_md: null,
+      avatar_sm: null,
+      avatar_storageRecordId: null,
+
+      authModifiedAt: new Date(),
+
+      profile: {
+        update: {
+          data: {
+            bio: null,
+            email: null,
+            location: null,
+            links: { deleteMany: {} },
+          },
+        },
+      },
+    },
+  })
 }
 
 export type ChangeStatusBody = { role: UserRole; comment?: string }

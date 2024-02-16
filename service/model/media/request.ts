@@ -67,6 +67,32 @@ export async function getMediaUpdateRequest(
   })
 }
 
-export async function rejectUpdateRequest(mediaId: string) {}
+export async function rejectUpdateRequest(mediaId: string, userId: string) {
+  return db.mediaUpdateRequest.update({
+    where: { mediaId },
+    data: { resolvedById: userId, status: 'REJECTED' },
+  })
+}
 
-export async function approveUpdateRequest() {}
+export async function approveUpdateRequest(mediaId: string, userId: string) {
+  const request = await db.mediaUpdateRequest.findUniqueOrThrow({
+    where: { mediaId },
+  })
+
+  await db.media.update({
+    where: { id: mediaId },
+    data: {
+      title: request.title || undefined,
+      description: request.description || undefined,
+      categoryId: request.categoryId || undefined,
+      hasGraphicContent: request.hasGraphicContent || undefined,
+      tags: request.tags ? request.tags.split(' ') : undefined,
+      modifiedAt: new Date(),
+    },
+  })
+
+  return db.mediaUpdateRequest.update({
+    where: { mediaId },
+    data: { resolvedById: userId, status: 'APPROVED' },
+  })
+}

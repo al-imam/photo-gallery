@@ -44,7 +44,7 @@ export const PATCH = authRouter(
       ctx.body<PatchBody>()
     )
 
-    if ('status' in result) {
+    if ('id' in result) {
       ctx.media = result
       ctx.extra = { updated: true }
     } else {
