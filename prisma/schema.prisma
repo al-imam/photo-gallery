@@ -4,7 +4,7 @@ model User {
   name     String   @db.VarChar(24)
   profile  Profile?
   role     UserRole @default(PUBLIC)
-  username String   @unique @default(cuid())
+  username String   @unique() @default(cuid())
 
   avatar_sm              String?
   avatar_md              String?
@@ -20,10 +20,12 @@ model User {
   Z_COLLECTIONS   Collection[]    @relation("Collection")
   Z_NOTIFICATIONS Notification[]  @relation("Notification")
 
-  Z_REPORTS                           MediaReport[]     @relation("MediaReport")
-  Z_LOG_ROLE                          LOG_RoleChange[]  @relation("LogRoleChange")
-  Z_LOG_ROLE_MODERATED                LOG_RoleChange[]  @relation("LogRoleChangeModerated")
-  Z_LOG_MEDIA_STATUS_CHANGE_MODERATED LOG_MediaChange[] @relation("LogMediaStatusChangeModerated")
+  Z_REPORTS                           MediaReport[]        @relation("MediaReport")
+  Z_LOG_ROLE                          LOG_RoleChange[]     @relation("LogRoleChange")
+  Z_MEDIA_REPORT                      MediaReport[]        @relation("MediaReportModerated")
+  Z_LOG_ROLE_MODERATED                LOG_RoleChange[]     @relation("LogRoleChangeModerated")
+  Z_MEDIA_UPDATE_REQUEST              MediaUpdateRequest[] @relation("MediaUpdateRequestModerated")
+  Z_LOG_MEDIA_STATUS_CHANGE_MODERATED LOG_MediaChange[]    @relation("LogMediaStatusChangeModerated")
 
   @@index([email])
   @@index([username])
@@ -57,6 +59,7 @@ model ProfileLink {
 model Media {
   id              String   @id @default(uuid()) @db.Uuid()
   createdAt       DateTime @default(now())
+  modifiedAt      DateTime @default(now())
   storageRecordId String
 
   status        ContentStatus @default(PENDING)
@@ -91,6 +94,7 @@ model Media {
 model MediaUpdateRequest {
   mediaId    String   @id @db.Uuid()
   modifiedAt DateTime @default(now())
+  media      Media    @relation("PendingMedia", fields: [mediaId], references: [id], onDelete: Cascade)
 
   title             String?  @db.VarChar(48)
   description       String?  @db.VarChar(200)
@@ -98,7 +102,9 @@ model MediaUpdateRequest {
   categoryId        String?  @db.Uuid()
   tags              String?
 
-  Z_MEDIA Media @relation("PendingMedia", fields: [mediaId], references: [id], onDelete: Cascade)
+  status       ContentStatus @default(PENDING)
+  resolvedById String?       @db.Uuid()
+  resolvedBy   User?         @relation("MediaUpdateRequestModerated", fields: [resolvedById], references: [id])
 }
 
 model MediaCategory {
@@ -129,8 +135,10 @@ model MediaReport {
   userId    String   @db.Uuid()
 
   type    MediaReportType
-  message String?         @db.VarChar(192)
-  status  ContentStatus   @default(PENDING)
+  message String          @db.VarChar(192)
+
+  resolvedById String? @db.Uuid()
+  resolvedBy   User?   @relation("MediaReportModerated", fields: [resolvedById], references: [id])
 
   Z_MEDIA Media @relation("MediaReport", fields: [mediaId], references: [id], onDelete: Cascade)
   Z_USER  User  @relation("MediaReport", fields: [userId], references: [id], onDelete: Cascade)
@@ -201,6 +209,7 @@ enum UserRole {
   VERIFIED
   PUBLIC
   BANNED
+  DELETED
 }
 
 enum ProfileLinkType {

@@ -4,6 +4,7 @@ import ReqErr from '@/service/ReqError'
 import { validateAndFormatTags } from './helpers'
 import { userPermissionFactory } from '../helpers'
 import config from '@/service/config'
+import { putUpdateRequest } from './request'
 
 export type CreateMediaApiBody = Pick<
   Prisma.MediaUncheckedCreateInput,
@@ -65,10 +66,11 @@ export async function updateMedia(
   body.tags = validateAndFormatTags(body.tags)
 
   if (oldMedia.authorId !== user.id) {
-    throw new ReqErr('You are not allowed to edit this media', 403)
+    throw new ReqErr('Only owner can edit a media', 403)
   }
 
-  if (oldMedia.status === 'PENDING' || userPermissionFactory(user).isVerified) {
+  const userPermission = userPermissionFactory(user)
+  if (oldMedia.status === 'PENDING' || userPermission.isVerifiedLevel) {
     return db.media.update({
       where: { id: oldMedia.id },
       data: pick(body, ...config.media.editableFields),
@@ -76,7 +78,13 @@ export async function updateMedia(
     })
   }
 
-  throw new ReqErr('You are not allowed to edit this media', 403)
+  return putUpdateRequest(
+    oldMedia.id,
+    pick(
+      { ...body, tags: body.tags?.join(' ') },
+      ...config.media.editableFields
+    )
+  )
 }
 
 export async function moderateMedia(

@@ -6,7 +6,7 @@ import { PaginationQueries, paginationQueries } from '@/service/helpers'
 import { userPermissionFactory } from '../helpers'
 
 export type GetReportsOptions = PaginationQueries &
-  PrettifyPick<MediaReport, never, 'mediaId' | 'userId' | 'status' | 'type'>
+  PrettifyPick<MediaReport, never, 'mediaId' | 'userId' | 'type'>
 
 export async function getReports(options: GetReportsOptions) {
   return db.mediaReport.findMany({
@@ -19,7 +19,6 @@ export async function getReports(options: GetReportsOptions) {
     where: {
       mediaId: options.mediaId,
       userId: options.userId,
-      status: options.status,
       type: options.type,
     },
   })
@@ -46,9 +45,7 @@ export async function createReport(
   })
 }
 
-export type UpdateReportBody = Partial<
-  CreateReportBody & PrettifyPick<MediaReport, 'status'>
->
+export type UpdateReportBody = Partial<CreateReportBody>
 export async function updateReport(
   reportId: string,
   user: PrettifyPick<User, 'id' | 'role'>,
@@ -59,7 +56,14 @@ export async function updateReport(
       id: reportId,
       userId: user.id,
     },
-    data: pick(body, 'type', 'status', 'message'),
+    data: pick(body, 'type', 'message'),
+  })
+}
+
+export async function doneReport(reportId: string, userId: string) {
+  return db.mediaReport.update({
+    where: { id: reportId },
+    data: { resolvedById: userId },
   })
 }
 

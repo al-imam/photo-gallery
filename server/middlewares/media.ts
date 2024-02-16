@@ -16,10 +16,16 @@ export type SendMediaWithLovesData = {
   relatedMedia?: MediaWithLoves[]
 }
 
-export const sendMediaWithLoves: NextUserMediaHandler = async (_, ctx) => {
+export const sendMediaWithLoves: NextUserMediaHandler<{
+  extra?: Record<string, any>
+}> = async (_, ctx) => {
   const media = await addLovesToMedia(ctx.media, ctx.user?.id)
   const relatedMedia =
     ctx.relatedMedia && (await addLovesToMedia(ctx.relatedMedia, ctx.user?.id))
 
-  return NextResponse.json<SendMediaWithLovesData>({ media, relatedMedia })
+  return NextResponse.json<SendMediaWithLovesData>({
+    media,
+    relatedMedia,
+    ...ctx.extra,
+  })
 }

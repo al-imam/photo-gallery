@@ -1,11 +1,11 @@
-import { onlyModerator } from '@/server/middlewares/auth'
 import {
   setMedia,
   sendMediaWithLoves,
   SendMediaWithLovesData,
 } from '@/server/middlewares/media'
-import { authRouter } from '@/server/router'
 import service from '@/service'
+import { authRouter } from '@/server/router'
+import { onlyModerator } from '@/server/middlewares/auth'
 import { ModerateMediaBody } from '@/service/model/media'
 
 export type GetData = Omit<SendMediaWithLovesData, 'relatedMedia'>

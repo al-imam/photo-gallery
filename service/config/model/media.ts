@@ -1,3 +1,4 @@
+import { createIncludeQuery } from '@/service/utils'
 import model from './_helper'
 import * as user from './user'
 
@@ -32,6 +33,8 @@ export const moderateFields = model.Media(
   'tags',
   'hasGraphicContent'
 )
+
+export const selectPublicFields = createIncludeQuery(publicFields)
 
 export const includePublicFields = {
   author: { select: user.selectPublicFields },
