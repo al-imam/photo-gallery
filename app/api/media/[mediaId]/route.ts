@@ -3,10 +3,11 @@ import {
   sendMediaWithLoves,
   SendMediaWithLovesData,
 } from '@/server/middlewares/media'
-import { authRouter, optionalAuthRouter } from '@/server/router'
 import service from '@/service'
-import { UpdateMediaBody } from '@/service/model/media'
 import { queryToNumber } from '@/service/utils'
+import { MediaUpdateRequest } from '@prisma/client'
+import { UpdateMediaBody } from '@/service/model/media'
+import { authRouter, optionalAuthRouter } from '@/server/router'
 
 export type GetQuery = { limit: string }
 export type GetData = SendMediaWithLovesData
@@ -23,17 +24,33 @@ export const GET = optionalAuthRouter(
 )
 
 export type PatchBody = UpdateMediaBody
-export type PatchData = SendMediaWithLovesData
+export type PatchData = SendMediaWithLovesData &
+  (
+    | {
+        updated: true
+      }
+    | {
+        updated: false
+        request: MediaUpdateRequest
+      }
+  )
+
 export const PATCH = authRouter(
   setMedia,
   async (_, ctx, next) => {
-    const media = await service.media.updateMedia(
+    const result = await service.media.updateMedia(
       ctx.user,
       ctx.media,
       ctx.body<PatchBody>()
     )
 
-    ctx.media = media
+    if ('status' in result) {
+      ctx.media = result
+      ctx.extra = { updated: true }
+    } else {
+      ctx.extra = { updated: false, request: result }
+    }
+
     return next()
   },
   sendMediaWithLoves

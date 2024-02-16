@@ -1,5 +1,5 @@
 import db, { Prisma, User } from '@/service/db'
-import { PrettifyPick } from '@/service/utils'
+import { Prettify, PrettifyPick } from '@/service/utils'
 import { mediaPermissionFactory } from './helpers'
 import ReqErr from '@/service/ReqError'
 
@@ -22,27 +22,34 @@ export async function getMediaUpdateRequest(
 
 export async function putUpdateRequest(
   mediaId: string,
-  data: Omit<
-    Prisma.MediaUpdateRequestUncheckedCreateInput,
-    'mediaId' | 'modifiedAt'
+  data: Prettify<
+    Omit<
+      Prisma.MediaUpdateRequestUncheckedCreateInput,
+      'mediaId' | 'modifiedAt'
+    >
   >
 ) {
-  const isExisting = await db.media.findUnique({ where: { id: mediaId } })
+  const isExisting = await db.mediaUpdateRequest.findUnique({
+    where: { mediaId },
+  })
 
   if (isExisting) {
     return db.mediaUpdateRequest.update({
-      where: { mediaId: mediaId, modifiedAt: new Date() },
-      data,
-    })
-  } else {
-    return db.mediaUpdateRequest.create({
+      where: { mediaId },
       data: {
         modifiedAt: new Date(),
-        mediaId,
         ...data,
       },
     })
   }
+
+  return db.mediaUpdateRequest.create({
+    data: {
+      mediaId,
+      modifiedAt: new Date(),
+      ...data,
+    },
+  })
 }
 
 export async function rejectUpdateRequest() {}
