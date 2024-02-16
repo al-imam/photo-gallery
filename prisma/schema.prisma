@@ -22,6 +22,7 @@ model User {
 
   Z_REPORTS                           MediaReport[]     @relation("MediaReport")
   Z_LOG_ROLE                          LOG_RoleChange[]  @relation("LogRoleChange")
+  Z_MEDIAREPORT                       MediaReport[]     @relation("MediaReportModerated")
   Z_LOG_ROLE_MODERATED                LOG_RoleChange[]  @relation("LogRoleChangeModerated")
   Z_LOG_MEDIA_STATUS_CHANGE_MODERATED LOG_MediaChange[] @relation("LogMediaStatusChangeModerated")
 
@@ -127,9 +128,10 @@ model MediaReport {
   mediaId   String   @db.Uuid()
   userId    String   @db.Uuid()
 
-  type    MediaReportType
-  message String?         @db.VarChar(192)
-  status  ContentStatus   @default(PENDING)
+  type         MediaReportType
+  message      String          @db.VarChar(192)
+  resolvedById String?         @db.Uuid()
+  resolvedBy   User?           @relation("MediaReportModerated", fields: [resolvedById], references: [id])
 
   Z_MEDIA Media @relation("MediaReport", fields: [mediaId], references: [id], onDelete: Cascade)
   Z_USER  User  @relation("MediaReport", fields: [userId], references: [id], onDelete: Cascade)
@@ -200,6 +202,7 @@ enum UserRole {
   VERIFIED
   PUBLIC
   BANNED
+  DELETED
 }
 
 enum ProfileLinkType {

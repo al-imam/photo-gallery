@@ -10,7 +10,7 @@ export const PATCH = authRouter(async (req, ctx) => {
   const report = await service.media.updateReport(
     ctx.params.reportId!,
     ctx.user,
-    { ...ctx.body<PatchBody>(), status: undefined }
+    { ...ctx.body<PatchBody>() }
   )
 
   return NextResponse.json<PatchData>({ report })
