@@ -1,9 +1,9 @@
-import ReqErr from '@/service/ReqError'
 import { authRouter } from '@/server/router'
 import { onlyModerator } from '@/server/middlewares/auth'
-
-// TODO: implement
+import service from '@/service'
+import { NextResponse } from 'next/server'
 
 export const GET = authRouter(onlyModerator, async (_, ctx, next) => {
-  throw new ReqErr('This route is not implemented')
+  const requests = await service.media.getUpdateRequests()
+  return NextResponse.json({ requests })
 })

@@ -91,14 +91,13 @@ model Media {
 model MediaUpdateRequest {
   mediaId    String   @id @db.Uuid()
   modifiedAt DateTime @default(now())
+  media      Media    @relation("PendingMedia", fields: [mediaId], references: [id], onDelete: Cascade)
 
   title             String?  @db.VarChar(48)
   description       String?  @db.VarChar(200)
   hasGraphicContent Boolean? @default(false)
   categoryId        String?  @db.Uuid()
   tags              String?
-
-  Z_MEDIA Media @relation("PendingMedia", fields: [mediaId], references: [id], onDelete: Cascade)
 }
 
 model MediaCategory {

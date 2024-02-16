@@ -1,24 +1,8 @@
 import db, { Prisma, User } from '@/service/db'
 import { Prettify, PrettifyPick } from '@/service/utils'
-import { mediaPermissionFactory } from './helpers'
 import ReqErr from '@/service/ReqError'
-
-export async function getUpdateRequests() {}
-
-export async function getMediaUpdateRequest(
-  requestId: string,
-  user: PrettifyPick<User, 'id' | 'role'>
-) {
-  const media = await db.media.findUniqueOrThrow({
-    where: { id: requestId },
-  })
-
-  if (!mediaPermissionFactory(media).view(user)) {
-    throw new ReqErr('Permission denied to view update request')
-  }
-
-  return db.mediaUpdateRequest.findUnique({ where: { mediaId: requestId } })
-}
+import { userPermissionFactory } from '../helpers'
+import config from '@/service/config'
 
 export async function putUpdateRequest(
   mediaId: string,
@@ -52,6 +36,37 @@ export async function putUpdateRequest(
   })
 }
 
-export async function rejectUpdateRequest() {}
+export async function getUpdateRequests() {
+  return db.mediaUpdateRequest.findMany({
+    include: {
+      media: { select: config.media.selectPublicFields },
+    },
+  })
+}
+
+export async function getMediaUpdateRequest(
+  requestId: string,
+  user: PrettifyPick<User, 'id' | 'role'>
+) {
+  const media = await db.media.findUniqueOrThrow({
+    where: { id: requestId },
+  })
+
+  if (
+    media.authorId !== user.id &&
+    !userPermissionFactory(user).isModeratorLevel
+  ) {
+    throw new ReqErr('Permission denied to view update request')
+  }
+
+  return db.mediaUpdateRequest.findUnique({
+    where: { mediaId: requestId },
+    include: {
+      media: { select: config.media.selectPublicFields },
+    },
+  })
+}
+
+export async function rejectUpdateRequest(mediaId: string) {}
 
 export async function approveUpdateRequest() {}
