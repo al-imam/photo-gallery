@@ -9,7 +9,7 @@ console.clear()
 configDotenv()
 
 const IMAGE_PER_USER = 10
-const USER_TO_CREATE = 20
+const USER_TO_CREATE = 10
 const CATEGORY_TO_CREATE = 10
 const REACTION_PER_USER = 50
 

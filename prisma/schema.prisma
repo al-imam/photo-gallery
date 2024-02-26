@@ -6,10 +6,11 @@ model User {
   role     UserRole @default(PUBLIC)
   username String   @unique() @default(cuid())
 
-  avatar_sm              String?
-  avatar_md              String?
-  avatar_lg              String?
-  avatar_storageRecordId String?
+  avatar_sm                  String?
+  avatar_md                  String?
+  avatar_lg                  String?
+  avatar_storageRecordId     String?   @unique()
+  avatar_storageUrlUpdatedAt DateTime?
 
   password       String
   email          String   @unique()
@@ -57,10 +58,11 @@ model ProfileLink {
 }
 
 model Media {
-  id              String   @id @default(uuid()) @db.Uuid()
-  createdAt       DateTime @default(now())
-  modifiedAt      DateTime @default(now())
-  storageRecordId String
+  id                  String   @id @default(uuid()) @db.Uuid()
+  createdAt           DateTime @default(now())
+  modifiedAt          DateTime @default(now())
+  storageRecordId     String   @unique()
+  storageUrlUpdatedAt DateTime
 
   status        ContentStatus @default(PENDING)
   url_media     String

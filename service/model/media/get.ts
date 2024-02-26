@@ -108,18 +108,3 @@ export async function getLatestMediaList(options: MediaListOptions = {}) {
     include: config.media.includePublicFields,
   })
 }
-
-export async function getBackup(cursor?: string, take = 20000) {
-  const mediaList = await db.media.findMany({
-    take,
-    where: {},
-    ...(cursor ? { cursor: { id: cursor }, skip: 1 } : undefined),
-    orderBy: { createdAt: 'desc' },
-    select: {
-      id: true,
-      url_media: true,
-    },
-  })
-
-  return mediaList
-}

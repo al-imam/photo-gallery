@@ -47,6 +47,7 @@ export async function createMedia(
       status: userPermission.isVerifiedLevel ? 'APPROVED' : 'PENDING',
 
       storageRecordId: body.storageRecordId,
+      storageUrlUpdatedAt: new Date(),
       media_size: body.media_size,
       media_width: body.media_width,
       media_height: body.media_height,
