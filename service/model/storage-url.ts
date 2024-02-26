@@ -1,7 +1,7 @@
 import db from '@/service/db'
 
 function lteDate() {
-  return new Date(Date.now() - 1000)
+  return new Date(Date.now() - 86400000 * 10) // 10 days ago
 }
 
 export async function getMediaUrls(take = 1000) {
