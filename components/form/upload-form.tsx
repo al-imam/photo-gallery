@@ -115,10 +115,10 @@ export function ImageForm({ id }: { id: string }) {
         <FormField
           control={form.control}
           name="category"
-          rules={{ required: 'Category is required' }}
+          rules={{}}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Category *</FormLabel>
+              <FormLabel>Category</FormLabel>
               <Select
                 onValueChange={field.onChange}
                 value={field.value}
@@ -126,7 +126,7 @@ export function ImageForm({ id }: { id: string }) {
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="status" />
+                    <SelectValue placeholder="NONE" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>

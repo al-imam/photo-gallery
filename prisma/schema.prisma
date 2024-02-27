@@ -79,8 +79,8 @@ model Media {
   authorId String @db.Uuid()
   author   User   @relation("Media", fields: [authorId], references: [id], onDelete: Cascade)
 
-  categoryId String        @db.Uuid()
-  category   MediaCategory @relation("MediaCategory", fields: [categoryId], references: [id])
+  categoryId String?        @db.Uuid()
+  category   MediaCategory? @relation("MediaCategory", fields: [categoryId], references: [id])
 
   reactions     MediaReaction[]     @relation("MediaReaction")
   updateRequest MediaUpdateRequest? @relation("PendingMedia")
