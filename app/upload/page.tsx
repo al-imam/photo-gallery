@@ -53,7 +53,7 @@ export default function Upload() {
         form.append('title', values.title)
         form.append('description', values.description)
         form.append('tags', JSON.stringify(values.tags.map((tag) => tag.value)))
-        values.category && form.append('categoryId', values.category)
+        if (values.category) form.append('categoryId', values.category)
 
         try {
           await axios.post(
