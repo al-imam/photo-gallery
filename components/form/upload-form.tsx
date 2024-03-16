@@ -4,6 +4,7 @@ import { MultiSelect } from '@/components/multi-select'
 import { ImageFormValues } from '@/context/upload-images'
 import { useCategory } from '@/hooks/category'
 import { useImageUpload } from '@/hooks/images'
+import { Button } from '@/shadcn/ui/button'
 import {
   Form,
   FormControl,
@@ -46,9 +47,9 @@ export function ImageForm({ id }: { id: string }) {
   const form = useForm<ImageFormValues>({
     defaultValues: {
       title: '',
+      category: '',
       description: '',
       tags: [],
-      category: undefined,
     },
   })
 
@@ -120,16 +121,25 @@ export function ImageForm({ id }: { id: string }) {
             <FormItem>
               <FormLabel>Category</FormLabel>
               <Select
-                onValueChange={field.onChange}
                 value={field.value}
+                onValueChange={field.onChange}
                 disabled={form.formState.isSubmitting || isAllSubmitting}
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="NONE" />
+                    <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                 </FormControl>
+
                 <SelectContent>
+                  <Button
+                    variant="ghost"
+                    className={'w-full ps-8 justify-start'}
+                    onClick={() => form.setValue('category', '')}
+                  >
+                    None
+                  </Button>
+
                   {data.categories.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
                       {category.name}
