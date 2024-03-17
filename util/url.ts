@@ -14,7 +14,7 @@ export function joinUrl(...args: Paths[]) {
 }
 
 export function getStorageUrl(folder: 'media' | 'avatar', url: string) {
-  return joinUrl('https://storage.palestinian.top', `/${folder}/`, url)
+  return joinUrl(process.env.NEXT_PUBLIC_STORAGE_URL, `/${folder}/`, url)
 }
 
 export function getMediaUrl(url: string) {
