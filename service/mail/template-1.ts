@@ -9,6 +9,7 @@ type Body = {
   buttonLink: string
   color: string
   iconUrl: string
+  remainingTime: string
 }
 
 export default function (body: Body) {
@@ -262,11 +263,7 @@ export default function (body: Body) {
                         >
                           <table border="0" cellspacing="0" cellpadding="0">
                             <tr>
-                              <td
-                                align="center"
-                                style="border-radius: 3px"
-                                bgcolor="${body.color}"
-                              >
+                              <td align="center">
                                 <a
                                   href="${body.buttonLink}"
                                   target="_blank"
@@ -278,8 +275,8 @@ export default function (body: Body) {
                                   color: #ffffff;
                                   text-decoration: none;
                                   padding: 15px 25px;
-                                  border-radius: 2px;
-                                  border: 1px solid ${body.color};
+                                  border-radius: 9999px;
+                                  background-color: ${body.color};
                                   display: inline-block;
                                 "
                                   >${body.buttonText}</a
@@ -307,6 +304,12 @@ export default function (body: Body) {
                     line-height: 25px;
                   "
                   >
+                    <p
+                      style="font-size: 15px; margin: 0; opacity: 0.8; font-style: italic;"
+                    >
+                      This link will expire in ${body.remainingTime}.
+                    </p>
+                    <br />
                     <p style="margin: 0">
                       If you have any questions, just reply to this
                       email&mdash;we're always happy to help out.

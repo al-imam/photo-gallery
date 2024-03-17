@@ -30,8 +30,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/shadcn/ui/alert-dialog'
-import axios from 'axios'
 import { useState } from 'react'
+import { getErrorMessage } from '../../util/error-message'
 
 interface UserSigninFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -56,7 +56,7 @@ export function UserSigninForm({ className, ...props }: UserSigninFormProps) {
   async function onSubmit(value: FormValues) {
     const [_, error] = await signIn(value)
 
-    if (error) return toast.error('Invalid email and password!')
+    if (error) return toast.error(getErrorMessage(error))
     toast.success('Welcome back, nice to see you again!')
 
     return router.replace(qp.get('callbackURL') ?? '/')
@@ -74,14 +74,7 @@ export function UserSigninForm({ className, ...props }: UserSigninFormProps) {
       await POST('auth/reset-password', { email: form.getValues('email') })
       toast.success('Password reset email sent!')
     } catch (error) {
-      if (
-        axios.isAxiosError(error) &&
-        error.response?.data?.error === 'No User found'
-      ) {
-        toast.error('No user found with that email!')
-      } else {
-        toast.error('Something went wrong!')
-      }
+      toast.error(getErrorMessage(error))
     } finally {
       setIsLoading(false)
       setIsResetPasswordOpen(false)
