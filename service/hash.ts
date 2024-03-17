@@ -3,6 +3,8 @@ import * as bcryptjs from 'bcryptjs'
 import env from './env'
 import { JWTPayload } from './types'
 import ReqErr from './ReqError'
+import { jwtExpireConfig } from './config/jwt'
+import { convertTimeSpan } from '@/util/time'
 
 const JWT_SECRET = new TextEncoder().encode(env.JWT_SECRET)
 
@@ -22,9 +24,7 @@ export const jwt = {
   sign<T extends keyof JWTPayload>(mode: T, payload: JWTPayload[T]) {
     return new jose.SignJWT({ payload, mode })
       .setProtectedHeader({ alg: 'HS256' })
-      .setExpirationTime(
-        mode === 'cookie' ? '30d' : mode === 'auth' ? '3d' : '5m'
-      )
+      .setExpirationTime(jwtExpireConfig[mode])
       .setIssuedAt()
       .sign(JWT_SECRET)
   },
@@ -48,7 +48,7 @@ export const jwt = {
         algorithms: ['HS256'],
       }
     )
-    
+
     if (payload.mode !== mode) throw new ReqErr('Invalid token')
 
     return {
@@ -60,5 +60,12 @@ export const jwt = {
         }
       },
     }
+  },
+
+  async getExpireTimeLeft(token: string) {
+    const { exp = 0 } = await jose.decodeJwt(token)
+    const currentTimeSpanInSec = Math.floor(Date.now() / 1000)
+    const timeLeftInSec = (exp - currentTimeSpanInSec) * 1000
+    return convertTimeSpan(timeLeftInSec)
   },
 }

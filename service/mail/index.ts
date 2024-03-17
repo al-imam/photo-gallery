@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer'
 import template1 from './template-1'
 import env from '../env'
+import { jwt } from '../hash'
 
 const noReplyEmailAddress = 'no-reply@palestinian.top'
 const supportEmailAddress = 'support@palestinian.top'
@@ -26,7 +27,7 @@ async function mail(to: string, subject: string, body: string) {
 }
 
 export default {
-  sendSignupToken(to: string, token: string) {
+  async sendSignupToken(to: string, token: string) {
     const url = `${env.NEXT_PUBLIC_URL}/signup/complete?token=${token}`
     console.log(to, url, token)
 
@@ -43,11 +44,12 @@ export default {
         color: '#81C75F',
         buttonText: 'Confirm account',
         buttonLink: url,
+        remainingTime: await jwt.getExpireTimeLeft(token),
       })
     )
   },
 
-  sendResetToken(to: string, token: string) {
+  async sendResetToken(to: string, token: string) {
     const url = `${env.NEXT_PUBLIC_URL}/reset-password?token=${token}`
     console.log(to, url, token)
 
@@ -63,11 +65,12 @@ export default {
         color: '#FFA73B',
         buttonText: 'Reset password',
         buttonLink: url,
+        remainingTime: await jwt.getExpireTimeLeft(token),
       })
     )
   },
 
-  sendChangeEmailToken(to: string, token: string) {
+  async sendChangeEmailToken(to: string, token: string) {
     const url = `${env.NEXT_PUBLIC_URL}/change-email/complete?token=${token}`
     console.log(to, url, token)
 
@@ -83,11 +86,12 @@ export default {
         color: '#F56565',
         buttonText: 'Change email',
         buttonLink: url,
+        remainingTime: await jwt.getExpireTimeLeft(token),
       })
     )
   },
 
-  sendPublicEmailToken(to: string, token: string) {
+  async sendPublicEmailToken(to: string, token: string) {
     const url = `${env.NEXT_PUBLIC_URL}/public-email/complete?token=${token}`
     console.log(to, url, token)
 
@@ -103,6 +107,7 @@ export default {
         color: '#F56565',
         buttonText: 'Change email',
         buttonLink: url,
+        remainingTime: await jwt.getExpireTimeLeft(token),
       })
     )
   },

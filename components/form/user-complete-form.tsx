@@ -17,6 +17,7 @@ import { emailRegex } from '@/util'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { getErrorMessage } from '../../util/error-message'
 
 interface UserCompleteFormProps extends React.HTMLAttributes<HTMLDivElement> {
   email: string
@@ -49,7 +50,7 @@ export function UserCompleteForm({
   async function onSubmit({ password }: FormValues) {
     const [_, error] = await signUpComplete({ password, token: auth })
 
-    if (error) return toast.error('Something went wrong!')
+    if (error) return toast.error(getErrorMessage(error))
     toast.success("Welcome you're in!")
 
     return router.replace(qp.get('callbackURL') ?? '/')

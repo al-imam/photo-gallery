@@ -17,6 +17,7 @@ import googleAuth from '@/util/google'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { getErrorMessage } from '../../util/error-message'
 
 interface UserSignupFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -34,8 +35,8 @@ export function UserSignupForm({ className, ...props }: UserSignupFormProps) {
 
   async function onSubmit({ email }: FormValues) {
     const [_, error] = await signUp({ email })
-    if (error) return toast.error('Something went wrong')
-    toast.success('Check your mail, you have 5 minuets', { duration: 10000 })
+    if (error) return toast.error(getErrorMessage(error))
+    toast.success('Check your mail for sign-up link', { duration: 10000 })
     return form.reset()
   }
 

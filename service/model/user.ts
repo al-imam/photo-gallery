@@ -168,7 +168,7 @@ export async function requestEmailChange(
   newEmail: string
 ) {
   const count = await db.user.count({ where: { email: newEmail } })
-  if (count) throw new ReqErr('Email already exists')
+  if (count) throw new ReqErr('Another account with this email exists')
 
   const token = await hash.jwt.sign('change-email', {
     userId: user.id,

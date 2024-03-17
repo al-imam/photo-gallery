@@ -17,6 +17,7 @@ import { emailRegex } from '@/util'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { getErrorMessage } from '../../util/error-message'
 
 interface ResetPasswordFormProps extends React.HTMLAttributes<HTMLDivElement> {
   email: string
@@ -49,7 +50,7 @@ export function ResetPasswordForm({
 
   async function onSubmit({ newPassword }: FormValues) {
     const [_, error] = await resetPassword({ newPassword, token: auth })
-    if (error) return toast.error('Something went wrong!')
+    if (error) return toast.error(getErrorMessage(error))
 
     toast.success('Password reset successful!')
     return router.replace(qp.get('callbackURL') ?? '/')

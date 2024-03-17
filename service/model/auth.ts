@@ -16,6 +16,7 @@ export async function checkAuth(
 
   const user = await userService.fetchById(payload)
   if (user.role === 'BANNED') throw new ReqErr('User has been banned')
+  if (user.role === 'DELETED') throw new ReqErr('User has been deleted')
   iatVerify(user.authModifiedAt)
 
   return user
@@ -23,8 +24,7 @@ export async function checkAuth(
 
 export async function signup(email: string) {
   const isAlreadyExist = await db.user.findUnique({ where: { email } })
-  if (isAlreadyExist) throw new ReqErr('Already exist')
-
+  if (isAlreadyExist) throw new ReqErr('Another account with this email exists')
   const token = await hash.jwt.sign('signup-email', email)
   await mail.sendSignupToken(email, token)
 }
