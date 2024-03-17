@@ -25,8 +25,6 @@ export async function checkAuth(
 export async function signup(email: string) {
   const isAlreadyExist = await db.user.findUnique({ where: { email } })
   if (isAlreadyExist) throw new ReqErr('Another account with this email exists')
-  console.log('Hello')
-
   const token = await hash.jwt.sign('signup-email', email)
   await mail.sendSignupToken(email, token)
 }

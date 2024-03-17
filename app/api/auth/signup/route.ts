@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { router } from '@/server/router'
 import service from '@/service'
+import env from '@/service/env'
 
 export type PostBody = { email: string }
 export type PostData = { message: string }
